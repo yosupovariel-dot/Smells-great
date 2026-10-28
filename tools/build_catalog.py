@@ -192,6 +192,8 @@ def main():
                     base = next((k for k in colors if k in c), None)
                     vals.append({'he': c, 'en': ' '.join(COLOR_EN.get(w, w) for w in re.findall(r'\w+', c)), 'imgs': color_imgs.get(base, [])[:1]})
                 options.append({'name': {'he': 'צבע', 'en': 'Color'}, 'values': vals})
+            if options and options[0]['values'][0]['imgs']:  # main image = first color's device shot
+                first = options[0]['values'][0]['imgs'][0]; gallery = [first] + [g for g in gallery if g != first]
             specs, body = specs_and_body(desc)
             p = num(price)
             products.append({'id': pid, 'cat': 'diffusers', 'sub': sub, 'name': {'he': name.strip(), 'en': en}, 'desc': {'he': body, 'en': ''}, 'specs': specs,

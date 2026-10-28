@@ -4,7 +4,7 @@
 import { SEED_PRODUCTS } from './data.js';
 import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js';
 
-const K = (k) => 'say2_' + k;
+const K = (k) => 'say3_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
 const write = (k, v) => { try { localStorage.setItem(K(k), JSON.stringify(v)); } catch {} };
 

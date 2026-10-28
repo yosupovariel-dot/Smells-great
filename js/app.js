@@ -106,6 +106,7 @@ function showSlide(i) {
   slideIdx = (i + ss.length) % ss.length;
   ss.forEach((s, k) => s.classList.toggle('on', k === slideIdx));
   $$('.dots button').forEach((b, k) => b.setAttribute('aria-current', k === slideIdx));
+  const n = $('#slide-n'); if (n) n.textContent = String(slideIdx + 1).padStart(2, '0');
 }
 function startSlides() {
   clearInterval(slideTimer); slideIdx = 0;
@@ -165,8 +166,20 @@ function route() {
   if (!v) v = html`<div class="wrap legal"><h1>404</h1><p>${t('notFound')}</p><a class="btn" href="#/">${t('backHome')}</a></div>`;
   render(app, html`${header()}<main id="main" tabindex="-1">${v}</main>${footer()}`);
   document.title = title;
-  applyA11y(); startTicker(); bars(); startSlides();
+  applyA11y(); startTicker(); bars(); startSlides(); observeReveal();
 }
+
+// Fade-in on scroll (skipped when reduced motion / a11y "stop animations" is on).
+let revealObs;
+function observeReveal() {
+  const els = $$('.reveal');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop');
+  if (still || !('IntersectionObserver' in window)) { els.forEach((e) => e.classList.add('in')); return; }
+  revealObs?.disconnect();
+  revealObs = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); revealObs.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+  els.forEach((e) => revealObs.observe(e));
+}
+addEventListener('scroll', () => document.body.classList.toggle('scrolled', scrollY > 40), { passive: true });
 function go() {
   const prevY = scrollY; route();
   if (!go.keep) { scrollTo(0, 0); $('#main')?.focus({ preventScroll: true }); } else scrollTo(0, prevY);
