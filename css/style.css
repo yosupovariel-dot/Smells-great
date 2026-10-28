@@ -771,3 +771,5 @@ html[lang="he"] .card-tag{font-family:var(--f-body);font-size:.75rem;font-weight
 @media (max-width:480px){.h-service .wrap{grid-template-columns:1fr}}
 @media (max-width:600px){.h-promo img{aspect-ratio:2000/968}.h-feature span{flex-direction:column;align-items:flex-start;gap:.2rem;padding:1rem}.h-feature b{font-size:1.35rem}}
 .h-collection{padding-top:clamp(4rem,9vw,7rem)}
+.ftr .brand{display:inline-flex;align-items:flex-start;margin-bottom:1rem}
+.ftr .brand b,.ftr .brand small{padding-inline-start:0}
