@@ -105,6 +105,9 @@ function showSlide(i) {
   ss.forEach((s, k) => s.classList.toggle('on', k === slideIdx));
   $$('.dots button').forEach((b, k) => b.setAttribute('aria-current', k === slideIdx));
   const n = $('#slide-n'); if (n) n.textContent = String(slideIdx + 1).padStart(2, '0');
+  $$('.h-progress i').forEach((b, k) => b.classList.toggle('on', k === slideIdx));
+  const cap = $('#slide-cap'); const sl = S.HERO_SLIDES?.[slideIdx];
+  if (cap && sl) { cap.textContent = sl[getLang()]; cap.href = '#/product/' + sl.pid; }
 }
 function startSlides() {
   clearInterval(slideTimer); slideIdx = 0;
@@ -177,6 +180,9 @@ function observeReveal() {
   revealObs = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); revealObs.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
   els.forEach((e) => revealObs.observe(e));
 }
+// Scent-library preview follows hover/focus.
+const famPreview = (e) => { const a = e.target.closest?.('[data-fam-img]'); const img = $('#fam-preview'); if (!a || !img) return; img.src = a.dataset.famImg; $$('[data-fam-img]').forEach((x) => x.classList.toggle('on', x === a)); };
+document.addEventListener('mouseover', famPreview); document.addEventListener('focusin', famPreview);
 addEventListener('scroll', () => document.body.classList.toggle('scrolled', scrollY > 40), { passive: true });
 function go() {
   const prevY = scrollY; route();

@@ -44,87 +44,80 @@ export function card(p) {
 }
 
 // ---------- Home ----------
-const HERO_SLIDES = [
-  { pid: 'bundle-say300-1l', he: 'SAY 300 + תמצית 1 ליטר', en: 'SAY 300 + 1L oil' },
-  { pid: 'bundle-say150-1l', he: 'SAY 150 + תמצית 1 ליטר', en: 'SAY 150 + 1L oil' },
-  { pid: 'say-150', he: 'SAY 150 — שחור ולבן', en: 'SAY 150 — black & white' },
-  { pid: 'bundle-car-kit', he: 'SAY Car + ערכת התנסות', en: 'SAY Car + discovery kit' },
+export const HERO_SLIDES = [
+  { pid: 'bundle-say300-1l', he: 'SAY 300 עם תמצית ליטר', en: 'SAY 300 with a litre of oil' },
+  { pid: 'bundle-say150-1l', he: 'SAY 150 עם תמצית ליטר', en: 'SAY 150 with a litre of oil' },
+  { pid: 'say-150', he: 'SAY 150, בשחור ובלבן', en: 'SAY 150, black and white' },
+  { pid: 'bundle-car-kit', he: 'SAY Car וערכת התנסות', en: 'SAY Car and discovery kit' },
 ];
-const secHead = (n, eyebrow, title, id, link) => html`<header class="sec-head lux">
-  <div><span class="sec-num latin" aria-hidden="true">${n}</span><p class="eyebrow">${eyebrow}</p><h2 id="${id}">${title}</h2></div>
-  ${link ? html`<a class="more" href="${link}">${t('viewAll')}<span aria-hidden="true">${he() ? '←' : '→'}</span></a>` : ''}</header>`;
+const FAMILY_EN = { 'בתי מלון ויוקרה': 'Hotels', 'חנויות ורשתות מובילות': 'Boutiques', 'השראת בשמים יוקרתיים': 'Fine fragrance', 'טבע וספא': 'Nature & spa', 'ניחוחות קלאסיים': 'Classics', 'ניקיון ורעננות': 'Fresh & clean', 'מאפים ומתוקים': 'Gourmand' };
+const arrow = () => (he() ? '←' : '→');
 
 export function home() {
   const all = active();
   const hero = (db.SITE.site?.hero || []).slice(0, 4);
   const promo = db.SITE.site?.hero?.[4];
-  const diff = all.filter((p) => p.cat === 'diffusers');
-  const kits = all.filter((p) => p.picks);
-  const hotels = all.filter((p) => p.sub === 'בתי מלון ויוקרה').slice(0, 3);
-  const oilsCount = all.filter((p) => p.cat === 'oils' && !p.picks).length;
-  const words = ['King David', 'Royal Beach', 'Hilton', 'White Tea', 'Royal Amber', 'Pure Vanilla', 'Sea Breeze', 'Grand Heritage'];
+  const banners = db.SITE.site?.subBanners || {};
+  const diff = all.filter((p) => p.cat === 'diffusers' && !p.quote);
+  const kit = all.find((p) => p.picks === 14);
+  const families = Object.keys(banners).map((f) => ({ f, img: banners[f], n: all.filter((p) => p.sub === f).length })).filter((x) => x.n);
   return html`
-  <section class="hero lux" aria-labelledby="hero-t">
-    <div class="hero-copy">
-      <p class="hero-side latin" aria-hidden="true">SAY BOUTIQUE · EST. 2024</p>
-      <p class="eyebrow latin">${t('heroEyebrow')}</p>
-      <h1 id="hero-t"><span class="reveal-line">${t('heroTitle1')}</span><em class="reveal-line">${t('heroTitle2')}</em></h1>
-      <p class="lead">${t('heroText')}</p>
-      <div class="hero-cta"><a class="btn" href="#/shop/diffusers">${T('למפיצי הריח', 'Shop diffusers')}</a><a class="btn link" href="#/shop/oils">${t('discover')}<span aria-hidden="true">${he() ? '←' : '→'}</span></a></div>
-      ${hero.length ? html`<div class="hero-ctrl"><span class="latin count" aria-hidden="true"><b id="slide-n">01</b> / ${String(hero.length).padStart(2, '0')}</span>
-        <div class="dots">${hero.map((_, i) => html`<button data-action="slide" data-i="${i}" aria-label="${T('שקופית', 'Slide')} ${i + 1}" aria-current="${i === 0}"></button>`)}</div></div>` : ''}
+  <section class="h-hero" aria-labelledby="hero-t">
+    <div class="h-slides" role="region" aria-roledescription="carousel" aria-label="${T('מוצרים נבחרים', 'Featured')}">
+      ${hero.map((src, i) => html`<figure class="slide ${i ? '' : 'on'}"><img src="${src}" alt="${HERO_SLIDES[i]?.[getLang()] || 'SAY Boutique'}" width="2000" height="968" ${raw(i ? 'loading="lazy"' : 'fetchpriority="high"')} decoding="async"></figure>`)}
     </div>
-    <div class="hero-art">
-      ${hero.length ? html`<div class="slides" role="region" aria-roledescription="carousel" aria-label="${T('מוצרים נבחרים', 'Featured')}">
-        ${hero.map((src, i) => { const s = HERO_SLIDES[i] || {}; return html`<figure class="slide ${i ? '' : 'on'}"><img src="${src}" alt="${s[getLang()] || 'SAY Boutique'}" width="2000" height="968" ${raw(i ? 'loading="lazy"' : 'fetchpriority="high"')} decoding="async">
-          ${s.pid ? html`<figcaption><a href="#/product/${s.pid}"><small class="latin">${T('בפוקוס', 'In focus')}</small>${s[getLang()]}</a></figcaption>` : ''}</figure>`; })}
-      </div>` : ''}
-      <span class="frame" aria-hidden="true"></span>
+    <div class="h-hero-card">
+      <p class="kicker latin">Luxury Home Fragrances</p>
+      <h1 id="hero-t">${t('heroTitle1')} <em>${t('heroTitle2')}</em></h1>
+      <div class="h-hero-foot">
+        <a class="btn" href="#/shop/diffusers">${T('לקולקציה', 'Explore')}</a>
+        ${hero.length ? html`<a class="h-caption" id="slide-cap" href="#/product/${HERO_SLIDES[0].pid}">${HERO_SLIDES[0][getLang()]}</a>` : ''}
+      </div>
+      ${hero.length ? html`<div class="h-progress" aria-hidden="true">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>
+      <div class="sr-only">${hero.map((_, i) => html`<button data-action="slide" data-i="${i}" aria-label="${T('שקופית', 'Slide')} ${i + 1}" aria-current="${i === 0}"></button>`)}</div>` : ''}
     </div>
   </section>
-  <div class="marquee" aria-hidden="true"><div>${[...words, ...words].map((w) => html`<span>${w}</span><span class="dot" aria-hidden="true"></span>`)}</div></div>
 
-  <section class="block" aria-labelledby="cats-t"><div class="wrap">
-    ${secHead('01', 'SAY Boutique', t('categories'), 'cats-t')}
-    <nav class="cat-tiles reveal" aria-label="${t('categories')}">${CATEGORIES.map((c) => html`<a class="tile ${c.img ? '' : 'soon'}" href="#/shop/${c.id}">
-      ${c.img ? html`<img src="${small(c.img)}" srcset="${small(c.img)} 640w, ${c.img} 1400w" sizes="(max-width:860px) 50vw, 40vw" alt="" loading="lazy" width="800" height="600">` : html`<img class="tile-mark" src="assets/img/mark.webp" alt="" loading="lazy" width="180" height="156">`}
-      <span><b>${L(c)}</b><small>${c.img ? (he() ? c.descHe : c.descEn) : 'Coming soon'}</small></span></a>`)}</nav>
+  <section class="h-manifesto reveal" aria-label="${T('על SAY', 'About SAY')}"><div class="wrap">
+    <p>${T('אנחנו מאמינים שבית זוכרים קודם כול דרך האף. לכן אנחנו מייבאים בעצמנו את התמציות ואת המכשירים שבתי המלון הטובים בעולם משתמשים בהם — ומביאים אותם אליכם, במחיר של יבואן.', 'We believe a home is remembered through scent first. So we import the same oils and devices the world’s finest hotels use — and bring them to you at importer prices.')}</p>
+    <a class="u-link" href="#/about">${T('הסיפור שלנו', 'Our story')} <span aria-hidden="true">${arrow()}</span></a>
   </div></section>
 
-  <section class="block tight" aria-labelledby="best-t"><div class="wrap">
-    ${secHead('02', T('טכנולוגיית אידוי קר', 'Cold-air technology'), T('מפיצי הריח שלנו', 'Our diffusers'), 'best-t', '#/shop/diffusers')}
-    <div class="grid reveal">${diff.slice(0, 4).map(card)}</div>
+  <section class="h-collection" aria-labelledby="col-t"><div class="wrap">
+    <header class="h-head"><h2 id="col-t">${T('המכשירים', 'The devices')}</h2><a class="u-link" href="#/shop/diffusers">${T('כל המפיצים', 'All diffusers')} <span aria-hidden="true">${arrow()}</span></a></header>
+    <div class="h-col-grid">
+      ${hero[0] ? html`<a class="h-feature reveal" href="#/product/say-300"><img src="${hero[0]}" alt="SAY 300" loading="lazy" width="2000" height="968">
+        <span><b>SAY 300</b><small>${T('לחללים של עד 300 מ"ר · Wi-Fi ובלוטות׳', 'Up to 300 m² · Wi-Fi & Bluetooth')}</small></span></a>` : ''}
+      <div class="h-col-list reveal">${diff.filter((p) => p.id !== 'say-300').slice(0, 4).map((p) => html`<a class="h-item" href="#/product/${p.id}">
+        <span class="h-item-img">${media(p)}</span><span class="h-item-t"><b>${L(p.name)}</b><small>${subName(p.sub)}</small></span><span class="h-item-p">${m(minPrice(p))}</span></a>`)}</div>
+    </div>
   </div></section>
 
-  <section class="signature" aria-labelledby="sig-t"><div class="wrap">
-    <p class="eyebrow latin">The SAY Signature</p>
-    <h2 id="sig-t" class="quote reveal">${T('“ריח הוא הדבר הראשון שאורחים זוכרים — והאחרון שהם שוכחים.”', '“Scent is the first thing guests remember — and the last they forget.”')}</h2>
-    <dl class="stats reveal">
-      <div><dt>${T('ניחוחות', 'Scents')}</dt><dd class="latin">${oilsCount}</dd></div>
-      <div><dt>${T('מ"ר כיסוי מקסימלי', 'm² max coverage')}</dt><dd class="latin">300</dd></div>
-      <div><dt>${T('שנת אחריות', 'Year warranty')}</dt><dd class="latin">1</dd></div>
-      <div><dt>${T('משלוח חינם מעל', 'Free shipping over')}</dt><dd class="latin">₪299</dd></div>
-    </dl>
-  </div></section>
-
-  ${kits.length ? html`<section class="block" aria-labelledby="kit-t"><div class="wrap story">
-    <div class="story-art photo reveal">${media(kits[0], '', false, kits[0].img, true)}<span class="frame" aria-hidden="true"></span></div>
-    <div class="reveal"><span class="sec-num latin" aria-hidden="true">03</span><p class="eyebrow">${T('מומלץ ללקוחות חדשים', 'Recommended for newcomers')}</p><h2 id="kit-t">${T('לא בטוחים איזה ריח?', 'Not sure which scent?')}<br><em>${T('תתנסו בכולם.', 'Try them all.')}</em></h2>
-      <p>${T('ערכות ההתנסות שלנו — 14 תמציות של 10 מ"ל או 4 תמציות של 30 מ"ל — במארז יוקרתי, ב־99₪ בלבד. בוחרים את הניחוחות, מגלים את ניחוח החתימה של הבית.', 'Our discovery kits — 14 × 10 ml or 4 × 30 ml — in a luxury box for just ₪99. Choose your scents and find your home’s signature.')}</p>
-      <div class="hero-cta">${kits.map((k) => html`<a class="btn ${k.picks === 14 ? '' : 'ghost'}" href="#/product/${k.id}">${k.picks} ${T('תמציות', 'oils')} · ${m(k.sizes[0].price)}</a>`)}</div></div>
+  ${families.length ? html`<section class="h-library" aria-labelledby="lib-t"><div class="wrap">
+    <header class="h-head"><h2 id="lib-t">${T('ספריית הניחוחות', 'The scent library')}</h2><a class="u-link" href="#/shop/oils">${T('כל התמציות', 'All oils')} <span aria-hidden="true">${arrow()}</span></a></header>
+    <div class="h-lib">
+      <ol class="h-lib-list">${families.map((x, i) => html`<li><a href="#/shop/oils/${encodeURIComponent(x.f)}" data-fam-img="${x.img}" class="${i ? '' : 'on'}">
+        <span class="latin idx">${FAMILY_EN[x.f] || ''}</span><b>${subName(x.f)}</b><small>${x.n} ${T('ניחוחות', 'scents')}</small></a></li>`)}</ol>
+      <figure class="h-lib-view" aria-hidden="true"><img id="fam-preview" src="${families[0].img}" alt="" loading="lazy" width="1600" height="700"></figure>
+    </div>
   </div></section>` : ''}
 
-  ${promo ? html`<div class="wrap"><a class="promo reveal" href="#/shop/bundles"><img src="${promo}" alt="${T('חבילת ה-Luxury שלנו — מארז היכרות יוקרתי', 'Our Luxury bundle')}" loading="lazy" width="2000" height="968"><span class="btn gold">${T('למארזים המשתלמים', 'Shop bundles')}</span></a></div>` : ''}
+  ${kit ? html`<section class="h-kit" aria-labelledby="kit-t"><div class="wrap h-kit-in">
+    <div class="h-kit-img reveal">${media(kit, '', false, kit.img, true)}</div>
+    <div class="h-kit-copy reveal"><p class="kicker latin">Discovery</p><h2 id="kit-t">${T('ארבעה־עשר ניחוחות.', 'Fourteen scents.')}<br>${T('קופסה אחת.', 'One box.')}</h2>
+      <p>${T('הדרך הנכונה להתחיל. בוחרים 14 תמציות של 10 מ"ל, מנסים במפיץ, ומגלים איזה ריח מרגיש כמו בית.', 'The right way to begin. Choose fourteen 10 ml oils, try them in your diffuser, and find the one that feels like home.')}</p>
+      <p class="h-kit-price">${m(kit.sizes[0].price)}</p>
+      <a class="btn" href="#/product/${kit.id}">${T('לבחירת הניחוחות', 'Choose your scents')}</a></div>
+  </div></section>` : ''}
 
-  <section class="block" aria-labelledby="new-t"><div class="wrap">
-    ${secHead('04', T('תמציות שמן', 'Fragrance oils'), T('הניחוח של בתי המלון', 'The scent of hotels'), 'new-t', '#/shop/oils/' + encodeURIComponent('בתי מלון ויוקרה'))}
-    <div class="grid wide-grid three reveal">${hotels.map(card)}</div>
+  ${promo ? html`<a class="h-promo reveal" href="#/shop/bundles"><img src="${promo}" alt="${T('חבילת ה-Luxury שלנו', 'Our Luxury bundle')}" loading="lazy" width="2000" height="968"></a>` : ''}
+
+  <section class="h-service" aria-label="${T('שירות', 'Service')}"><div class="wrap">
+    <div><b>${T('משלוח חינם', 'Free delivery')}</b><p>${T('בכל הזמנה מעל 299₪, עד הבית בתוך 3–5 ימי עסקים.', 'On orders over ₪299, at your door in 3–5 business days.')}</p></div>
+    <div><b>${T('שנת אחריות', 'One-year warranty')}</b><p>${T('אחריות יבואן מלאה על כל מכשירי הבישום.', 'Full importer warranty on every device.')}</p></div>
+    <div><b>${T('ליווי אישי', 'Personal advice')}</b><p>${T('לא בטוחים מה מתאים לחלל שלכם? כתבו לנו ונמליץ.', 'Not sure what suits your space? Message us.')} <a href="${waLink(T('שלום, אשמח להמלצה', 'Hello, I would like a recommendation'))}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
+    <div><b>${T('לעסקים', 'For business')}</b><p>${T('מחירון סיטונאי למלונות, משרדים וחנויות.', 'Wholesale pricing for hotels, offices and shops.')} <a href="#/wholesale">${T('לפרטים', 'Details')}</a></p></div>
   </div></section>
-
-  <div class="wrap"><section class="story block" aria-labelledby="story-t">
-    <div class="story-art reveal" aria-hidden="true"><img src="assets/img/logo.webp" alt="" width="290" height="450" loading="lazy"></div>
-    <div class="reveal"><span class="sec-num latin" aria-hidden="true">05</span><p class="eyebrow">${t('storyEyebrow')}</p><h2 id="story-t">${t('storyTitle')}</h2><p>${t('storyText')}</p><a class="btn link" href="#/about">${t('about')}<span aria-hidden="true">${he() ? '←' : '→'}</span></a></div>
-  </section></div>
   ${clubBlock()}`;
 }
 
