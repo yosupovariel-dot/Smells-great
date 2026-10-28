@@ -78,11 +78,6 @@ export function home() {
     </div>
   </section>
 
-  <section class="h-manifesto reveal" aria-label="${T('על SAY', 'About SAY')}"><div class="wrap">
-    <p>${T('אנחנו מאמינים שבית זוכרים קודם כול דרך האף. לכן אנחנו מייבאים בעצמנו את התמציות ואת המכשירים שבתי המלון הטובים בעולם משתמשים בהם — ומביאים אותם אליכם, במחיר של יבואן.', 'We believe a home is remembered through scent first. So we import the same oils and devices the world’s finest hotels use — and bring them to you at importer prices.')}</p>
-    <a class="u-link" href="#/about">${T('הסיפור שלנו', 'Our story')} <span aria-hidden="true">${arrow()}</span></a>
-  </div></section>
-
   <section class="h-collection" aria-labelledby="col-t"><div class="wrap">
     <header class="h-head"><h2 id="col-t">${T('המכשירים', 'The devices')}</h2><a class="u-link" href="#/shop/diffusers">${T('כל המפיצים', 'All diffusers')} <span aria-hidden="true">${arrow()}</span></a></header>
     <div class="h-col-grid">
