@@ -89,6 +89,13 @@ export function home() {
     </div>
   </section>
 
+  <section class="h-finder" aria-labelledby="fd-t"><div class="wrap h-finder-in">
+    <div><p class="kicker latin">Scent finder</p><h2 id="fd-t">${T('54 ניחוחות. אחד מהם שלכם.', '54 scents. One of them is yours.')}</h2>
+      <p>${T('שלוש שאלות קצרות, ונמליץ לכם על המכשיר והניחוחות שמתאימים בדיוק לחלל ולאווירה שאתם מחפשים.', 'Three short questions and we will recommend the device and scents that fit your space and mood.')}</p>
+      <a class="btn" href="#/finder">${T('למציאת הריח שלי', 'Find my scent')}<span aria-hidden="true"> ${arrow()}</span></a><small class="fd-time">${T('לוקח פחות מדקה', 'Takes under a minute')}</small></div>
+    <ol class="h-steps"><li><b>01</b><span>${T('בוחרים חלל', 'Pick a space')}</span></li><li><b>02</b><span>${T('בוחרים תחושה', 'Pick a feeling')}</span></li><li><b>03</b><span>${T('מקבלים התאמה', 'Get your match')}</span></li></ol>
+  </div></section>
+
   <section class="h-collection" aria-labelledby="col-t"><div class="wrap">
     <header class="h-head"><h2 id="col-t">${T('המכשירים', 'The devices')}</h2><a class="u-link" href="#/shop/diffusers">${T('כל המפיצים', 'All diffusers')} <span aria-hidden="true">${arrow()}</span></a></header>
     <div class="h-col-grid">
@@ -107,6 +114,15 @@ export function home() {
       <figure class="h-lib-view" aria-hidden="true"><img id="fam-preview" src="${families[0].img}" alt="" loading="lazy" width="1600" height="700"></figure>
     </div>
   </div></section>` : ''}
+
+  <section class="h-how" aria-labelledby="how-t"><div class="wrap">
+    <header class="h-head"><h2 id="how-t">${T('איך זה עובד', 'How it works')}</h2></header>
+    <ol class="how">
+      <li><span class="latin">I</span><b>${T('בוחרים מכשיר', 'Choose a device')}</b><p>${T('לפי גודל החלל — מרכב ועד לובי של 300 מ"ר. בלי מים, בלי חום, שקט לגמרי.', 'By the size of your space — from a car to a 300 m² lobby. No water, no heat, silent.')}</p></li>
+      <li><span class="latin">II</span><b>${T('בוחרים ניחוח', 'Choose a scent')}</b><p>${T('54 תמציות בהשראת מלונות, בשמים וטבע. לא בטוחים? ערכת התנסות עושה את העבודה.', '54 oils inspired by hotels, perfumes and nature. Unsure? A discovery kit does the work.')}</p></li>
+      <li><span class="latin">III</span><b>${T('מתזמנים ונהנים', 'Schedule & enjoy')}</b><p>${T('מגדירים שעות באפליקציה, והבית מריח כמו מלון בוטיק — כל יום, אוטומטית.', 'Set the hours in the app and your home smells like a boutique hotel — every day.')}</p></li>
+    </ol>
+  </div></section>
 
   ${kit ? html`<section class="h-kit" aria-labelledby="kit-t"><div class="wrap h-kit-in">
     <div class="h-kit-img reveal">${media(kit, '', false, kit.img, true)}</div>
@@ -195,6 +211,15 @@ function richText(text) {
   flush(); return out;
 }
 
+// Price per ml and saving vs the smallest size — an honest comparison, computed from the real prices.
+const ml = (label) => { const n = parseFloat(String(label).replace(/[^\d.]/g, '')); if (!n) return 0; return /ליטר|l\b/i.test(label) ? n * 1000 : n; };
+function perUnit(p, s, priceOf) {
+  const base = p.sizes.find((x) => ml(x.label)); const v = ml(s.label);
+  if (!base || !v || s === base) return { save: 0 };
+  const save = Math.round((1 - priceOf(s) / v / (priceOf(base) / ml(base.label))) * 100);
+  return { save: save >= 5 ? save : 0 };
+}
+
 export function productPage(id) {
   const p = db.product(id);
   if (!p || p.active === false) return null;
@@ -218,7 +243,7 @@ export function productPage(id) {
         <div class="buy-row"><a class="btn gold" href="${waLink(T('שלום, אשמח להצעת מחיר עבור ', 'Hello, I would like a quote for ') + L(p.name))}" target="_blank" rel="noopener noreferrer">${T('לקבלת הצעת מחיר בוואטסאפ', 'Get a quote on WhatsApp')}</a><a class="btn ghost" href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a></div>` : html`
       <form data-form="add" data-id="${p.id}" novalidate>
         ${p.sizes.length > 1 ? html`<fieldset class="sizes"><legend>${p.cat === 'oils' ? T('נפח', 'Volume') : t('size')}</legend>
-          ${p.sizes.map((s, i) => html`<label class="size-opt"><input type="radio" name="size" value="${s.label}" ${raw(i ? '' : 'checked')} data-input="size" data-price="${priceOf(s)}"><span>${s.label}</span></label>`)}
+          ${p.sizes.map((s, i) => { const v = perUnit(p, s, priceOf); return html`<label class="size-opt"><input type="radio" name="size" value="${s.label}" ${raw(i ? '' : 'checked')} data-input="size" data-price="${priceOf(s)}"><span>${s.label}${v.save ? html`<em>−${v.save}%</em>` : ''}</span></label>`; })}
         </fieldset>` : html`<input type="hidden" name="size" value="${p.sizes[0].label}">`}
         ${opt ? html`<fieldset class="sizes"><legend>${L(opt.name)}</legend>
           ${opt.values.map((v, i) => html`<label class="size-opt"><input type="radio" name="opt" value="${v.he}" ${raw(i ? '' : 'checked')} data-input="opt" data-img="${v.imgs?.[0] || ''}"><span>${L(v)}</span></label>`)}
@@ -233,6 +258,8 @@ export function productPage(id) {
         </div>
         <p class="err" id="add-err" role="alert"></p>
       </form>`}
+      ${p.cat === 'oils' && p.sizes.length > 2 ? html`<p class="unit-note">${T('ככל שהבקבוק גדול יותר — המחיר למ"ל נמוך יותר. האחוז מציין את החיסכון לעומת 10 מ"ל.', 'Bigger bottles cost less per ml — the % shows the saving vs 10 ml.')}</p>` : ''}
+      <ul class="trust" aria-label="${T('ההבטחה שלנו', 'Our promise')}"><li><b>${T('14 יום', '14 days')}</b><span>${T('להחזרה', 'to return')}</span></li><li><b>${p.cat === 'diffusers' ? T('שנה', '1 year') : T('3–5 ימים', '3–5 days')}</b><span>${p.cat === 'diffusers' ? T('אחריות יבואן', 'warranty') : T('עד הבית', 'delivery')}</span></li><li><b>SSL</b><span>${T('תשלום מאובטח', 'secure payment')}</span></li></ul>
       <ul class="perks"><li>${t('perk1')}</li><li>${t('perk2')}</li>${p.cat === 'diffusers' ? html`<li>${T('שנת אחריות יבואן', '1-year importer warranty')}</li><li><a href="#/guide">${T('מדריך שימוש ותחזוקה', 'Use & care guide')}</a></li>` : html`<li>${t('perk3')}</li>`}</ul>
     </div>
   </div>
@@ -280,6 +307,53 @@ export function kitUpsell() {
     <div class="up-grid">${kits.map((k) => html`<a class="up" href="#/product/${k.id}" data-action="modal-close">${media(k)}<b>${L(k.name)}</b><span>${m(k.sizes[0].price)}</span></a>`)}</div>
     <div class="bo-filters"><button class="btn ghost" data-action="modal-close">${T('המשך קנייה', 'Continue shopping')}</button><button class="btn" data-action="go-cart">${T('לסל הקניות', 'View cart')}</button></div>
   </div></div>`;
+}
+
+// ---------- Scent finder (3 questions → personal recommendation) ----------
+const FINDER = {
+  space: [
+    ['room', 'חדר שינה או קליניקה', 'Bedroom or clinic', 'say-room-office', 'עד 20 מ"ר', 'Up to 20 m²'],
+    ['home', 'סלון ובית', 'Living room & home', 'say-150', 'עד 150 מ"ר', 'Up to 150 m²'],
+    ['office', 'משרד או חנות', 'Office or shop', 'say-100', 'עד 100 מ"ר', 'Up to 100 m²'],
+    ['big', 'לובי, אולם או עסק גדול', 'Lobby or large venue', 'say-300', 'עד 300 מ"ר', 'Up to 300 m²'],
+    ['car', 'רכב', 'Car', 'say-car', 'נייד ונטען', 'Portable'],
+  ],
+  mood: [
+    ['בתי מלון ויוקרה', 'כמו לובי של מלון יוקרה', 'Like a luxury hotel lobby'],
+    ['השראת בשמים יוקרתיים', 'בושם אייקוני שאני אוהב', 'An iconic perfume I love'],
+    ['טבע וספא', 'רוגע, טבע וספא', 'Calm, nature & spa'],
+    ['ניקיון ורעננות', 'נקי, רענן ואוורירי', 'Clean, fresh & airy'],
+    ['מאפים ומתוקים', 'חם, מתוק ועוטף', 'Warm, sweet & cosy'],
+    ['ניחוחות קלאסיים', 'קלאסי ועל־זמני', 'Classic & timeless'],
+  ],
+  power: [['soft', 'עדין — שירגישו כשנכנסים', 'Subtle — noticed on entry'], ['mid', 'מאוזן — נוכח כל הזמן', 'Balanced — always present'], ['strong', 'עוצמתי — ריח חתימה', 'Strong — a signature scent']],
+};
+export function finder(f = {}) {
+  const step = !f.space ? 1 : !f.mood ? 2 : !f.power ? 3 : 4;
+  const banners = db.SITE.site?.subBanners || {};
+  const back = step > 1 && step < 4 ? html`<button class="u-link fd-back" data-action="fq-back">${T('חזרה', 'Back')}</button>` : '';
+  const head = (q, sub) => html`<header class="fd-head"><p class="kicker latin">Scent finder · ${step}/3</p><div class="fd-bar" aria-hidden="true"><i class="s${step}"></i></div><h1>${q}</h1><p class="lead">${sub}</p></header>`;
+  let body;
+  if (step === 1) body = html`${head(T('איפה הריח יחיה?', 'Where will the scent live?'), T('נתאים מכשיר לגודל החלל.', 'We will match a device to your space.'))}
+    <div class="fd-opts five">${FINDER.space.map(([k, he_, en, pid, sHe, sEn]) => { const p = db.product(pid); return html`<button class="fd-opt studio" data-action="fq" data-k="space" data-v="${k}">${p ? media(p, '', false, p.pack || p.img) : ''}<b>${T(he_, en)}</b><small>${T(sHe, sEn)}</small></button>`; })}</div>`;
+  else if (step === 2) body = html`${head(T('איזו תחושה אתם מחפשים?', 'What feeling are you after?'), T('בחרו את מה שהכי מדבר אליכם — אין תשובה לא נכונה.', 'Pick what speaks to you — there is no wrong answer.'))}
+    <div class="fd-opts">${FINDER.mood.map(([k, he_, en]) => html`<button class="fd-opt photo" data-action="fq" data-k="mood" data-v="${k}">${banners[k] ? html`<img src="${small(banners[k])}" alt="" loading="lazy" width="640" height="300">` : ''}<b>${T(he_, en)}</b><small>${subName(k)}</small></button>`)}</div>`;
+  else if (step === 3) body = html`${head(T('כמה נוכח שיהיה הריח?', 'How present should it be?'), T('את העוצמה אפשר תמיד לכוונן במכשיר.', 'You can always fine-tune the intensity.'))}
+    <div class="fd-opts three">${FINDER.power.map(([k, he_, en], i) => html`<button class="fd-opt text" data-action="fq" data-k="power" data-v="${k}"><span class="fd-dots" aria-hidden="true">${[0, 1, 2].map((d) => html`<i class="${d <= i ? 'on' : ''}"></i>`)}</span><b>${T(he_, en)}</b></button>`)}</div>`;
+  else {
+    const sp = FINDER.space.find((x) => x[0] === f.space); const dev = db.product(sp[3]);
+    const scents = active().filter((p) => p.sub === f.mood).slice(0, 3);
+    const kit = db.product('kit-14');
+    const tip = { soft: T('הפעלה של 10–15 שניות כל כמה דקות מספיקה לנוכחות עדינה.', 'Short bursts every few minutes give a subtle presence.'), mid: T('תזמנו עבודה בשעות שאתם בבית — ככה הריח נשאר רציף בלי בזבוז.', 'Schedule it for the hours you are home.'), strong: T('לריח חתימה, מקמו את המכשיר בגובה 1.2–1.5 מטר, הרחק מחלונות פתוחים.', 'For a signature scent, place it 1.2–1.5 m high, away from open windows.') }[f.power];
+    body = html`<header class="fd-head"><p class="kicker latin">Your SAY ritual</p><h1>${T('ההתאמה שלכם', 'Your match')}</h1><p class="lead">${T('על סמך התשובות שלכם — זה השילוב שהיינו ממליצים עליו לחבר קרוב.', 'Based on your answers — the pairing we would recommend to a close friend.')}</p></header>
+      <div class="fd-result">
+        ${dev ? html`<a class="fd-dev studio" href="#/product/${dev.id}"><span class="fd-dev-img">${media(dev, '', false, dev.pack || dev.img)}</span><span><small>${T('המכשיר שלכם', 'Your device')}</small><b>${L(dev.name)}</b><em>${sp[T(4, 5)]}</em>${priceTag(dev)}</span></a>` : ''}
+        <div class="fd-scents"><small>${T('הניחוחות שלכם', 'Your scents')} · ${subName(f.mood)}</small><div class="grid three">${scents.map(card)}</div></div>
+      </div>
+      <p class="fd-tip"><b>${T('טיפ:', 'Tip:')}</b> ${tip}</p>
+      <div class="hero-cta">${kit ? html`<a class="btn" href="#/product/${kit.id}">${T('לא בטוחים? התחילו מערכת התנסות', 'Not sure? Start with a discovery kit')} · ${m(kit.sizes[0].price)}</a>` : ''}<button class="btn link" data-action="fq-reset">${T('להתחיל מחדש', 'Start over')}</button></div>`;
+  }
+  return html`<section class="finder wrap" aria-live="polite">${back}${body}</section><div class="block"></div>`;
 }
 
 export function guide() {

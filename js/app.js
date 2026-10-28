@@ -7,7 +7,7 @@ import * as Lg from './views-legal.js';
 import * as A from './views-admin.js';
 
 const app = $('#app');
-const state = { q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
+const state = { finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
 const ICONS = {
   search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
   user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>',
@@ -29,7 +29,7 @@ function header() {
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
       <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-      ${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/about', t('about'))}${navLink('#/wholesale', t('wholesale'))}${navLink('#/contact', t('contact'))}
+      ${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/contact', t('contact'))}
     </nav>
     <a class="brand" href="#/" aria-label="SAY Boutique — ${t('home')}"><b>SAY</b><small>BOUTIQUE</small></a>
     <div class="tools">
@@ -157,6 +157,7 @@ function route() {
     case 'about': v = S.about(); break;
     case 'wholesale': v = S.wholesalePage(); break;
     case 'guide': v = S.guide(); break;
+    case 'finder': v = S.finder(state.finder); title = (getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder') + ' | SAY Boutique'; break;
     case 'terms': v = Lg.terms(); break;
     case 'returns': v = Lg.returns(); break;
     case 'privacy': v = Lg.privacy(); break;
@@ -261,6 +262,9 @@ document.addEventListener('click', async (e) => {
     case 'menu-close': $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); $('[data-action="menu"]').focus(); break;
     case 'cart-open': openCart(); break;
     case 'search-open': openSearch(); break;
+    case 'fq': state.finder = { ...state.finder, [el.dataset.k]: el.dataset.v }; go(); break;
+    case 'fq-back': { const f = state.finder; if (f.mood) delete f.mood; else delete f.space; go(); break; }
+    case 'fq-reset': state.finder = {}; go(); break;
     case 'metric': state.metric = el.dataset.k; rerender(); break;
     case 'range': state.range = +el.dataset.n; rerender(); break;
     case 'pcat': state.pcat = el.dataset.c; rerender(); break;
