@@ -823,3 +823,22 @@ body.no-scroll{overflow:hidden}
 .so-t b{font-family:var(--f-display);font-weight:400;font-size:1.1rem}
 .so-empty{font-size:1.1rem;color:var(--ink-2)}
 @media (max-width:800px){.so-grid{grid-template-columns:1fr 1fr}.so-cats{grid-template-columns:1fr}.so-form{min-height:80px}}
+/* Motion */
+#main{animation:pageIn .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px)}}
+.grid .card{animation:cardIn .8s cubic-bezier(.2,.7,.2,1) both}
+.grid .card:nth-child(2){animation-delay:.06s}.grid .card:nth-child(3){animation-delay:.12s}.grid .card:nth-child(4){animation-delay:.18s}
+.grid .card:nth-child(5){animation-delay:.24s}.grid .card:nth-child(6){animation-delay:.3s}.grid .card:nth-child(7){animation-delay:.36s}.grid .card:nth-child(n+8){animation-delay:.42s}
+@keyframes cardIn{from{opacity:0;transform:translateY(22px)}}
+.hdr{transition:transform .45s cubic-bezier(.2,.7,.2,1),background .3s,box-shadow .3s}
+body.hdr-hide .hdr{transform:translateY(-100%)}
+.buy-bar{position:fixed;bottom:0;inset-inline:0;z-index:65;background:rgba(244,238,228,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);transform:translateY(110%);transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+.buy-bar.on{transform:none}
+.buy-bar .wrap{display:flex;align-items:center;gap:1.2rem;min-height:72px;padding-inline-end:90px}
+.bb-name{font-family:var(--f-display);font-size:1.15rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bb-price{font-weight:600}
+.buy-bar .btn{min-height:46px}
+@media (max-width:600px){.buy-bar .wrap{padding-inline:12px 80px;gap:.7rem}.bb-name{font-size:.95rem}}
+html.a11y-stop #main,html.a11y-stop .grid .card{animation:none}
+.buy-bar .wrap{padding-inline:90px}
+.rich .rt-h{margin:2rem 0 .8rem;font-weight:400}

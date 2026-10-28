@@ -177,7 +177,8 @@ function richText(text) {
   const flush = () => { if (list.length) { out.push(html`<ul class="feat">${list}</ul>`); list = []; } };
   for (const line of String(text || '').split('\n').map((l) => l.trim()).filter(Boolean)) {
     const m2 = line.match(/^([^:]{2,40}):\s*(.+)$/);
-    if (/^\p{Extended_Pictographic}/u.test(line) && line.length < 90) { flush(); out.push(html`<h3 class="rt-h">${line}</h3>`); }
+    // A short line with no sentence-ending period is a heading (the sheet's emoji markers are stripped).
+    if ((/^\p{Extended_Pictographic}/u.test(line) || !/[.:]$/.test(line)) && line.length < 70 && !m2) { flush(); out.push(html`<h3 class="rt-h">${line}</h3>`); }
     else if (m2) list.push(html`<li><b>${m2[1]}:</b> ${m2[2]}</li>`);
     else { flush(); out.push(html`<p>${line}</p>`); }
   }

@@ -167,7 +167,7 @@ function route() {
   if (!v) v = html`<div class="wrap legal"><h1>404</h1><p>${t('notFound')}</p><a class="btn" href="#/">${t('backHome')}</a></div>`;
   render(app, html`${header()}<main id="main" tabindex="-1">${v}</main>${footer()}`);
   document.title = title;
-  applyA11y(); startTicker(); bars(); startSlides(); observeReveal();
+  applyA11y(); startTicker(); bars(); startSlides(); observeReveal(); observeBuy();
 }
 
 // Fade-in on scroll (skipped when reduced motion / a11y "stop animations" is on).
@@ -183,7 +183,27 @@ function observeReveal() {
 // Scent-library preview follows hover/focus.
 const famPreview = (e) => { const a = e.target.closest?.('[data-fam-img]'); const img = $('#fam-preview'); if (!a || !img) return; img.src = a.dataset.famImg; $$('[data-fam-img]').forEach((x) => x.classList.toggle('on', x === a)); };
 document.addEventListener('mouseover', famPreview); document.addEventListener('focusin', famPreview);
-addEventListener('scroll', () => document.body.classList.toggle('scrolled', scrollY > 40), { passive: true });
+// Header tucks away while scrolling down and returns on scroll up.
+let lastY = 0;
+addEventListener('scroll', () => {
+  const y = scrollY; const b = document.body;
+  b.classList.toggle('scrolled', y > 40);
+  b.classList.toggle('hdr-hide', y > 260 && y > lastY && !b.classList.contains('cart-open'));
+  lastY = y;
+}, { passive: true });
+
+// Product page: pinned buy bar once the main button scrolls out of view.
+let buyObs;
+function observeBuy() {
+  buyObs?.disconnect(); $('.buy-bar')?.remove();
+  const btn = $('form[data-form="add"] [type="submit"]'); const p = location.hash.startsWith('#/product/') && db.product(location.hash.split('/')[2]);
+  if (!btn || !p) return;
+  const bar = document.createElement('div'); bar.className = 'buy-bar'; bar.setAttribute('aria-hidden', 'true');
+  render(bar, html`<div class="wrap"><span class="bb-name">${p.name[getLang()]}</span><span class="bb-price" id="bb-price">${$('#pdp-price')?.textContent || ''}</span><button class="btn" data-action="buy-bar" tabindex="-1">${t('addToCart')}</button></div>`);
+  document.body.append(bar);
+  buyObs = new IntersectionObserver(([e]) => bar.classList.toggle('on', !e.isIntersecting && e.boundingClientRect.top < 0));
+  buyObs.observe(btn);
+}
 function go() {
   const prevY = scrollY; route();
   if (!go.keep) { scrollTo(0, 0); $('#main')?.focus({ preventScroll: true }); } else scrollTo(0, prevY);
@@ -237,6 +257,7 @@ document.addEventListener('click', async (e) => {
     case 'menu-close': $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); $('[data-action="menu"]').focus(); break;
     case 'cart-open': openCart(); break;
     case 'search-open': openSearch(); break;
+    case 'buy-bar': $('form[data-form="add"] [type="submit"]')?.click(); break;
     case 'search-close': closeSearch(); break;
     case 'search-term': { const i = $('#sq'); i.value = el.dataset.q; runSearch(el.dataset.q); i.focus(); break; }
     case 'cart-close': closeCart(); break;
