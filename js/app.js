@@ -7,7 +7,7 @@ import * as Lg from './views-legal.js';
 import * as A from './views-admin.js';
 
 const app = $('#app');
-const state = { q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'board', om: undefined, os: '', oq: '', ctab: 'todo', lastOrder: null };
+const state = { q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
 const ICONS = {
   search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
   user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>',
@@ -142,10 +142,10 @@ function route() {
   if (isBO) {
     if (!db.can(STAFF[a])) { state.authTab = 'login'; location.hash = '#/account'; return; }
     let v;
-    if (a === 'admin') v = b === 'products' ? A.productsAdmin(state.pcat, state.pq) : b === 'reports' ? A.reports(state.range) : b === 'users' ? A.usersAdmin(state.uq, state.ur) : A.dashboard();
+    if (a === 'admin') v = b === 'products' ? A.productsAdmin(state.pcat, state.pq) : b === 'reports' ? A.reports(state.range) : b === 'users' ? A.usersAdmin(state.uq, state.ur) : A.dashboard(state.metric);
     if (a === 'orders') v = A.ordersBoard({ view: state.ov, month: state.om, q: state.oq, status: state.os });
     if (a === 'courier') v = A.courierView(state.ctab);
-    render(app, v); document.title = 'SAY · Back Office'; return;
+    render(app, v); applyStyleAttrs(); document.title = 'SAY · Back Office'; return;
   }
   let v, title = 'SAY Boutique';
   switch (a || '') {
@@ -224,6 +224,12 @@ function closeCart() { document.body.classList.remove('cart-open'); releaseDrawe
 const refreshCart = () => { const d = $('#drawer'); if (d && document.body.classList.contains('cart-open')) { render(d, S.cartDrawer()); bars(); } const n = db.cart().reduce((a, l) => a + l.qty, 0); const btn = $('[data-action="cart-open"]'); if (btn) { btn.setAttribute('aria-label', `${t('cart')} (${n})`); $('.badge', btn)?.remove(); if (n) btn.insertAdjacentHTML('beforeend', `<span class="badge" aria-hidden="true">${n}</span>`); } };
 document.addEventListener('cart', refreshCart);
 
+// Bar widths / heat levels are passed as data attributes and applied through CSSOM (strict CSP: no inline style attributes).
+function applyStyleAttrs(root = document) {
+  $$('[style-w]', root).forEach((e) => (e.style.width = e.getAttribute('style-w') + '%'));
+  $$('[style-a]', root).forEach((e) => e.style.setProperty('--a', e.getAttribute('style-a')));
+}
+
 // ---------- Search overlay ----------
 let releaseSearch;
 function openSearch() {
@@ -257,6 +263,15 @@ document.addEventListener('click', async (e) => {
     case 'menu-close': $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); $('[data-action="menu"]').focus(); break;
     case 'cart-open': openCart(); break;
     case 'search-open': openSearch(); break;
+    case 'metric': state.metric = el.dataset.k; rerender(); break;
+    case 'range': state.range = +el.dataset.n; rerender(); break;
+    case 'pcat': state.pcat = el.dataset.c; rerender(); break;
+    case 'utab': state.ur = el.dataset.t; rerender(); break;
+    case 'os-tab': state.os = el.dataset.s; rerender(); break;
+    case 'user-find': state.uq = el.dataset.q; state.ur = ''; location.hash = '#/admin/users'; rerender(); break;
+    case 'approve-ws': db.updateUser(id, { role: 'wholesale', wsRequest: false }); toast(getLang() === 'he' ? 'החשבון אושר כסיטונאי' : 'Approved as wholesale'); rerender(); break;
+    case 'size-add': { const tpl = $('#srow-t'); $('#srows').append(tpl.content.cloneNode(true)); $('#srows .srow:last-child input').focus(); break; }
+    case 'size-rm': { const rows = $$('#srows .srow'); if (rows.length > 1) el.closest('.srow').remove(); break; }
     case 'buy-bar': $('form[data-form="add"] [type="submit"]')?.click(); break;
     case 'search-close': closeSearch(); break;
     case 'search-term': { const i = $('#sq'); i.value = el.dataset.q; runSearch(el.dataset.q); i.focus(); break; }
@@ -283,7 +298,7 @@ document.addEventListener('click', async (e) => {
     case 'block-user': { const u = db.users().find((x) => x.id === id); db.updateUser(id, { blocked: !u.blocked }); rerender(); break; }
     case 'del-user': if (confirm(getLang() === 'he' ? 'למחוק את המשתמש לצמיתות?' : 'Delete user permanently?')) { db.deleteUser(id); rerender(); } break;
     case 'order-view': modal(A.orderModal(id)); break;
-    case 'order-status': db.setOrderStatus(id, el.dataset.s, db.me()?.name); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); rerender(); break;
+    case 'order-status': db.setOrderStatus(id, el.dataset.s, db.me()?.name); toast(getLang() === 'he' ? 'הסטטוס עודכן' : 'Status updated'); { const keep = el.dataset.keep; closeModal(); rerender(); if (keep) modal(A.orderModal(id)); } break;
     case 'clear-demo': if (confirm(getLang() === 'he' ? 'למחוק את כל לקוחות והזמנות הדמו? (מומלץ לפני העלייה לאוויר)' : 'Delete all demo customers and orders?')) { db.clearDemoData(); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); rerender(); } break;
     case 'notes-read': db.markNotesRead(); rerender(); break;
     case 'ov': state.ov = el.dataset.v; rerender(); break;
@@ -306,6 +321,8 @@ document.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { const p = $('#a11y-panel'); if (p?.classList.contains('open')) $('.fab-a11y').click(); } });
 
 const searchDeb = debounce(() => rerender(), 250);
+const boSearchDeb = debounce((v) => { const r = $('#bo-results'); if (!r) return; const out = A.boSearch(v); render(r, out); r.hidden = !v || v.length < 2; }, 120);
+document.addEventListener('click', (e) => { const r = $('#bo-results'); if (r && !e.target.closest('.bo-search')) r.hidden = true; });
 document.addEventListener('input', (e) => {
   const el = e.target; const k = el.dataset.input; if (!k) return;
   const v = clean(el.value, 60);
@@ -314,6 +331,7 @@ document.addEventListener('input', (e) => {
   if (k === 'pq') { state.pq = v; searchDeb(); keepFocus('#pq'); }
   if (k === 'uq') { state.uq = v; searchDeb(); keepFocus('#uq'); }
   if (k === 'oq') { state.oq = v; searchDeb(); keepFocus('#oq'); }
+  if (k === 'bo-q') boSearchDeb(v);
 });
 function keepFocus(sel) { setTimeout(() => { const i = $(sel); if (i && document.activeElement !== i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 300); }
 document.addEventListener('change', (e) => {
@@ -330,6 +348,7 @@ document.addEventListener('change', (e) => {
     $('#pick-count').textContent = sur ? (getLang() === 'he' ? 'נבחר' : 'Set') : `${$$('[data-input="pick"]:checked').length}/${max}`;
   }
   if (k === 'ws-toggle') $('#biz-f').hidden = !el.checked;
+  if (k === 'p-active') { const p = db.product(el.dataset.id); db.saveProduct({ ...p, active: el.checked }); toast(el.checked ? (getLang() === 'he' ? 'המוצר מוצג באתר' : 'Product is live') : (getLang() === 'he' ? 'המוצר הוסתר' : 'Product hidden')); rerender(); }
   if (k === 'role') { db.updateUser(el.dataset.id, { role: el.value, wsRequest: el.value === 'wholesale' ? false : undefined }); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); }
   if (k === 'm-status') { db.setOrderStatus(el.dataset.id, el.value, db.me()?.name); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); closeModal(); rerender(); }
   if (k === 'm-courier') { db.assignCourier(el.dataset.id, el.value); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); }
@@ -375,17 +394,19 @@ document.addEventListener('submit', async (e) => {
     f.reset(); err.textContent = ''; toast(t('sent'));
   }
   if (kind === 'product') {
-    const d = Object.fromEntries(new FormData(f)); const err = $('#pf-err');
-    const sizes = String(d.sizes).split('\n').map((l) => l.split('|').map((x) => x.trim())).filter((x) => x[0])
-      .map(([label, price, wholesale, cost]) => ({ label: clean(label, 30), price: Math.max(0, +price || 0), wholesale: Math.max(0, +wholesale || 0), cost: Math.max(0, +cost || 0) }));
-    if (!clean(d.he) || !sizes.length || sizes.some((s) => !s.price)) { err.textContent = getLang() === 'he' ? 'יש למלא שם וגודל אחד לפחות עם מחיר' : 'Name and at least one priced size required'; return; }
-    const img = clean(d.img, 200);
-    if (img && !/^(assets\/products\/[\w\-./]+|https:\/\/[\w\-./%?=&]+)$/.test(img)) { err.textContent = 'Image path invalid'; return; }
+    const fd = new FormData(f); const d = Object.fromEntries(fd); const err = $('#pf-err');
+    const multi = (s) => String(s ?? '').replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, '').trim().slice(0, 4000); // keeps line breaks
+    const L_ = fd.getAll('s_label'), P_ = fd.getAll('s_price'), W_ = fd.getAll('s_ws'), C_ = fd.getAll('s_cost');
+    const sizes = L_.map((l, i) => ({ label: clean(l, 30), price: Math.max(0, +P_[i] || 0), wholesale: Math.max(0, +W_[i] || 0), cost: Math.max(0, +C_[i] || 0) })).filter((x) => x.label);
     const old = f.dataset.id ? db.product(f.dataset.id) : {};
+    const quote = !!old.quote;
+    if (!clean(d.he) || !sizes.length || (!quote && sizes.some((x) => !x.price))) { err.textContent = getLang() === 'he' ? 'יש למלא שם וגודל אחד לפחות עם מחיר' : 'Name and at least one priced size required'; return; }
+    const img = clean(d.imgpick || d.img, 200);
+    if (img && !/^(assets\/products\/[\w\-./]+|https:\/\/[\w\-./%?=&]+)$/.test(img)) { err.textContent = getLang() === 'he' ? 'נתיב התמונה אינו תקין' : 'Image path invalid'; return; }
     const id = f.dataset.id || (clean(d.en || d.he, 40).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'p') + '-' + Date.now().toString(36);
-    db.saveProduct({ ...old, id, cat: CATEGORIES.some((c) => c.id === d.cat) ? d.cat : 'oils', name: { he: clean(d.he, 120), en: clean(d.en, 120) }, desc: { he: clean(d.dhe, 800), en: clean(d.den, 800) },
-      notes: clean(d.notes, 200).split(',').map((x) => x.trim()).filter(Boolean).slice(0, 6), sizes, img, tag: d.tag === 'new' || d.tag === 'best' ? d.tag : '', active: !!d.active, stock: Math.max(0, parseInt(d.stock) || 0) });
-    closeModal(); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); rerender();
+    db.saveProduct({ ...old, id, cat: CATEGORIES.some((c) => c.id === d.cat) ? d.cat : 'oils', name: { he: clean(d.he, 120), en: clean(d.en, 120) }, desc: { he: multi(d.dhe), en: multi(d.den) },
+      sizes, img, gallery: old.gallery || (img ? [img] : []), tag: d.tag === 'new' || d.tag === 'best' ? d.tag : '', active: !!d.active, stock: Math.max(0, parseInt(d.stock) || 0) });
+    closeModal(); toast(getLang() === 'he' ? 'המוצר נשמר' : 'Product saved'); rerender();
   }
 });
 
