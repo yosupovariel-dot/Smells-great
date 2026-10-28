@@ -17,6 +17,8 @@ const ICONS = {
   a11y: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><circle cx="12" cy="4" r="2"/><path d="M19 8.5l-5 1v4l2.5 7h-2l-2-5.5h-1l-2 5.5h-2L10 13.5v-4l-5-1 .4-1.8L12 8l6.6-1.3z"/></svg>',
 };
 
+const TICK_ICONS = { tick1: '✈', tick2: '✦', tick3: '%', tick4: '♛', tick5: '☏' };
+
 // ---------- Layout ----------
 function header() {
   const n = db.cart().reduce((a, l) => a + l.qty, 0); const route = location.hash;
@@ -24,8 +26,10 @@ function header() {
   const msgs = ['tick1', 'tick2', 'tick3', 'tick4', 'tick5'];
   return html`<a class="skip" href="#main">${t('skip')}</a>
   <div class="ticker" role="region" aria-label="${getLang() === 'he' ? 'הודעות' : 'Announcements'}"><div class="wrap">
-    <div class="ticker-track" aria-live="off">${msgs.map((k, i) => html`<p class="ticker-msg ${i ? '' : 'on'}" ${raw(i ? 'aria-hidden="true"' : '')}>${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}">${t(k)}</a>` : t(k)}</p>`)}</div>
-    <button data-action="ticker-toggle" aria-label="${t('pause')}" aria-pressed="false">❚❚</button></div></div>
+    <button class="tk-nav" data-action="tick-step" data-d="-1" aria-label="${getLang() === 'he' ? 'ההודעה הקודמת' : 'Previous message'}">${getLang() === 'he' ? '›' : '‹'}</button>
+    <div class="ticker-track" aria-live="off">${msgs.map((k, i) => html`<p class="ticker-msg ${i ? '' : 'on'}" ${raw(i ? 'aria-hidden="true"' : '')}><span class="tk-ic" aria-hidden="true">${TICK_ICONS[k]}</span>${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}">${t(k)}</a>` : html`<span>${t(k)}</span>`}</p>`)}</div>
+    <button class="tk-nav" data-action="tick-step" data-d="1" aria-label="${getLang() === 'he' ? 'ההודעה הבאה' : 'Next message'}">${getLang() === 'he' ? '‹' : '›'}</button>
+    <button class="tk-pause" data-action="ticker-toggle" aria-label="${t('pause')}" aria-pressed="false"><span aria-hidden="true">❚❚</span></button></div></div>
   <header class="hdr"><div class="wrap">
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
@@ -81,14 +85,18 @@ function a11yPanel() {
 
 // ---------- Ticker ----------
 let tickTimer, tickIdx = 0, tickPaused = false;
+function stepTicker(d) {
+  const ms = $$('.ticker-msg'); if (!ms.length) return;
+  ms[tickIdx].classList.remove('on'); ms[tickIdx].setAttribute('aria-hidden', 'true');
+  tickIdx = (tickIdx + d + ms.length) % ms.length; ms[tickIdx].classList.add('on'); ms[tickIdx].removeAttribute('aria-hidden');
+}
 function startTicker() {
   clearInterval(tickTimer);
   if (tickPaused || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   tickTimer = setInterval(() => {
     const ms = $$('.ticker-msg'); if (!ms.length) return;
-    ms[tickIdx].classList.remove('on'); ms[tickIdx].setAttribute('aria-hidden', 'true');
-    tickIdx = (tickIdx + 1) % ms.length; ms[tickIdx].classList.add('on'); ms[tickIdx].removeAttribute('aria-hidden');
-  }, 4000);
+    stepTicker(1);
+  }, 4500);
 }
 
 // ---------- Hero slides ----------
@@ -112,12 +120,13 @@ function maybeConsent() {
   setTimeout(() => {
     if ($('.consent')) return;
     const d = document.createElement('div');
-    d.className = 'consent'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-labelledby', 'cs-t'); d.setAttribute('aria-describedby', 'cs-d');
-    render(d, html`<h2 id="cs-t">${t('consentTitle')}</h2><p id="cs-d">${t('consentText')}<a href="#/terms">${t('terms')}</a>${t('and')}<a href="#/privacy">${t('privacy')}</a>.</p>
-      <div class="actions"><button class="btn" data-action="consent" data-v="all">${t('accept')}</button><button class="btn ghost" data-action="consent" data-v="essential">${t('essentialOnly')}</button></div>`);
+    d.className = 'consent'; d.setAttribute('role', 'region'); d.setAttribute('aria-labelledby', 'cs-t'); d.setAttribute('aria-live', 'polite');
+    render(d, html`<button class="consent-x" data-action="consent" data-v="essential" aria-label="${t('close')}">✕</button>
+      <div class="consent-head"><img src="assets/img/mark.webp" alt="" width="44" height="38"><h2 id="cs-t">${t('consentTitle')}</h2></div>
+      <p>${t('consentText')}<a href="#/terms">${t('terms')}</a>${t('and')}<a href="#/privacy">${t('privacy')}</a>.</p>
+      <div class="actions"><button class="btn sm" data-action="consent" data-v="all">${t('accept')}</button><button class="btn sm ghost" data-action="consent" data-v="essential">${t('essentialOnly')}</button></div>`);
     document.body.append(d);
-    const rel = trapFocus(d, () => {});
-    d.addEventListener('click', (e) => { const b = e.target.closest('[data-action="consent"]'); if (!b) return; try { localStorage.setItem('say_consent', JSON.stringify({ v: b.dataset.v, at: Date.now() })); } catch {} rel(); d.remove(); });
+    d.addEventListener('click', (e) => { const b = e.target.closest('[data-action="consent"]'); if (!b) return; try { localStorage.setItem('say_consent', JSON.stringify({ v: b.dataset.v, at: Date.now() })); } catch {} d.classList.add('out'); setTimeout(() => d.remove(), 350); });
   }, 5000);
 }
 
@@ -200,7 +209,8 @@ document.addEventListener('click', async (e) => {
     case 'qty': { const i = $('#qty'); i.value = Math.max(1, Math.min(99, (parseInt(i.value) || 1) + +el.dataset.d)); break; }
     case 'line-qty': { const c = db.cart(); const l = c[+el.dataset.i]; if (!l) break; l.qty += +el.dataset.d; if (l.qty < 1) c.splice(+el.dataset.i, 1); db.saveCart(c); break; }
     case 'line-rm': { const c = db.cart(); c.splice(+el.dataset.i, 1); db.saveCart(c); break; }
-    case 'ticker-toggle': tickPaused = !tickPaused; el.setAttribute('aria-pressed', tickPaused); el.setAttribute('aria-label', tickPaused ? t('play') : t('pause')); el.textContent = tickPaused ? '▶' : '❚❚'; startTicker(); break;
+    case 'ticker-toggle': tickPaused = !tickPaused; el.setAttribute('aria-pressed', tickPaused); el.setAttribute('aria-label', tickPaused ? t('play') : t('pause')); el.firstElementChild.textContent = tickPaused ? '▶' : '❚❚'; startTicker(); break;
+    case 'tick-step': stepTicker(+el.dataset.d); startTicker(); break;
     case 'a11y': { const p = $('#a11y-panel'); const open = !p.classList.contains('open'); p.classList.toggle('open', open); $('.fab-a11y').setAttribute('aria-expanded', open); if (open) $('button', p).focus(); else $('.fab-a11y').focus(); break; }
     case 'fs': a11yState.fs = Math.max(0, Math.min(3, (a11yState.fs || 0) + +el.dataset.d)); applyA11y(); break;
     case 'a11y-t': a11yState[el.dataset.k] = !a11yState[el.dataset.k]; el.setAttribute('aria-pressed', a11yState[el.dataset.k]); applyA11y(); break;
