@@ -6,9 +6,11 @@ import * as db from './db.js';
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
 const T = (a, b) => (he() ? a : b);
-export const media = (p, cls = '', eager = false, src = p.img) =>
+// Catalog images come in two sizes (name.webp ≤1400px, name-sm.webp ≤640px); cards/lists use the small one.
+export const small = (src) => (/^assets\/products\/.+\.webp$/.test(src) && !src.endsWith('-sm.webp') ? src.replace(/\.webp$/, '-sm.webp') : src);
+export const media = (p, cls = '', eager = false, src = p.img, full = false) =>
   src
-    ? html`<img src="${src}" alt="${L(p.name)}" width="1200" height="900" ${raw(eager ? 'fetchpriority="high"' : 'loading="lazy"')} decoding="async" class="${cls}">`
+    ? html`<img src="${full ? src : small(src)}" ${raw(full || small(src) === src ? '' : `srcset="${small(src)} 640w, ${src} 1400w" sizes="(max-width:600px) 50vw, 320px"`)} alt="${L(p.name)}" width="1200" height="900" ${raw(eager ? 'fetchpriority="high"' : 'loading="lazy"')} decoding="async" class="${cls}">`
     : raw(artSVG(p, cls));
 const catName = (id) => L(CATEGORIES.find((c) => c.id === id));
 export const subName = (s) => (he() ? s : db.SITE.site?.subEn?.[s] || s);
@@ -69,7 +71,7 @@ export function home() {
   <section class="block" aria-labelledby="cats-t"><div class="wrap">
     <div class="sec-head"><div><p class="eyebrow">SAY Boutique</p><h2 id="cats-t">${t('categories')}</h2></div></div>
     <nav class="cat-tiles" aria-label="${t('categories')}">${CATEGORIES.map((c) => html`<a class="tile ${c.img ? '' : 'soon'}" href="#/shop/${c.id}">
-      ${c.img ? html`<img src="${c.img}" alt="" loading="lazy" width="800" height="600">` : html`<img class="tile-mark" src="assets/img/mark.webp" alt="" loading="lazy" width="180" height="156">`}
+      ${c.img ? html`<img src="${small(c.img)}" srcset="${small(c.img)} 640w, ${c.img} 1400w" sizes="(max-width:860px) 50vw, 40vw" alt="" loading="lazy" width="800" height="600">` : html`<img class="tile-mark" src="assets/img/mark.webp" alt="" loading="lazy" width="180" height="156">`}
       <span><b>${L(c)}</b><small>${he() ? c.descHe : c.descEn}</small></span></a>`)}</nav>
   </div></section>
   <section class="block tight" aria-labelledby="best-t"><div class="wrap">
@@ -173,8 +175,8 @@ export function productPage(id) {
   const groups = [...new Set(pickList.map((x) => x.sub))];
   return html`<div class="wrap"><div class="pdp">
     <div class="pdp-gallery">
-      <div class="pdp-media ${p.fit === 'contain' ? 'contain' : ''}" data-zoom>${media(p, '', true, gallery[0])}</div>
-      ${gallery.length > 1 ? html`<div class="thumbs" role="group" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<button data-action="thumb" data-src="${g}" aria-label="${T('תמונה', 'Image')} ${i + 1}" aria-pressed="${i === 0}"><img src="${g}" alt="" loading="lazy" width="120" height="120"></button>`)}</div>` : ''}
+      <div class="pdp-media ${p.fit === 'contain' ? 'contain' : ''}" data-zoom>${media(p, '', true, gallery[0], true)}</div>
+      ${gallery.length > 1 ? html`<div class="thumbs" role="group" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<button data-action="thumb" data-src="${g}" aria-label="${T('תמונה', 'Image')} ${i + 1}" aria-pressed="${i === 0}"><img src="${small(g)}" alt="" loading="lazy" width="120" height="120"></button>`)}</div>` : ''}
     </div>
     <div>
       <div class="crumbs"><a href="#/">${t('home')}</a> / <a href="#/shop/${p.cat}">${catName(p.cat)}</a>${p.sub ? html` / <a href="#/shop/${p.cat}/${encodeURIComponent(p.sub)}">${subName(p.sub)}</a>` : ''}</div>

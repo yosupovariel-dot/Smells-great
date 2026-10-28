@@ -129,6 +129,8 @@ def save(src, name, box=1400, q=82):
     im = im.convert('RGB'); im.thumbnail((box, box), Image.LANCZOS)
     rel = f'assets/products/{name}.webp'
     im.save(os.path.join(ROOT, rel), 'WEBP', quality=q, method=6)
+    sm = im.copy(); sm.thumbnail((640, 640), Image.LANCZOS)  # card/gallery size, see media() srcset
+    sm.save(os.path.join(ROOT, rel.replace('.webp', '-sm.webp')), 'WEBP', quality=76, method=6)
     written[src] = rel
     return rel
 
