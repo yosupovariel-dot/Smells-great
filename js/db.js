@@ -4,7 +4,7 @@
 import { SEED_PRODUCTS } from './data.js';
 import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js';
 
-const K = (k) => 'say_' + k;
+const K = (k) => 'say2_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
 const write = (k, v) => { try { localStorage.setItem(K(k), JSON.stringify(v)); } catch {} };
 
@@ -20,11 +20,13 @@ async function hashPw(pw, saltB64) {
 const safeEq = (a, b) => { if (a.length !== b.length) return false; let r = 0; for (let i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i); return r === 0; };
 
 // ---------- Products ----------
+export let SITE = { site: {}, subs: {}, guide: '' };
 export async function loadCatalog() {
+  try { const r = await fetch('data/site.json'); if (r.ok) SITE = await r.json(); } catch {}
   if (read('products', null)) return;
   let list = SEED_PRODUCTS;
   try {
-    const r = await fetch('data/products.json', { cache: 'no-cache' });
+    const r = await fetch('data/products.json');
     if (r.ok) { const j = await r.json(); if (Array.isArray(j) && j.length) list = j; }
   } catch {}
   write('products', list);
@@ -96,9 +98,9 @@ export const clubList = () => read('club', []);
 // ---------- Cart ----------
 export const cart = () => read('cart', []);
 export const saveCart = (c) => { write('cart', c); document.dispatchEvent(new CustomEvent('cart')); };
-export function addToCart(pid, size, qty = 1) {
-  const c = cart(); const l = c.find((x) => x.pid === pid && x.size === size);
-  l ? (l.qty = Math.min(99, l.qty + qty)) : c.push({ pid, size, qty });
+export function addToCart(pid, size, qty = 1, opt = '') {
+  const c = cart(); const l = c.find((x) => x.pid === pid && x.size === size && (x.opt || '') === opt);
+  l ? (l.qty = Math.min(99, l.qty + qty)) : c.push({ pid, size, qty, opt });
   saveCart(c);
 }
 export function priceOf(p, sizeLabel, user = me()) {
@@ -124,7 +126,7 @@ export function placeOrder(customer) {
   const num = 1000 + l.length + 1;
   const o = {
     id: uid('o_'), num, date: Date.now(), status: 'new', payment: 'pending', userId: u?.id || null, customer,
-    items: tt.lines.map((x) => ({ pid: x.pid, name: x.p.name, size: x.size, qty: x.qty, price: x.price, cost: (x.p.sizes.find((s) => s.label === x.size) || {}).cost || 0 })),
+    items: tt.lines.map((x) => ({ pid: x.pid, name: x.p.name, size: x.size, opt: x.opt || '', qty: x.qty, price: x.price, cost: (x.p.sizes.find((s) => s.label === x.size) || {}).cost || 0 })),
     subtotal: tt.subtotal, discount: tt.discount, shipping: tt.shipping, total: tt.total, history: [{ s: 'new', at: Date.now() }],
   };
   l.unshift(o); saveOrders(l);
@@ -158,7 +160,7 @@ export async function seedDemo() {
   }
   saveUsers(l);
   // Historical orders across the last 12 months so reports have data.
-  const prods = products(); const names = ['דנה כהן', 'יוסי לוי', 'מיכל אברהם', 'אבי מזרחי', 'רונית פרץ', 'עומר ביטון', 'נועה דהן', 'איתי שלום'];
+  const prods = products().filter((p) => !p.quote && p.sizes[0].price); const names = ['דנה כהן', 'יוסי לוי', 'מיכל אברהם', 'אבי מזרחי', 'רונית פרץ', 'עומר ביטון', 'נועה דהן', 'איתי שלום'];
   const cities = ['תל אביב', 'רמת גן', 'חולון', 'ראשון לציון', 'פתח תקווה', 'הרצליה', 'נתניה', 'ירושלים'];
   const courier = l.find((u) => u.role === 'courier');
   const ol = []; let num = 1000; const now = new Date();

@@ -17,13 +17,14 @@ GitHub Pages: `https://yosupovariel-dot.github.io/Smells-great/`
 | Orders manager | orders@say-boutique.co.il | Say2026!demo |
 | Courier | courier@say-boutique.co.il | Say2026!demo |
 
-## Importing products from the Google Sheet + Drive images
+## Catalog (Google Sheet + Drive)
+The products and images come from the product sheet and the Drive folder. To update them:
 ```
-# sheet → File > Download > CSV → tools/products.csv ; Drive folder → unzip to tools/images/
-npm i sharp
-node tools/import-products.mjs tools/products.csv tools/images
+pip install pillow
+python3 tools/build_catalog.py
 ```
-Writes `data/products.json` and optimised images to `assets/products/`. After that, use "Reset demo" (clear site data) to load the new catalog.
+This writes `data/products.json` and `data/site.json`, plus optimized WebP images in `assets/products/`. All images are hosted on the site itself.
+Oil prices per size (10ml–5L) are set in `OIL_PRICES` at the top of the script, because the sheet only gives a 10–999 range. Prices can also be edited per product in the admin.
 
 ## Before going live (requires hosting/backend)
 The preview stores data in the browser (`js/db.js`). Each function there maps to an API endpoint. For production:

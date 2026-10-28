@@ -91,6 +91,20 @@ function startTicker() {
   }, 4000);
 }
 
+// ---------- Hero slides ----------
+let slideTimer, slideIdx = 0;
+function showSlide(i) {
+  const ss = $$('.slide'); if (!ss.length) return;
+  slideIdx = (i + ss.length) % ss.length;
+  ss.forEach((s, k) => s.classList.toggle('on', k === slideIdx));
+  $$('.dots button').forEach((b, k) => b.setAttribute('aria-current', k === slideIdx));
+}
+function startSlides() {
+  clearInterval(slideTimer); slideIdx = 0;
+  if (!$('.slide') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  slideTimer = setInterval(() => { if (!tickPaused) showSlide(slideIdx + 1); }, 5500);
+}
+
 // ---------- Consent ----------
 function maybeConsent() {
   let ok; try { ok = localStorage.getItem('say_consent'); } catch {}
@@ -113,7 +127,7 @@ function route() {
   const parts = (location.hash.slice(2) || '').split('/').map(decodeURIComponent);
   const [a, b] = parts;
   const isBO = ['admin', 'orders', 'courier'].includes(a);
-  document.body.classList.remove('cart-open');
+  document.body.classList.remove('cart-open'); closeModal();
   if (isBO) {
     if (!db.can(STAFF[a])) { state.authTab = 'login'; location.hash = '#/account'; return; }
     let v;
@@ -125,7 +139,7 @@ function route() {
   let v, title = 'SAY Boutique';
   switch (a || '') {
     case '': v = S.home(); title = 'SAY Boutique | Luxury Home Fragrances'; break;
-    case 'shop': v = S.shop(b, state.q, state.sort); title = `${t('shop')} | SAY Boutique`; break;
+    case 'shop': v = S.shop(b, state.q, state.sort, parts[2] || ''); title = `${t('shop')} | SAY Boutique`; break;
     case 'product': v = S.productPage(b); if (v) title = `${(db.product(b).name[getLang()])} | SAY Boutique`; break;
     case 'checkout': v = S.checkout(); break;
     case 'done': v = state.lastOrder ? S.orderDone(state.lastOrder) : S.home(); break;
@@ -133,6 +147,7 @@ function route() {
     case 'contact': v = S.contact(); break;
     case 'about': v = S.about(); break;
     case 'wholesale': v = S.wholesalePage(); break;
+    case 'guide': v = S.guide(); break;
     case 'terms': v = Lg.terms(); break;
     case 'returns': v = Lg.returns(); break;
     case 'privacy': v = Lg.privacy(); break;
@@ -141,7 +156,7 @@ function route() {
   if (!v) v = html`<div class="wrap legal"><h1>404</h1><p>${t('notFound')}</p><a class="btn" href="#/">${t('backHome')}</a></div>`;
   render(app, html`${header()}<main id="main" tabindex="-1">${v}</main>${footer()}`);
   document.title = title;
-  applyA11y(); startTicker(); bars();
+  applyA11y(); startTicker(); bars(); startSlides();
 }
 function go() {
   const prevY = scrollY; route();
@@ -178,6 +193,9 @@ document.addEventListener('click', async (e) => {
     case 'menu-close': $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); $('[data-action="menu"]').focus(); break;
     case 'cart-open': openCart(); break;
     case 'cart-close': closeCart(); break;
+    case 'slide': showSlide(+el.dataset.i); clearInterval(slideTimer); break;
+    case 'thumb': { const img = $('.pdp-media img'); if (img) img.src = el.dataset.src; $$('.thumbs button').forEach((b) => b.setAttribute('aria-pressed', b === el)); break; }
+    case 'go-cart': closeModal(); openCart(); break;
     case 'quick-add': { const p = db.product(id); db.addToCart(id, p.sizes[0].label, 1); toast(`${t('added')}: ${p.name[getLang()]}`); if (!document.body.classList.contains('cart-open')) openCart(); break; }
     case 'qty': { const i = $('#qty'); i.value = Math.max(1, Math.min(99, (parseInt(i.value) || 1) + +el.dataset.d)); break; }
     case 'line-qty': { const c = db.cart(); const l = c[+el.dataset.i]; if (!l) break; l.qty += +el.dataset.d; if (l.qty < 1) c.splice(+el.dataset.i, 1); db.saveCart(c); break; }
@@ -232,6 +250,14 @@ document.addEventListener('change', (e) => {
   const map = { sort: 'sort', range: 'range', pcat: 'pcat', ur: 'ur', om: 'om', os: 'os' };
   if (map[k]) { state[map[k]] = k === 'range' ? +el.value : el.value; rerender(); }
   if (k === 'size') { const pr = $('#pdp-price'); if (pr) pr.firstChild.textContent = new Intl.NumberFormat(getLang() === 'he' ? 'he-IL' : 'en-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 }).format(+el.dataset.price); }
+  if (k === 'opt' && el.dataset.img) { const img = $('.pdp-media img'); if (img) img.src = el.dataset.img; }
+  if (k === 'pick' || k === 'surprise') {
+    const box = $('.pick-groups'); const max = +box.dataset.max; const sur = $('[data-input="surprise"]').checked;
+    const picked = $$('[data-input="pick"]:checked');
+    if (picked.length > max) { el.checked = false; toast(getLang() === 'he' ? `אפשר לבחור עד ${max} ניחוחות` : `Up to ${max} scents`); }
+    $$('[data-input="pick"]').forEach((c) => (c.disabled = sur));
+    $('#pick-count').textContent = sur ? '✓' : `${$$('[data-input="pick"]:checked').length}/${max}`;
+  }
   if (k === 'ws-toggle') $('#biz-f').hidden = !el.checked;
   if (k === 'role') { db.updateUser(el.dataset.id, { role: el.value, wsRequest: el.value === 'wholesale' ? false : undefined }); toast('✓'); }
   if (k === 'm-status') { db.setOrderStatus(el.dataset.id, el.value, db.me()?.name); toast('✓'); closeModal(); rerender(); }
@@ -244,7 +270,16 @@ document.addEventListener('submit', async (e) => {
   const btn = f.querySelector('[type="submit"]'); if (btn?.disabled) return;
   if (kind === 'add') {
     const d = new FormData(f); const qty = Math.max(1, Math.min(99, parseInt(d.get('qty')) || 1));
-    db.addToCart(f.dataset.id, d.get('size'), qty); toast(t('added')); openCart();
+    const p = db.product(f.dataset.id); let opt = clean(d.get('opt') || '', 40);
+    if (p.picks) {
+      const picks = d.getAll('pick').map((x) => clean(x, 40));
+      if (d.get('surprise')) opt = getLang() === 'he' ? 'הפתיעו אותי' : 'Surprise me';
+      else if (picks.length !== p.picks) { $('#add-err').textContent = getLang() === 'he' ? `יש לבחור ${p.picks} ניחוחות (נבחרו ${picks.length})` : `Please choose ${p.picks} scents (${picks.length} chosen)`; $('.picker').scrollIntoView({ block: 'center' }); return; }
+      else opt = picks.join(', ');
+    }
+    $('#add-err').textContent = '';
+    db.addToCart(f.dataset.id, d.get('size'), qty, opt); toast(t('added'));
+    if (p.upsellKit && !db.cart().some((l) => db.product(l.pid)?.picks)) modal(S.kitUpsell()); else openCart();
   }
   if (kind === 'club') {
     const email = clean(f.email.value, 120);

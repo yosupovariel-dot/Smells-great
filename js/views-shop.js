@@ -1,37 +1,53 @@
 import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js';
 import { t, L, getLang } from './i18n.js';
-import { CATEGORIES, COMPLEMENTS, artSVG, catIcon } from './data.js';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js';
 import * as db from './db.js';
 
 const m = (n) => money(n, getLang());
-export const media = (p, cls = '', eager = false) =>
-  p.img
-    ? html`<img src="${p.img}" alt="${L(p.name)}" width="800" height="1000" ${raw(eager ? 'fetchpriority="high"' : 'loading="lazy"')} decoding="async" class="${cls}">`
+const he = () => getLang() === 'he';
+const T = (a, b) => (he() ? a : b);
+export const media = (p, cls = '', eager = false, src = p.img) =>
+  src
+    ? html`<img src="${src}" alt="${L(p.name)}" width="1200" height="900" ${raw(eager ? 'fetchpriority="high"' : 'loading="lazy"')} decoding="async" class="${cls}">`
     : raw(artSVG(p, cls));
 const catName = (id) => L(CATEGORIES.find((c) => c.id === id));
+export const subName = (s) => (he() ? s : db.SITE.site?.subEn?.[s] || s);
 const active = () => db.products().filter((p) => p.active !== false);
+const minPrice = (p, ws) => Math.min(...p.sizes.map((s) => (ws && s.wholesale ? s.wholesale : s.price)));
+const waLink = (txt) => `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(txt)}`;
+
+export function priceTag(p) {
+  if (p.quote) return html`<span class="price">${T('מחיר בהתאמה אישית', 'Price on request')}</span>`;
+  const ws = db.me()?.role === 'wholesale';
+  const from = p.sizes.length > 1 ? T('החל מ־', 'From ') : '';
+  return html`<span class="price">${from}${m(minPrice(p, ws))}${ws ? html`<s>${m(minPrice(p, false))}</s>` : ''}</span>`;
+}
 
 export function card(p) {
-  const u = db.me(); const s = p.sizes[0];
-  const showWs = u?.role === 'wholesale' && s.wholesale;
-  return html`<article class="card">
-    <a class="card-media" href="#/product/${p.id}" tabindex="-1" aria-hidden="true">${media(p)}</a>
+  const cls = `card${p.wide ? ' wide' : ''}`;
+  const quick = p.quote || p.picks || p.options?.length || p.sizes.length > 1
+    ? html`<a class="btn block sm" href="#/product/${p.id}">${p.quote ? T('לפרטים', 'Details') : T('לבחירה', 'Choose options')}</a>`
+    : html`<button class="btn block sm" data-action="quick-add" data-id="${p.id}" aria-label="${t('quickAdd')}: ${L(p.name)}">${t('quickAdd')}</button>`;
+  return html`<article class="${cls}">
+    <a class="card-media ${p.fit === 'contain' ? 'contain' : ''}" href="#/product/${p.id}" tabindex="-1" aria-hidden="true">${media(p)}${p.gallery?.[1] && p.fit === 'contain' ? media(p, 'alt-img', false, p.gallery[1]) : ''}</a>
     ${p.tag ? html`<span class="card-tag">${t('tag_' + p.tag)}</span>` : ''}
-    <div class="card-quick"><button class="btn block sm" data-action="quick-add" data-id="${p.id}" aria-label="${t('quickAdd')}: ${L(p.name)}">${t('quickAdd')}</button></div>
+    <div class="card-quick">${quick}</div>
     <div class="card-body">
-      <small class="muted">${catName(p.cat)}</small>
+      <small class="muted">${p.sub ? subName(p.sub) : catName(p.cat)}</small>
       <h3><a href="#/product/${p.id}">${L(p.name)}</a></h3>
-      <span class="price">${p.sizes.length > 1 ? (getLang() === 'he' ? 'החל מ־' : 'From ') : ''}${m(showWs ? s.wholesale : s.price)}${showWs ? html`<s>${m(s.price)}</s>` : ''}</span>
+      ${priceTag(p)}
     </div>
   </article>`;
 }
 
+// ---------- Home ----------
 export function home() {
   const all = active();
-  const best = all.filter((p) => p.tag === 'best').concat(all).filter((v, i, a) => a.indexOf(v) === i).slice(0, 4);
-  const fresh = all.filter((p) => p.tag === 'new').concat(all.slice().reverse()).filter((v, i, a) => a.indexOf(v) === i).slice(0, 4);
-  const heroP = all.find((p) => p.cat === 'sticks') || all[0];
-  const words = ['White Tea', 'Black Orchid', 'Royal Oud', 'Fig Tree', 'Santal', 'Amber Nights', 'Clean Linen'];
+  const hero = db.SITE.site?.hero || [];
+  const diff = all.filter((p) => p.cat === 'diffusers');
+  const kits = all.filter((p) => p.picks);
+  const hotels = all.filter((p) => p.sub?.startsWith('🏨')).slice(0, 4);
+  const words = ['King David', 'Royal Beach', 'Hilton', 'White Tea', 'Royal Amber', 'Pure Vanilla', 'Sea Breeze', 'Grand Heritage'];
   return html`
   <section class="hero" aria-labelledby="hero-t">
     <div class="hero-copy">
@@ -39,36 +55,45 @@ export function home() {
       <h1 id="hero-t">${t('heroTitle1')}<br><em>${t('heroTitle2')}</em></h1>
       <span class="rule"></span>
       <p>${t('heroText')}</p>
-      <div class="hero-cta"><a class="btn" href="#/shop">${t('shopNow')}</a><a class="btn ghost" href="#/shop/oils">${t('discover')}</a></div>
+      <div class="hero-cta"><a class="btn" href="#/shop/diffusers">${T('למפיצי הריח', 'Shop diffusers')}</a><a class="btn ghost" href="#/shop/oils">${t('discover')}</a></div>
     </div>
-    <div class="hero-art" aria-hidden="true">
-      <div class="arch"></div>
-      <img class="hero-mark" src="assets/img/mark.webp" alt="" width="180" height="156">
-      ${heroP?.img ? html`<img src="${heroP.img}" alt="" width="600" height="750" fetchpriority="high">` : raw(artSVG(heroP || { cat: 'sticks', name: {} }, 'hero-bottle').replace('preserveAspectRatio="xMidYMid slice"', '').replace(/<rect width="200" height="250"[^>]*\/>/, '').replace(/<path d="M40 250[^>]*\/>/, ''))}
+    <div class="hero-art">
+      ${hero.length ? html`<div class="slides" role="region" aria-roledescription="carousel" aria-label="${T('מבצעים ומארזים', 'Featured')}">
+        ${hero.map((src, i) => html`<img class="slide ${i ? '' : 'on'}" src="${src}" alt="${T('מפיצי ריח ותמציות SAY Boutique', 'SAY Boutique diffusers and oils')}" width="2000" height="1100" ${raw(i ? 'loading="lazy"' : 'fetchpriority="high"')} decoding="async">`)}
+        <div class="dots">${hero.map((_, i) => html`<button data-action="slide" data-i="${i}" aria-label="${T('שקופית', 'Slide')} ${i + 1}" aria-current="${i === 0}"></button>`)}</div>
+      </div>` : raw('<div class="arch"></div>')}
     </div>
-    <div class="hero-meta"><span>EST. 2024</span><span>TEL AVIV</span><span>${PHONE_DISPLAY}</span></div>
+    <div class="hero-meta"><span>LUXURY HOME FRAGRANCES</span><span>${PHONE_DISPLAY}</span></div>
   </section>
   <div class="marquee" aria-hidden="true"><div>${[...words, ...words].map((w) => html`<span>${w}</span><span>✦</span>`)}</div></div>
   <section class="block" aria-labelledby="cats-t"><div class="wrap">
     <div class="sec-head"><div><p class="eyebrow">SAY Boutique</p><h2 id="cats-t">${t('categories')}</h2></div></div>
-    <nav class="cats" aria-label="${t('categories')}">${CATEGORIES.map((c) => html`<a class="cat" href="#/shop/${c.id}">${raw(catIcon(c.id))}<span>${L(c)}</span><small>${getLang() === 'he' ? c.descHe : c.descEn}</small></a>`)}</nav>
+    <nav class="cat-tiles" aria-label="${t('categories')}">${CATEGORIES.map((c) => html`<a class="tile ${c.img ? '' : 'soon'}" href="#/shop/${c.id}">
+      ${c.img ? html`<img src="${c.img}" alt="" loading="lazy" width="800" height="600">` : html`<img class="tile-mark" src="assets/img/mark.webp" alt="" loading="lazy" width="180" height="156">`}
+      <span><b>${L(c)}</b><small>${he() ? c.descHe : c.descEn}</small></span></a>`)}</nav>
   </div></section>
-  <section class="block" aria-labelledby="best-t"><div class="wrap">
-    <div class="sec-head"><h2 id="best-t">${t('bestsellers')}</h2><a href="#/shop">${t('viewAll')} ←</a></div>
-    <div class="grid">${best.map(card)}</div>
+  <section class="block tight" aria-labelledby="best-t"><div class="wrap">
+    <div class="sec-head"><div><p class="eyebrow">${T('טכנולוגיית אידוי קר', 'Cold-air technology')}</p><h2 id="best-t">${T('מפיצי הריח שלנו', 'Our diffusers')}</h2></div><a href="#/shop/diffusers">${t('viewAll')} ←</a></div>
+    <div class="grid">${diff.slice(0, 4).map(card)}</div>
   </div></section>
   <div class="wrap"><div class="features">
     <div><b>${t('f1')}</b><span>${t('f1s')}</span></div><div><b>${t('f2')}</b><span>${t('f2s')}</span></div>
-    <div><b>${t('f3')}</b><span>${t('f3s')}</span></div><div><b>${t('f4')}</b><span>${t('f4s')}</span></div>
+    <div><b>${T('שנת אחריות', '1-year warranty')}</b><span>${T('אחריות יבואן על המכשירים', 'Importer warranty on devices')}</span></div><div><b>${t('f4')}</b><span>${t('f4s')}</span></div>
   </div></div>
-  <section class="block" aria-labelledby="story-t"><div class="wrap story">
+  ${kits.length ? html`<section class="block" aria-labelledby="kit-t"><div class="wrap story">
+    <div class="story-art photo">${media(kits[0])}</div>
+    <div><p class="eyebrow">${T('מומלץ ללקוחות חדשים', 'Recommended for newcomers')}</p><h2 id="kit-t">${T('לא בטוחים איזה ריח? תתנסו בכולם.', 'Not sure which scent? Try them all.')}</h2><span class="rule"></span>
+      <p>${T('ערכות ההתנסות שלנו — 14 תמציות של 10 מ"ל או 4 תמציות של 30 מ"ל — במארז יוקרתי, ב־99₪ בלבד. בוחרים את הניחוחות, מגלים את ניחוח החתימה של הבית.', 'Our discovery kits — 14 × 10 ml or 4 × 30 ml — in a luxury box for just ₪99. Choose your scents and find your home’s signature.')}</p>
+      <div class="hero-cta">${kits.map((k) => html`<a class="btn ${k.picks === 14 ? '' : 'ghost'}" href="#/product/${k.id}">${k.picks} ${T('תמציות', 'oils')}</a>`)}</div></div>
+  </div></section>` : ''}
+  <section class="block tight" aria-labelledby="new-t"><div class="wrap">
+    <div class="sec-head"><div><p class="eyebrow">${T('תמציות שמן', 'Fragrance oils')}</p><h2 id="new-t">${T('הניחוח של בתי המלון', 'The scent of hotels')}</h2></div><a href="#/shop/oils">${t('viewAll')} ←</a></div>
+    <div class="grid wide-grid">${hotels.map(card)}</div>
+  </div></section>
+  <div class="wrap"><section class="story block" aria-labelledby="story-t">
     <div class="story-art" aria-hidden="true"><img src="assets/img/logo.webp" alt="" width="290" height="450" loading="lazy"></div>
     <div><p class="eyebrow">${t('storyEyebrow')}</p><h2 id="story-t">${t('storyTitle')}</h2><span class="rule"></span><p>${t('storyText')}</p><a class="btn ghost" href="#/about">${t('about')}</a></div>
-  </div></section>
-  <section class="block" aria-labelledby="new-t"><div class="wrap">
-    <div class="sec-head"><h2 id="new-t">${t('newIn')}</h2><a href="#/shop">${t('viewAll')} ←</a></div>
-    <div class="grid">${fresh.map(card)}</div>
-  </div></section>
+  </section></div>
   ${clubBlock()}`;
 }
 
@@ -80,24 +105,31 @@ export const clubBlock = () => html`<section class="block club" aria-labelledby=
   <p class="sr-only" aria-live="polite" id="club-msg"></p>
 </div></section>`;
 
-export function shop(cat, q = '', sort = 'pop') {
+// ---------- Shop ----------
+export function shop(cat, q = '', sort = 'pop', sub = '') {
   let list = active();
   if (cat) list = list.filter((p) => p.cat === cat);
-  if (q) { const s = q.toLowerCase(); list = list.filter((p) => (p.name.he + ' ' + p.name.en + ' ' + (p.notes || []).join(' ')).toLowerCase().includes(s)); }
-  const price = (p) => p.sizes[0].price;
-  if (sort === 'low') list.sort((a, b) => price(a) - price(b));
-  if (sort === 'high') list.sort((a, b) => price(b) - price(a));
+  if (sub) list = list.filter((p) => p.sub === sub);
+  if (q) { const s = q.toLowerCase(); list = list.filter((p) => (p.name.he + ' ' + p.name.en + ' ' + (p.sub || '')).toLowerCase().includes(s)); }
+  if (sort === 'low') list.sort((a, b) => minPrice(a) - minPrice(b));
+  if (sort === 'high') list.sort((a, b) => minPrice(b) - minPrice(a));
   if (sort === 'name') list.sort((a, b) => L(a.name).localeCompare(L(b.name), getLang()));
   const count = (c) => active().filter((p) => !c || p.cat === c).length;
+  const c = CATEGORIES.find((x) => x.id === cat);
+  const subs = (db.SITE.subs?.[c?.he] || []).filter((s) => active().some((p) => p.sub === s));
+  const banner = sub && db.SITE.site?.subBanners?.[sub];
+  const soon = c && !count(cat);
   return html`<div class="wrap">
-    <div class="crumbs"><a href="#/">${t('home')}</a> / ${cat ? catName(cat) : t('shop')}</div>
-    <h1>${cat ? catName(cat) : t('shop')}</h1>
+    <div class="crumbs"><a href="#/">${t('home')}</a> / ${cat ? html`<a href="#/shop/${cat}">${catName(cat)}</a>` : t('shop')}${sub ? html` / ${subName(sub)}` : ''}</div>
+    ${banner ? html`<div class="sub-banner"><img src="${banner}" alt="" width="1600" height="700"><h1>${subName(sub)}</h1></div>` : html`<h1>${sub ? subName(sub) : cat ? catName(cat) : t('shop')}</h1>`}
+    ${subs.length > 1 ? html`<nav class="chips" aria-label="${T('תת־קטגוריות', 'Subcategories')}"><a href="#/shop/${cat}" aria-current="${!sub}">${t('all')}</a>${subs.map((s) => html`<a href="#/shop/${cat}/${encodeURIComponent(s)}" aria-current="${s === sub}">${subName(s)}</a>`)}</nav>` : ''}
     <div class="shop">
       <aside class="filters" aria-label="${t('categories')}"><h2>${t('categories')}</h2><ul>
         <li><a href="#/shop" aria-current="${!cat}">${t('all')} <span>${count()}</span></a></li>
-        ${CATEGORIES.map((c) => html`<li><a href="#/shop/${c.id}" aria-current="${cat === c.id}">${L(c)} <span>${count(c.id)}</span></a></li>`)}
+        ${CATEGORIES.map((x) => html`<li><a href="#/shop/${x.id}" aria-current="${cat === x.id}">${L(x)} <span>${count(x.id) || T('בקרוב', 'soon')}</span></a></li>`)}
       </ul></aside>
       <div>
+        ${soon ? html`<div class="soon-box"><img src="assets/img/mark.webp" alt="" width="180" height="156"><h2>${T('הקטגוריה תעלה בקרוב', 'Coming soon')}</h2><p>${T('אנחנו מכינים עבורכם קולקציה חדשה. רוצים לשמוע ראשונים או להזמין כבר עכשיו?', 'A new collection is on its way. Want to hear first or order now?')}</p><a class="btn" href="${waLink(T('שלום, אשמח לפרטים על ', 'Hello, I would like details about ') + catName(cat))}" target="_blank" rel="noopener noreferrer">WhatsApp</a></div>` : html`
         <div class="toolbar">
           <div><label class="sr-only" for="q">${t('search')}</label><input class="input" id="q" type="search" value="${q}" placeholder="${t('search')}…" data-input="search" maxlength="60"></div>
           <div><label for="sort" class="muted">${t('sortBy')}: </label><select class="input" id="sort" data-input="sort">
@@ -105,57 +137,99 @@ export function shop(cat, q = '', sort = 'pop') {
           </select></div>
         </div>
         <p class="muted" aria-live="polite">${list.length} ${t('results')}</p>
-        ${list.length ? html`<div class="grid">${list.map(card)}</div>` : html`<p>${t('noResults')}</p>`}
+        ${list.length ? html`<div class="grid ${list.every((p) => p.wide) ? 'wide-grid' : ''}">${list.map(card)}</div>` : html`<p>${t('noResults')}</p>`}`}
       </div>
     </div></div><div class="block"></div>`;
 }
 
 export function complements(p, n = 4) {
-  const all = active().filter((x) => x.id !== p.id);
   const picks = [];
-  for (const c of (p.related?.length ? [] : COMPLEMENTS[p.cat] || [])) {
-    const x = all.find((y) => y.cat === c && !picks.includes(y)); if (x) picks.push(x);
-  }
-  for (const id of p.related || []) { const x = db.product(id); if (x) picks.push(x); }
-  for (const x of all) if (picks.length < n && !picks.includes(x) && x.cat === p.cat) picks.push(x);
+  for (const id of p.related || COMPLEMENTS[p.cat] || []) { const x = db.product(id); if (x && x.id !== p.id && x.active !== false) picks.push(x); }
+  for (const x of active()) if (picks.length < n && !picks.includes(x) && x.id !== p.id && x.sub === p.sub) picks.push(x);
   return picks.slice(0, n);
+}
+
+// Renders the sheet's rich description (emoji headings, "title: text" bullets).
+function richText(text) {
+  const out = []; let list = [];
+  const flush = () => { if (list.length) { out.push(html`<ul class="feat">${list}</ul>`); list = []; } };
+  for (const line of String(text || '').split('\n').map((l) => l.trim()).filter(Boolean)) {
+    const m2 = line.match(/^([^:]{2,40}):\s*(.+)$/);
+    if (/^\p{Extended_Pictographic}/u.test(line) && line.length < 90) { flush(); out.push(html`<h3 class="rt-h">${line}</h3>`); }
+    else if (m2) list.push(html`<li><b>${m2[1]}:</b> ${m2[2]}</li>`);
+    else { flush(); out.push(html`<p>${line}</p>`); }
+  }
+  flush(); return out;
 }
 
 export function productPage(id) {
   const p = db.product(id);
   if (!p || p.active === false) return null;
-  const u = db.me(); const ws = u?.role === 'wholesale';
-  const s0 = p.sizes[0];
-  const notes = p.notes || [];
+  const ws = db.me()?.role === 'wholesale';
+  const gallery = [...new Set([p.img, ...(p.gallery || [])].filter(Boolean))];
+  const opt = p.options?.[0];
+  const priceOf = (s) => (ws && s.wholesale ? s.wholesale : s.price);
+  const pickList = p.picks ? (p.pickFrom || []).map((x) => db.product(x)).filter(Boolean) : [];
+  const groups = [...new Set(pickList.map((x) => x.sub))];
   return html`<div class="wrap"><div class="pdp">
-    <div class="pdp-media" data-zoom>${media(p, '', true)}</div>
+    <div class="pdp-gallery">
+      <div class="pdp-media ${p.fit === 'contain' ? 'contain' : ''}" data-zoom>${media(p, '', true, gallery[0])}</div>
+      ${gallery.length > 1 ? html`<div class="thumbs" role="group" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<button data-action="thumb" data-src="${g}" aria-label="${T('תמונה', 'Image')} ${i + 1}" aria-pressed="${i === 0}"><img src="${g}" alt="" loading="lazy" width="120" height="120"></button>`)}</div>` : ''}
+    </div>
     <div>
-      <div class="crumbs"><a href="#/">${t('home')}</a> / <a href="#/shop/${p.cat}">${catName(p.cat)}</a></div>
-      <p class="eyebrow">${catName(p.cat)}</p>
+      <div class="crumbs"><a href="#/">${t('home')}</a> / <a href="#/shop/${p.cat}">${catName(p.cat)}</a>${p.sub ? html` / <a href="#/shop/${p.cat}/${encodeURIComponent(p.sub)}">${subName(p.sub)}</a>` : ''}</div>
+      <p class="eyebrow">${p.sub ? subName(p.sub) : catName(p.cat)}</p>
       <h1>${L(p.name)}</h1>
-      <p class="price" id="pdp-price" aria-live="polite">${m(ws && s0.wholesale ? s0.wholesale : s0.price)}${ws && s0.wholesale ? html`<s>${m(s0.price)}</s><span class="ws">${t('wsPrice')}</span>` : ''}</p>
-      <p>${L(p.desc)}</p>
-      ${notes.length >= 3 ? html`<div class="notes" aria-label="${t('notes')}"><div><b>${t('top')}</b>${notes[0]}</div><div><b>${t('heart')}</b>${notes[1]}</div><div><b>${t('base')}</b>${notes[2]}</div></div>` : ''}
-      <form data-form="add" data-id="${p.id}">
-        <fieldset class="sizes"><legend>${t('size')}</legend>
-          ${p.sizes.map((s, i) => html`<label class="size-opt"><input type="radio" name="size" value="${s.label}" ${raw(i ? '' : 'checked')} data-input="size" data-price="${ws && s.wholesale ? s.wholesale : s.price}"><span>${s.label}</span></label>`)}
-        </fieldset>
+      <p class="price big" id="pdp-price" aria-live="polite">${p.quote ? T('מחיר בהתאמה אישית', 'Price on request') : m(priceOf(p.sizes[0]))}${!p.quote && ws ? html` <s>${m(p.sizes[0].price)}</s> <span class="ws">${t('wsPrice')}</span>` : ''}</p>
+      ${p.quote ? html`<p>${he() ? p.desc.he.split('\n')[0] : p.desc.en || p.desc.he.split('\n')[0]}</p>
+        <div class="buy-row"><a class="btn gold" href="${waLink(T('שלום, אשמח להצעת מחיר עבור ', 'Hello, I would like a quote for ') + L(p.name))}" target="_blank" rel="noopener noreferrer">${T('לקבלת הצעת מחיר בוואטסאפ', 'Get a quote on WhatsApp')}</a><a class="btn ghost" href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a></div>` : html`
+      <form data-form="add" data-id="${p.id}" novalidate>
+        ${p.sizes.length > 1 ? html`<fieldset class="sizes"><legend>${p.cat === 'oils' ? T('נפח', 'Volume') : t('size')}</legend>
+          ${p.sizes.map((s, i) => html`<label class="size-opt"><input type="radio" name="size" value="${s.label}" ${raw(i ? '' : 'checked')} data-input="size" data-price="${priceOf(s)}"><span>${s.label}</span></label>`)}
+        </fieldset>` : html`<input type="hidden" name="size" value="${p.sizes[0].label}">`}
+        ${opt ? html`<fieldset class="sizes"><legend>${L(opt.name)}</legend>
+          ${opt.values.map((v, i) => html`<label class="size-opt"><input type="radio" name="opt" value="${v.he}" ${raw(i ? '' : 'checked')} data-input="opt" data-img="${v.imgs?.[0] || ''}"><span>${L(v)}</span></label>`)}
+        </fieldset>` : ''}
+        ${p.picks ? html`<fieldset class="picker" aria-describedby="pick-count"><legend>${T(`בחרו ${p.picks} ניחוחות`, `Choose ${p.picks} scents`)} <span id="pick-count" class="pill st-new" aria-live="polite">0/${p.picks}</span></legend>
+          <label class="check"><input type="checkbox" name="surprise" data-input="surprise"><span>${T('הפתיעו אותי — תבחרו בשבילי את הניחוחות הכי אהובים', 'Surprise me — pick the favourites for me')}</span></label>
+          <div class="pick-groups" data-max="${p.picks}">${groups.map((g) => html`<div><h3>${subName(g)}</h3>${pickList.filter((x) => x.sub === g).map((x) => html`<label class="pick"><input type="checkbox" name="pick" value="${x.name.he}" data-input="pick"><span>${L(x.name)}</span></label>`)}</div>`)}</div>
+        </fieldset>` : ''}
         <div class="buy-row">
           <div class="qty"><button type="button" data-action="qty" data-d="-1" aria-label="${t('decrease')}">−</button><label class="sr-only" for="qty">${t('qty')}</label><input id="qty" name="qty" inputmode="numeric" value="1" maxlength="2"><button type="button" data-action="qty" data-d="1" aria-label="${t('increase')}">+</button></div>
           <button class="btn" type="submit" ${raw(p.stock === 0 ? 'disabled' : '')}>${p.stock === 0 ? t('outStock') : t('addToCart')}</button>
         </div>
-      </form>
-      <ul class="perks"><li>${t('perk1')}</li><li>${t('perk2')}</li><li>${t('perk3')}</li></ul>
+        <p class="err" id="add-err" role="alert"></p>
+      </form>`}
+      <ul class="perks"><li>${t('perk1')}</li><li>${t('perk2')}</li>${p.cat === 'diffusers' ? html`<li>${T('שנת אחריות יבואן', '1-year importer warranty')}</li><li><a href="#/guide">${T('מדריך שימוש ותחזוקה', 'Use & care guide')}</a></li>` : html`<li>${t('perk3')}</li>`}</ul>
     </div>
   </div>
+  ${p.specs?.length ? html`<section class="specs" aria-labelledby="spec-t"><h2 id="spec-t">${T('מפרט טכני', 'Specifications')}</h2><table class="spec-tbl"><tbody>${p.specs.map(([k, v]) => html`<tr><th scope="row">${k}</th><td>${v}</td></tr>`)}</tbody></table></section>` : ''}
+  ${!p.quote ? html`<section class="rich" aria-label="${T('תיאור המוצר', 'Product description')}">${he() || !p.desc.en ? richText(p.desc.he) : richText(p.desc.en)}</section>` : ''}
   <section class="block" aria-labelledby="comp-t"><h2 id="comp-t">${t('complements')}</h2><span class="rule"></span><div class="grid">${complements(p).map(card)}</div></section></div>`;
+}
+
+export function kitUpsell() {
+  const kits = active().filter((p) => p.picks);
+  if (!kits.length) return '';
+  return html`<div class="modal-bg"><div class="modal shop-modal" role="dialog" aria-modal="true" aria-labelledby="up-t">
+    <p class="eyebrow">${T('נוסף לסל ✓', 'Added to cart ✓')}</p>
+    <h2 id="up-t">${T('ומה תפיצו בו? השלימו עם ערכת התנסות', 'What will you diffuse? Add a discovery kit')}</h2>
+    <p class="muted">${T('המכשיר עובד עם תמציות שמן בלבד. ערכת התנסות היא הדרך הכי טובה למצוא את הניחוח שלכם.', 'The device works with fragrance oils only. A discovery kit is the best way to find your scent.')}</p>
+    <div class="up-grid">${kits.map((k) => html`<a class="up" href="#/product/${k.id}" data-action="modal-close">${media(k)}<b>${L(k.name)}</b><span>${m(k.sizes[0].price)}</span></a>`)}</div>
+    <div class="bo-filters"><button class="btn ghost" data-action="modal-close">${T('המשך קנייה', 'Continue shopping')}</button><button class="btn" data-action="go-cart">${T('לסל הקניות', 'View cart')}</button></div>
+  </div></div>`;
+}
+
+export function guide() {
+  const g = db.SITE.guide || '';
+  return html`<div class="wrap legal rich"><p class="eyebrow">SAY Boutique</p><h1>${T('מדריך שימוש, מיקום ותחזוקה', 'Use, placement & care guide')}</h1>${richText(g)}</div>`;
 }
 
 export function cartDrawer() {
   const tt = db.cartTotals();
   const left = Math.max(0, FREE_SHIP - (tt.subtotal - tt.discount));
   const ratio = Math.min(1, (tt.subtotal - tt.discount) / FREE_SHIP);
-  const ups = tt.lines.length ? complements(tt.lines[0].p, 6).filter((x) => !tt.lines.some((l) => l.pid === x.id)).slice(0, 2) : [];
+  const ups = tt.lines.length ? complements(tt.lines[0].p, 6).filter((x) => !x.quote && !tt.lines.some((l) => l.pid === x.id)).slice(0, 2) : [];
   return html`<header><h2 id="cart-t">${t('cart')}</h2><button class="icon-btn" data-action="cart-close" aria-label="${t('close')}">✕</button></header>
   <div class="drawer-body">
     ${tt.lines.length ? html`
@@ -163,11 +237,11 @@ export function cartDrawer() {
       <div class="progress" aria-hidden="true"><i class="pbar" data-ratio="${ratio}"></i></div>
       ${tt.lines.map((l, i) => html`<div class="line">
         <div class="line-media">${media(l.p)}</div>
-        <div><h3>${L(l.p.name)}</h3><small class="muted">${l.size}</small>
+        <div><h3>${L(l.p.name)}</h3><small class="muted">${l.size === 'יחידה' || l.size === 'מארז' ? '' : l.size}${l.opt ? html` · ${l.opt.length > 40 ? l.opt.slice(0, 40) + '…' : l.opt}` : ''}</small>
           <div class="qty"><button data-action="line-qty" data-i="${i}" data-d="-1" aria-label="${t('decrease')}">−</button><input aria-label="${t('qty')}" value="${l.qty}" readonly><button data-action="line-qty" data-i="${i}" data-d="1" aria-label="${t('increase')}">+</button></div></div>
         <div><b>${m(l.price * l.qty)}</b><br><button class="link-btn" data-action="line-rm" data-i="${i}">${t('remove')}</button></div>
       </div>`)}
-      ${ups.length ? html`<div class="upsell"><h3>${t('youMayLike')}</h3>${ups.map((x) => html`<div class="mini"><div class="line-media">${media(x)}</div><div><a href="#/product/${x.id}">${L(x.name)}</a><br><small>${m(x.sizes[0].price)}</small></div><button class="btn sm ghost" data-action="quick-add" data-id="${x.id}" aria-label="${t('addToCart')}: ${L(x.name)}">+</button></div>`)}</div>` : ''}
+      ${ups.length ? html`<div class="upsell"><h3>${t('youMayLike')}</h3>${ups.map((x) => html`<div class="mini"><div class="line-media">${media(x)}</div><div><a href="#/product/${x.id}">${L(x.name)}</a><br><small>${m(Math.min(...x.sizes.map((s) => s.price)))}</small></div><a class="btn sm ghost" href="#/product/${x.id}" data-action="cart-close" aria-label="${L(x.name)}">←</a></div>`)}</div>` : ''}
     ` : html`<p>${t('cartEmpty')}</p><a class="btn ghost" href="#/shop" data-action="cart-close">${t('continueShop')}</a>`}
   </div>
   ${tt.lines.length ? html`<footer>${totalsBlock(tt)}<a class="btn block" href="#/checkout" data-action="cart-close">${t('checkout')}</a></footer>` : ''}`;
@@ -197,7 +271,7 @@ export function checkout() {
       <button class="btn block gold" type="submit">${t('placeOrder')} · ${m(tt.total)}</button>
       <p class="secure-note"><span aria-hidden="true">🔒</span>${t('secure')}</p>
     </form>
-    <aside class="summary" aria-label="${t('cart')}">${tt.lines.map((l) => html`<div class="mini"><div class="line-media">${media(l.p)}</div><div>${L(l.p.name)}<br><small class="muted">${l.size} × ${l.qty}</small></div><b>${m(l.price * l.qty)}</b></div>`)}<hr>${totalsBlock(tt)}</aside>
+    <aside class="summary" aria-label="${t('cart')}">${tt.lines.map((l) => html`<div class="mini"><div class="line-media">${media(l.p)}</div><div>${L(l.p.name)}<br><small class="muted">${l.size} × ${l.qty}${l.opt ? html`<br>${l.opt}` : ''}</small></div><b>${m(l.price * l.qty)}</b></div>`)}<hr>${totalsBlock(tt)}</aside>
   </div></div>`;
 }
 
