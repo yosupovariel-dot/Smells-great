@@ -71,7 +71,10 @@ const delta = (a, b) => { const p = pct(a, b); return html`<span class="delta ${
 
 export function dashboard() {
   const months = lastMonths(12); const { by, prod } = stats(months);
-  const cur = by[months.at(-1)], prev = by[months.at(-2)];
+  const cur = by[months.at(-1)];
+  // Compare month-to-date with the same days of last month, not the whole previous month.
+  const today = new Date(); const pmStart = new Date(today.getFullYear(), today.getMonth() - 1, 1); const pmCut = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate(), 23, 59);
+  const prev = db.orders().filter((o) => o.status !== 'cancelled' && o.date >= +pmStart && o.date <= +pmCut).reduce((a, o) => ({ rev: a.rev + o.total, n: a.n + 1, profit: a.profit + o.total - o.items.reduce((c, i) => c + (i.cost || 0) * i.qty, 0) }), { rev: 0, n: 0, profit: 0 });
   const aov = (b) => (b.n ? b.rev / b.n : 0);
   const top = Object.entries(prod).map(([id, p]) => ({ id, ...p, q: p.months[months.at(-1)].q + p.months[months.at(-2)].q })).sort((a, b) => b.q - a.q).slice(0, 5);
   const recent = db.orders().slice(0, 6);
@@ -83,6 +86,8 @@ export function dashboard() {
       <div class="kpi"><small>${T('הזמנות', 'Orders')}</small><b>${cur.n}</b>${delta(cur.n, prev.n)}</div>
       <div class="kpi"><small>${T('סל ממוצע', 'Avg. order')}</small><b>${m(Math.round(aov(cur)))}</b>${delta(aov(cur), aov(prev))}</div>
     </div>
+    <p class="muted kpi-note">${T('השינוי באחוזים — לעומת אותם ימים בחודש הקודם', 'Change vs. the same days last month')}</p>
+    ${db.orders().some((o) => o.demo) ? html`<div class="panel demo-note"><b>${T('מצב תצוגה:', 'Preview mode:')}</b> ${T('הנתונים הם סימולציה של שנת פעילות להצגה ללקוח.', 'Data simulates a year of trading for the client preview.')} <button class="btn sm ghost" data-action="clear-demo">${T('ניקוי נתוני דמו', 'Clear demo data')}</button></div>` : ''}
     <div class="panel chart"><div class="panel-head"><h2>${T('הכנסות ורווח — 12 חודשים', 'Revenue & profit — 12 months')}</h2><small><span aria-hidden="true">■</span> ${T('שחור: הכנסות · זהב: רווח', 'Black: revenue · Gold: profit')}</small></div>${barChart(months, by)}</div>
     <div class="row2">
       <div class="panel"><div class="panel-head"><h2>${T('מוצרים מובילים', 'Top products')}</h2><a href="#/admin/reports">${T('לדוח המלא', 'Full report')}</a></div>

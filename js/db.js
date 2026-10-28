@@ -4,7 +4,7 @@
 import { SEED_PRODUCTS } from './data.js';
 import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js';
 
-const K = (k) => 'say3_' + k;
+const K = (k) => 'say5_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
 const write = (k, v) => { try { localStorage.setItem(K(k), JSON.stringify(v)); } catch {} };
 
@@ -159,30 +159,90 @@ export async function seedDemo() {
     l.push({ id: uid('u_'), name, email, phone: '0523233310', role, club: false, blocked: false, mustChange: true, createdAt: Date.now(), salt, hash });
   }
   saveUsers(l);
-  // Historical orders across the last 12 months so reports have data.
-  const prods = products().filter((p) => !p.quote && p.sizes[0].price); const names = ['דנה כהן', 'יוסי לוי', 'מיכל אברהם', 'אבי מזרחי', 'רונית פרץ', 'עומר ביטון', 'נועה דהן', 'איתי שלום'];
-  const cities = ['תל אביב', 'רמת גן', 'חולון', 'ראשון לציון', 'פתח תקווה', 'הרצליה', 'נתניה', 'ירושלים'];
+  // A simulated first year of trading (deterministic, so every viewer sees the same store).
+  let seed = 20251028;
+  const rnd = () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const pick = (a) => a[Math.floor(rnd() * a.length)];
+  const weighted = (a) => { const tot = a.reduce((x, y) => x + y.w, 0); let r = rnd() * tot; for (const x of a) if ((r -= x.w) < 0) return x; return a[0]; };
+  const now = new Date(); const DAY = 864e5;
+  const first = ['דנה', 'יוסי', 'מיכל', 'אבי', 'רונית', 'עומר', 'נועה', 'איתי', 'שירה', 'אלון', 'הילה', 'רועי', 'מורן', 'גיל', 'ליאת', 'עידו', 'קרן', 'משה', 'אורית', 'דניאל', 'יעל', 'אריאל', 'סיון', 'נדב', 'טל', 'אסף', 'רחל', 'שמעון', 'אפרת', 'יונתן', 'חן', 'ברק', 'ענבל', 'אליהו', 'מאיה', 'שלומי'];
+  const last = ['כהן', 'לוי', 'מזרחי', 'פרץ', 'ביטון', 'דהן', 'אברהם', 'פרידמן', 'שלום', 'אזולאי', 'יוסף', 'חדד', 'גבאי', 'עמר', 'אוחיון', 'בן דוד', 'קליין', 'רוזן', 'שפירא', 'אלמוג', 'נחום', 'סויסה', 'טל', 'ברגר'];
+  const cities = [['תל אביב', 14], ['רמת גן', 7], ['ראשון לציון', 8], ['חולון', 6], ['פתח תקווה', 7], ['הרצליה', 5], ['נתניה', 6], ['ירושלים', 8], ['חיפה', 6], ['באר שבע', 4], ['רעננה', 4], ['מודיעין', 4], ['אשדוד', 5], ['כפר סבא', 4], ['בת ים', 3], ['רחובות', 4]].map(([c, w]) => ({ c, w }));
+  const streets = ['הרצל', 'ויצמן', 'ז׳בוטינסקי', 'בן גוריון', 'רוטשילד', 'העצמאות', 'הנביאים', 'סוקולוב', 'אחד העם', 'ביאליק', 'הגפן', 'התאנה', 'הדקל', 'ההגנה', 'יגאל אלון', 'אבן גבירול'];
+  const biz = ['מלון בוטיק הים', 'קליניקת אסתטיקה גלואו', 'משרדי עו״ד לוינסון', 'ספא אורן', 'חנות עיצוב Nordic', 'אולם אירועים גני הדר', 'משרדי הייטק Pixelo', 'מספרת סטודיו 54'];
   const courier = l.find((u) => u.role === 'courier');
-  const ol = []; let num = 1000; const now = new Date();
+  // Customers who joined over the year (preview accounts — no password, cannot sign in).
+  const cust = [];
+  for (let i = 0; i < 230; i++) {
+    const daysAgo = Math.floor(Math.pow(rnd(), 0.75) * 360);
+    const f = pick(first), ln = pick(last), ws = i < biz.length;
+    cust.push({ id: 'u_demo' + i, name: ws ? biz[i] : `${f} ${ln}`, email: `client${i + 1}@example.com`, phone: '05' + String(Math.floor(20000000 + rnd() * 79999999)),
+      role: ws ? 'wholesale' : 'customer', biz: ws ? biz[i] : '', wsRequest: !ws && i < biz.length + 3, club: true, newsletter: rnd() > .35, blocked: false,
+      firstOrderDiscount: false, createdAt: +now - daysAgo * DAY - Math.floor(rnd() * DAY), salt: '', hash: '', demo: true, city: weighted(cities).c });
+  }
+  saveUsers([...l, ...cust]);
+  write('club', Array.from({ length: 140 }, (_, i) => `subscriber${i + 1}@example.com`));
+  // Product popularity
+  const prods = products().filter((p) => !p.quote && p.sizes[0].price);
+  const pop = { 'say-150': 9, 'say-car': 8, 'say-100': 6, 'say-room-office': 6, 'say-300': 3, 'kit-14': 10, 'kit-4': 7, 'oil-king-david': 6, 'oil-luxury-hotel': 6, 'oil-white-tea': 6, 'oil-hilton': 5, 'oil-royal-beach': 5, 'oil-bleu-chanel': 5, 'oil-pure-vanilla': 4, 'oil-sea-breeze': 4, 'oil-tom-ford': 4, 'oil-dior-sauvage': 4, 'oil-zara': 3 };
+  const pool = prods.map((p) => ({ p, w: pop[p.id] || (p.cat === 'oils' ? 1.6 : 2) }));
+  const oilSizes = (ws) => (ws ? [{ i: 4, w: 3 }, { i: 5, w: 4 }, { i: 6, w: 2 }] : [{ i: 0, w: 1 }, { i: 1, w: 2 }, { i: 2, w: 6 }, { i: 3, w: 4 }, { i: 4, w: 2 }, { i: 5, w: 1 }]);
+  const oilNames = prods.filter((p) => p.cat === 'oils' && !p.picks).map((p) => p.name.he);
+  const ol = []; let num = 1000;
   for (let m = 11; m >= 0; m--) {
-    const count = 8 + Math.round((11 - m) * 1.6 + Math.random() * 6);
+    const mDate = new Date(now.getFullYear(), now.getMonth() - m, 1);
+    const month = mDate.getMonth();
+    const season = { 10: 1.3, 11: 1.5, 0: .85, 1: .95, 8: 1.05, 9: 1.15, 3: 1.15 }[month] || 1; // Nov–Dec gifting, Tishrei holidays, Pesach
+    const count = Math.round((30 + (11 - m) * 9) * season * (0.9 + rnd() * .2));
+    const daysIn = new Date(mDate.getFullYear(), month + 1, 0).getDate();
     for (let i = 0; i < count; i++) {
-      const d = new Date(now.getFullYear(), now.getMonth() - m, 1 + Math.floor(Math.random() * 27), 9 + Math.floor(Math.random() * 11), Math.floor(Math.random() * 60));
+      const d = new Date(mDate.getFullYear(), month, 1 + Math.floor(rnd() * daysIn), 8 + Math.floor(rnd() * 15), Math.floor(rnd() * 60));
       if (d > now) continue;
-      const items = Array.from({ length: 1 + Math.floor(Math.random() * 3) }, () => {
-        const p = prods[Math.floor(Math.random() * prods.length)]; const s = p.sizes[Math.floor(Math.random() * p.sizes.length)];
-        return { pid: p.id, name: p.name, size: s.label, qty: 1 + Math.floor(Math.random() * 2), price: s.price, cost: s.cost || 0 };
-      });
-      const subtotal = items.reduce((a, x) => a + x.price * x.qty, 0); const shipping = subtotal >= FREE_SHIP ? 0 : SHIP_COST;
-      const age = now - d; const status = age < 864e5 ? 'new' : age < 2 * 864e5 ? 'processing' : age < 3 * 864e5 ? (Math.random() > .5 ? 'ready' : 'shipped') : Math.random() > .04 ? 'delivered' : 'cancelled';
-      const n = names[Math.floor(Math.random() * names.length)];
-      ol.push({ id: uid('o_'), num: ++num, date: +d, status, payment: status === 'cancelled' ? 'refunded' : 'paid', userId: null, courierId: courier?.id,
-        customer: { name: n, phone: '05' + Math.floor(20000000 + Math.random() * 79999999), email: 'demo@example.com', city: cities[Math.floor(Math.random() * cities.length)], street: 'הרצל ' + (1 + Math.floor(Math.random() * 120)), apt: '', notes: '' },
-        items, subtotal, discount: 0, shipping, total: subtotal + shipping, history: [{ s: status, at: +d }], demo: true });
+      const eligible = cust.filter((c) => c.createdAt <= +d);
+      const c = eligible.length && rnd() > .3 ? pick(eligible) : null;
+      const ws = c?.role === 'wholesale';
+      const items = [];
+      const nItems = ws ? 2 + Math.floor(rnd() * 4) : 1 + Math.floor(rnd() * rnd() * 4);
+      for (let k = 0; k < nItems; k++) {
+        const p = weighted(pool).p;
+        const si = p.cat === 'oils' && !p.picks ? weighted(oilSizes(ws)).i : 0;
+        const s = p.sizes[Math.min(si, p.sizes.length - 1)];
+        let opt = '';
+        if (p.options?.length) opt = pick(p.options[0].values).he;
+        if (p.picks) opt = rnd() > .3 ? Array.from({ length: p.picks }, () => pick(oilNames)).filter((v, j, a) => a.indexOf(v) === j).join(', ') : 'הפתיעו אותי';
+        const qty = ws ? 2 + Math.floor(rnd() * 6) : rnd() > .85 ? 2 : 1;
+        const price = ws && s.wholesale ? s.wholesale : s.price;
+        const ex = items.find((x) => x.pid === p.id && x.size === s.label && x.opt === opt);
+        ex ? (ex.qty += qty) : items.push({ pid: p.id, name: p.name, size: s.label, opt, qty, price, cost: s.cost || 0 });
+      }
+      const subtotal = items.reduce((a, x) => a + x.price * x.qty, 0);
+      const discount = c && !ws && Math.abs(+d - c.createdAt) < 3 * DAY ? Math.round(subtotal * .1) : 0;
+      const shipping = subtotal - discount >= FREE_SHIP ? 0 : SHIP_COST;
+      const age = now - d;
+      const status = age < .6 * DAY ? 'new' : age < 1.5 * DAY ? 'processing' : age < 2.5 * DAY ? 'ready' : age < 3.5 * DAY ? 'shipped' : rnd() > .03 ? 'delivered' : 'cancelled';
+      const hist = [{ s: 'new', at: +d }];
+      const steps = ['processing', 'ready', 'shipped', 'delivered'];
+      for (let k = 0; k < steps.indexOf(status) + 1; k++) hist.push({ s: steps[k], at: +d + (k + 1) * (0.5 + rnd()) * DAY * .8 });
+      if (status === 'cancelled') hist.push({ s: 'cancelled', at: +d + DAY * rnd() });
+      const name = c ? c.name : `${pick(first)} ${pick(last)}`;
+      ol.push({ id: uid('o_'), num: 0, date: +d, status, payment: status === 'cancelled' ? 'refunded' : 'paid', userId: c?.id || null, courierId: courier?.id,
+        customer: { name, phone: c?.phone || '05' + String(Math.floor(20000000 + rnd() * 79999999)), email: c?.email || `guest${num}@example.com`, city: c?.city || weighted(cities).c,
+          street: `${pick(streets)} ${1 + Math.floor(rnd() * 140)}`, apt: rnd() > .5 ? `דירה ${1 + Math.floor(rnd() * 30)}` : '', notes: rnd() > .85 ? pick(['להשאיר ליד הדלת', 'להתקשר לפני הגעה', 'קומה 3 ללא מעלית', 'מתנה — בלי חשבונית בחבילה']) : '' },
+        items, subtotal, discount, shipping, total: subtotal - discount + shipping, history: hist, demo: true });
     }
   }
-  saveOrders(ol.sort((a, b) => b.date - a.date));
+  ol.sort((a, b) => a.date - b.date).forEach((o) => (o.num = ++num));
+  saveOrders(ol.reverse());
+  write('notify', ol.filter((o) => o.status === 'new').map((o) => ({ id: o.id, num: o.num, at: o.date, read: false })));
+  // Stock levels that reflect a year of sales
+  const sold = {}; ol.forEach((o) => o.items.forEach((it) => (sold[it.pid] = (sold[it.pid] || 0) + it.qty)));
+  write('products', products().map((p) => (p.quote ? p : { ...p, stock: Math.max(0, Math.round((p.cat === 'diffusers' ? 60 : 140) - (sold[p.id] || 0) * .18 + rnd() * 20)) })));
   write('seeded', true);
 }
 export function resetDemo() { for (const k of ['products', 'users', 'orders', 'seeded', 'notify', 'cart', 'lock', 'club']) try { localStorage.removeItem(K(k)); } catch {} }
+// Remove simulated customers/orders but keep staff and the catalog (use before going live).
+export function clearDemoData() {
+  saveUsers(users().filter((u) => !u.demo)); saveOrders(orders().filter((o) => !o.demo));
+  write('notify', []); write('club', []); write('seeded', true);
+}
 export { monthKey };

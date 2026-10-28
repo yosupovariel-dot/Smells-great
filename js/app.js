@@ -34,7 +34,7 @@ function header() {
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
       <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}">✕</button>
-      ${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/about', t('about'))}${navLink('#/wholesale', t('wholesale'))}${navLink('#/contact', t('contact'))}
+      ${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/about', t('about'))}${navLink('#/wholesale', t('wholesale'))}<a href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(getLang() === 'he' ? 'שלום SAY Boutique, אשמח לעזרה' : 'Hello SAY Boutique')}" target="_blank" rel="noopener noreferrer">${t('contact')} <span class="sr-only">(WhatsApp)</span></a>
     </nav>
     <a class="brand" href="#/" aria-label="SAY Boutique — ${t('home')}"><b>SAY</b><small>BOUTIQUE</small></a>
     <div class="tools">
@@ -52,7 +52,7 @@ function footer() {
       <div><a class="brand" href="#/" aria-label="SAY Boutique"><b>SAY</b><small>BOUTIQUE</small></a><p class="muted">Luxury Home Fragrances<br>${t('tick2')}</p>
         <p><a href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a> · <a href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
       <div><h2>${t('shop')}</h2><ul>${CATEGORIES.map((c) => html`<li><a href="#/shop/${c.id}">${c[getLang()]}</a></li>`)}</ul></div>
-      <div><h2>${t('service')}</h2><ul><li><a href="#/contact">${t('contact')}</a></li><li><a href="#/account">${t('club')}</a></li><li><a href="#/wholesale">${t('wholesale')}</a></li><li><a href="#/returns">${t('returns')}</a></li></ul></div>
+      <div><h2>${t('service')}</h2><ul><li><a href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">${t('contact')} · WhatsApp</a></li><li><a href="#/account">${t('club')}</a></li><li><a href="#/wholesale">${t('wholesale')}</a></li><li><a href="#/returns">${t('returns')}</a></li></ul></div>
       <div><h2>${t('info')}</h2><ul><li><a href="#/terms">${t('terms')}</a></li><li><a href="#/privacy">${t('privacy')}</a></li><li><a href="#/accessibility">${t('accessibility')}</a></li><li><a href="#/about">${t('about')}</a></li></ul></div>
     </div>
     <div class="ftr-bottom"><span>© ${y} SAY Boutique · ${t('rights')}</span>
@@ -238,6 +238,7 @@ document.addEventListener('click', async (e) => {
     case 'del-user': if (confirm(getLang() === 'he' ? 'למחוק את המשתמש לצמיתות?' : 'Delete user permanently?')) { db.deleteUser(id); rerender(); } break;
     case 'order-view': modal(A.orderModal(id)); break;
     case 'order-status': db.setOrderStatus(id, el.dataset.s, db.me()?.name); toast('✓'); rerender(); break;
+    case 'clear-demo': if (confirm(getLang() === 'he' ? 'למחוק את כל לקוחות והזמנות הדמו? (מומלץ לפני העלייה לאוויר)' : 'Delete all demo customers and orders?')) { db.clearDemoData(); toast('✓'); rerender(); } break;
     case 'notes-read': db.markNotesRead(); rerender(); break;
     case 'ov': state.ov = el.dataset.v; rerender(); break;
     case 'ctab': state.ctab = el.dataset.t; rerender(); break;
@@ -345,6 +346,8 @@ applyLang(); applyA11y();
 window.addEventListener('hashchange', go);
 (async () => {
   await db.loadCatalog();
+  go();
   await db.seedDemo();
-  go(); maybeConsent();
+  if (/^#\/(admin|orders|courier|account)/.test(location.hash)) rerender();
+  maybeConsent();
 })();
