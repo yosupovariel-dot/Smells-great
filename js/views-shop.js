@@ -383,14 +383,25 @@ export async function authSubmit(form, kind) {
 }
 
 export function contact() {
-  return html`<div class="wrap legal"><p class="eyebrow">${t('contact')}</p><h1>${t('contactTitle')}</h1><p>${t('contactText')}</p>
-  <p><a href="tel:${PHONE_INTL.replace('972', '+972')}">${PHONE_DISPLAY}</a> · <a href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p>
-  <form data-form="contact" novalidate>
-    <div class="row2"><div class="field"><label for="c-name">${t('fullName')} *</label><input class="input" id="c-name" name="name" required maxlength="80" autocomplete="name"></div>
-    <div class="field"><label for="c-phone">${t('phone')} *</label><input class="input" id="c-phone" name="phone" type="tel" required maxlength="20" autocomplete="tel"></div></div>
-    <div class="field"><label for="c-msg">${t('message')} *</label><textarea class="input" id="c-msg" name="msg" rows="5" required maxlength="1000"></textarea></div>
-    <p class="err" id="c-err" role="alert"></p>
-    <button class="btn" type="submit">${t('send')}</button></form></div>`;
+  const topics = [
+    [T('ייעוץ בבחירת ריח', 'Choosing a scent'), T('לא בטוחים איזה ניחוח מתאים לבית, למשרד או לעסק? ספרו לנו על החלל ונמליץ.', 'Tell us about your space and we will recommend a scent.'), T('שלום, אשמח להמלצה על ניחוח', 'Hello, I would like a scent recommendation')],
+    [T('התאמת מכשיר לחלל', 'Matching a device'), T('גודל החלל, תקרה, מיזוג — נעזור לבחור את המפיץ הנכון ואת עוצמת הפיזור.', 'Room size, ceiling, A/C — we will help you pick the right diffuser.'), T('שלום, אשמח לעזרה בבחירת מפיץ ריח', 'Hello, I need help choosing a diffuser')],
+    [T('הזמנה קיימת', 'An existing order'), T('מעקב משלוח, שינוי כתובת או כל שאלה על הזמנה. ציינו את מספר ההזמנה.', 'Tracking, address changes or any order question — include your order number.'), T('שלום, יש לי שאלה לגבי הזמנה מספר ', 'Hello, I have a question about order #')],
+    [T('לעסקים וסיטונאים', 'Business & wholesale'), T('מלונות, משרדים, חנויות וספא — מחירון סיטונאי, מיתוג וליווי אישי.', 'Hotels, offices, shops and spas — wholesale pricing and branding.'), T('שלום, אשמח לפרטים על רכישה לעסק', 'Hello, I would like details for a business purchase')],
+  ];
+  return html`<div class="contact-page">
+    <header class="shop-head wrap"><nav class="crumbs" aria-label="${T('מיקום בעמוד', 'Breadcrumb')}"><a href="#/">${t('home')}</a><span aria-hidden="true">/</span>${t('contact')}</nav>
+      <h1>${T('נשמח לדבר איתכם', 'Let’s talk')}</h1>
+      <p class="lead">${T('אנחנו זמינים בוואטסאפ לכל שאלה — מבחירת הניחוח הראשון ועד הזמנה לעסק. בחרו נושא, ונפתח לכם שיחה עם הודעה מוכנה.', 'We are on WhatsApp for anything — from your first scent to a business order. Pick a topic and we will open a chat with a ready message.')}</p></header>
+    <div class="wrap">
+      <div class="topics">${topics.map(([h, p, msg]) => html`<a class="topic" href="${waLink(msg)}" target="_blank" rel="noopener noreferrer"><b>${h}</b><p>${p}</p><span class="u-link">${T('לשיחה בוואטסאפ', 'Chat on WhatsApp')} <span aria-hidden="true">${he() ? '←' : '→'}</span></span></a>`)}</div>
+      <div class="contact-info">
+        <div><h2>${T('שעות פעילות', 'Hours')}</h2><p>${T('ראשון–חמישי: 9:00–19:00', 'Sun–Thu: 9:00–19:00')}<br>${T('שישי: 9:00–13:00', 'Fri: 9:00–13:00')}</p></div>
+        <div><h2>${T('טלפון ו-WhatsApp', 'Phone & WhatsApp')}</h2><p><a href="tel:+${PHONE_INTL}" dir="ltr">${PHONE_DISPLAY}</a></p></div>
+        <div><h2>${T('זמן מענה', 'Response time')}</h2><p>${T('בדרך כלל תוך שעה בשעות הפעילות.', 'Usually within an hour during opening hours.')}</p></div>
+      </div>
+      <p class="contact-cta"><a class="btn" href="${waLink(T('שלום SAY Boutique, אשמח לעזרה', 'Hello SAY Boutique'))}" target="_blank" rel="noopener noreferrer">${T('פתיחת שיחה בוואטסאפ', 'Open WhatsApp chat')}</a></p>
+    </div></div><div class="block"></div>`;
 }
 
 export function about() {

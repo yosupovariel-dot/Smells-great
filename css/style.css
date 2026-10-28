@@ -773,3 +773,19 @@ html[lang="he"] .card-tag{font-family:var(--f-body);font-size:.75rem;font-weight
 .h-collection{padding-top:clamp(4rem,9vw,7rem)}
 .ftr .brand{display:inline-flex;align-items:flex-start;margin-bottom:1rem}
 .ftr .brand b,.ftr .brand small{padding-inline-start:0}
+/* Contact */
+.contact-page .lead{max-width:38rem;color:var(--ink-2);font-size:1.08rem}
+.topics{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ink);margin-top:1rem}
+.topic{display:flex;flex-direction:column;gap:.6rem;padding:1.8rem 1.4rem 1.6rem;border-inline-end:1px solid var(--line);border-bottom:1px solid var(--line);text-decoration:none;transition:background .3s}
+.topic:last-child{border-inline-end:0}
+.topic:hover{background:var(--white)}
+.topic b{font-family:var(--f-display);font-weight:400;font-size:1.35rem}
+.topic p{color:var(--muted);font-size:.92rem;margin:0;flex:1}
+.topic .u-link{align-self:flex-start;font-size:.85rem}
+.contact-info{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;padding:3rem 0 1rem}
+.contact-info h2{font-family:var(--f-body);font-weight:600;font-size:.9rem;color:var(--gold-dark);margin-bottom:.4rem}
+.contact-info p{margin:0}
+.contact-cta{margin:1.6rem 0 0}
+@media (max-width:900px){.topics{grid-template-columns:1fr 1fr}.topic:nth-child(2){border-inline-end:0}}
+@media (max-width:560px){.topics,.contact-info{grid-template-columns:1fr}.topic{border-inline-end:0}}
+html[lang="he"] .ftr h2{font-family:var(--f-body);letter-spacing:0;font-weight:600;font-size:.95rem}
