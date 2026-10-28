@@ -62,7 +62,7 @@ DIFF = {
     'SAY car': ('say-car', 'SAY Car', {'ברונזה': [1, 7, 10, 13, 16, 19], 'לבן': [2, 8, 11, 14, 17, 20], 'שחור': [0, 6, 9, 12, 15, 18]}),
     'SAY 100': ('say-100', 'SAY 100', {'לבן': r'白色|לוגו', 'אפור': r'灰色'}),
     'SAY 150': ('say-150', 'SAY 150', {'לבן': [0, 2, 3], 'שחור': [1, 4, 3]}),
-    'SAY 300': ('say-300', 'SAY 300', {'לבן': [1, 3, 5, 7, 10], 'שחור': [0, 2, 4, 6, 8, 9, 11]}),
+    'SAY 300': ('say-300', 'SAY 300', {'לבן': [3, 1, 5, 7, 10], 'שחור': [2, 0, 4, 6, 8, 9, 11]}),
     'SAY 400': ('say-400', 'SAY 400', {}),
 }
 COLOR_EN = {'לבן': 'White', 'שחור': 'Black', 'ברונזה': 'Bronze', 'אפור': 'Grey'}
@@ -232,6 +232,19 @@ def main():
     bundles = os.path.join(cache, 'מארזים משתלמים')
     site['bundles'] = [save(os.path.join(bundles, f), 'bundle-' + str(i), box=1600, q=80) for i, f in enumerate(sorted(os.listdir(bundles)))]
     site['subEn'] = SUB_EN
+    # Card packshots: one consistent bottle shot for every oil (the scene image shows on hover / in the gallery),
+    # and a clean front shot for devices whose first photo is a lifestyle or open-door view.
+    bottle = sorted(os.listdir(os.path.join(cache, 'תמציות שמן')))
+    bottle = [b for b in bottle if b.endswith('.png')]
+    if len(bottle) > 2:
+        im = Image.open(os.path.join(cache, 'תמציות שמן', bottle[2])).convert('RGB'); W, H = im.size; w = int(H * 4 / 5)
+        im = im.crop(((W - w) // 2, 0, (W - w) // 2 + w, H)); im.thumbnail((1200, 1500), Image.LANCZOS)
+        im.save(os.path.join(OUT_IMG, 'oil-pack.webp'), 'WEBP', quality=84, method=6)
+        sm = im.copy(); sm.thumbnail((640, 800), Image.LANCZOS); sm.save(os.path.join(OUT_IMG, 'oil-pack-sm.webp'), 'WEBP', quality=78, method=6)
+        for p in products:
+            if p['cat'] == 'oils' and not p.get('picks'): p['pack'] = 'assets/products/oil-pack.webp'
+    for p in products:
+        if p['id'] == 'say-100' and len(p['gallery']) > 7: p['pack'] = p['gallery'][7]
     BUNDLES = [('SAY100 + 1 ליטר', 'bundle-say100-1l', 'SAY 100 + 1L oil', 'מארזים משתלמים', 'SAY100 + 1ליטר עם רקע'),
                ('SAY150 + 1 ליטר', 'bundle-say150-1l', 'SAY 150 + 1L oil', 'תמונות לקרוסלה', 'SAY150 + 1 ליטר'),
                ('SAY 300 + 1 ליטר', 'bundle-say300-1l', 'SAY 300 + 1L oil', 'תמונות לקרוסלה', 'SAY 300 +1 ליטר'),

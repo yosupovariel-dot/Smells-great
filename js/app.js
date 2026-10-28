@@ -24,10 +24,7 @@ function header() {
   const msgs = ['tick1', 'tick2', 'tick3', 'tick4', 'tick5'];
   return html`<a class="skip" href="#main">${t('skip')}</a>
   <div class="ticker" role="region" aria-label="${getLang() === 'he' ? 'הודעות' : 'Announcements'}"><div class="wrap">
-    <button class="tk-nav" data-action="tick-step" data-d="-1" aria-label="${getLang() === 'he' ? 'ההודעה הקודמת' : 'Previous message'}">${getLang() === 'he' ? '›' : '‹'}</button>
-    <div class="ticker-track" aria-live="off">${msgs.map((k, i) => html`<p class="ticker-msg ${i ? '' : 'on'}" ${raw(i ? 'aria-hidden="true"' : '')}>${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}">${t(k)}</a>` : html`<span>${t(k)}</span>`}</p>`)}</div>
-    <button class="tk-nav" data-action="tick-step" data-d="1" aria-label="${getLang() === 'he' ? 'ההודעה הבאה' : 'Next message'}">${getLang() === 'he' ? '‹' : '›'}</button>
-    <button class="tk-pause" data-action="ticker-toggle" aria-label="${t('pause')}" aria-pressed="false"><svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path class="i-pause" d="M3 2h2v8H3zM7 2h2v8H7z" fill="currentColor"/><path class="i-play" d="M3 2l7 4-7 4z" fill="currentColor"/></svg></button></div></div>
+    <div class="ticker-track" aria-live="off">${msgs.map((k, i) => html`<p class="ticker-msg ${i ? '' : 'on'}" ${raw(i ? 'aria-hidden="true"' : '')}>${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}">${t(k)}</a>` : html`<span>${t(k)}</span>`}</p>`)}</div></div></div>
   <header class="hdr"><div class="wrap">
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
@@ -54,7 +51,7 @@ function footer() {
       <div><h2>${t('info')}</h2><ul><li><a href="#/terms">${t('terms')}</a></li><li><a href="#/privacy">${t('privacy')}</a></li><li><a href="#/accessibility">${t('accessibility')}</a></li><li><a href="#/about">${t('about')}</a></li></ul></div>
     </div>
     <div class="ftr-bottom"><span>© ${y} SAY Boutique · ${t('rights')}</span>
-      <span>${t('builtBy')} <a href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener">arielyosupov-webdesign</a> · <a href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener">arielyosupov-webdesign.com</a></span></div>
+      <a class="credit" href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener">${t('builtBy')}</a></div>
   </div></footer>
   <a class="fab fab-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer" aria-label="${t('whatsapp')} ${PHONE_DISPLAY}">${raw(ICONS.wa)}</a>
   <button class="fab fab-a11y" data-action="a11y" aria-label="${t('a11yTitle')}" aria-expanded="false" aria-controls="a11y-panel">${raw(ICONS.a11y)}</button>
@@ -92,7 +89,8 @@ function startTicker() {
   clearInterval(tickTimer);
   if (tickPaused || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   tickTimer = setInterval(() => {
-    const ms = $$('.ticker-msg'); if (!ms.length) return;
+    // Pauses while hovered/focused or when "stop animations" is on (WCAG 2.2.2).
+    if (document.documentElement.classList.contains('a11y-stop') || $('.ticker:hover, .ticker:focus-within')) return;
     stepTicker(1);
   }, 4500);
 }

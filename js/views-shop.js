@@ -27,18 +27,28 @@ export function priceTag(p) {
   return html`<span class="price">${from}${m(minPrice(p, ws))}${ws ? html`<s>${m(minPrice(p, false))}</s>` : ''}</span>`;
 }
 
+// Card image: a consistent "packshot" (oil bottle / clean device front), with a second look on hover.
+const cardImgs = (p) => {
+  const main = p.pack || p.img;
+  const alt = p.cat === 'oils' && p.pack ? p.img
+    : p.options?.[0]?.values?.[1]?.imgs?.[0] || (p.pack && p.pack !== p.img ? p.img : '');
+  const studio = p.fit === 'contain' && (p.pack || p.img) !== (p.cat === 'diffusers' && !p.pack && p.id === 'say-100' ? p.img : '');
+  return { main, alt: alt !== main ? alt : '', studio: p.fit === 'contain' };
+};
 export function card(p) {
-  const cls = `card${p.wide ? ' wide' : ''}`;
-  const quick = p.quote || p.picks || p.options?.length || p.sizes.length > 1
-    ? html`<a class="btn block sm" href="#/product/${p.id}">${p.quote ? T('לפרטים', 'Details') : T('לבחירה', 'Choose options')}</a>`
-    : html`<button class="btn block sm" data-action="quick-add" data-id="${p.id}" aria-label="${t('quickAdd')}: ${L(p.name)}">${t('quickAdd')}</button>`;
-  return html`<article class="${cls}">
-    <a class="card-media ${p.fit === 'contain' ? 'contain' : ''}" href="#/product/${p.id}" tabindex="-1" aria-hidden="true">${media(p)}${p.gallery?.[1] && p.fit === 'contain' ? media(p, 'alt-img', false, p.gallery[1]) : ''}</a>
+  const { main, alt, studio } = cardImgs(p);
+  const direct = !(p.quote || p.picks || p.options?.length || p.sizes.length > 1);
+  return html`<article class="card ${studio ? 'studio' : 'photo'}">
+    <a class="card-media" href="#/product/${p.id}" tabindex="-1" aria-hidden="true">
+      ${media(p, 'm1', false, main)}${alt ? media(p, 'm2', false, alt) : ''}
+    </a>
     ${p.tag ? html`<span class="card-tag">${t('tag_' + p.tag)}</span>` : ''}
-    <div class="card-quick">${quick}</div>
+    ${p.quote ? '' : direct
+      ? html`<button class="card-add" data-action="quick-add" data-id="${p.id}" aria-label="${t('quickAdd')}: ${L(p.name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`
+      : html`<a class="card-add" href="#/product/${p.id}" aria-label="${T('לבחירת אפשרויות', 'Choose options')}: ${L(p.name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>`}
     <div class="card-body">
-      <small class="muted">${p.sub ? subName(p.sub) : catName(p.cat)}</small>
       <h3><a href="#/product/${p.id}">${L(p.name)}</a></h3>
+      <small>${p.sub ? subName(p.sub) : catName(p.cat)}${p.sizes.length > 1 ? html` · ${p.sizes.length} ${T('גדלים', 'sizes')}` : ''}${p.options?.[0] ? html` · ${p.options[0].values.length} ${T('צבעים', 'colours')}` : ''}</small>
       ${priceTag(p)}
     </div>
   </article>`;
@@ -189,14 +199,14 @@ export function productPage(id) {
   const p = db.product(id);
   if (!p || p.active === false) return null;
   const ws = db.me()?.role === 'wholesale';
-  const gallery = [...new Set([p.img, ...(p.gallery || [])].filter(Boolean))];
+  const gallery = [...new Set([p.pack, p.img, ...(p.gallery || [])].filter(Boolean))];
   const opt = p.options?.[0];
   const priceOf = (s) => (ws && s.wholesale ? s.wholesale : s.price);
   const pickList = p.picks ? (p.pickFrom || []).map((x) => db.product(x)).filter(Boolean) : [];
   const groups = [...new Set(pickList.map((x) => x.sub))];
   return html`<div class="wrap"><div class="pdp">
     <div class="pdp-gallery">
-      <div class="pdp-media ${p.fit === 'contain' ? 'contain' : ''}" data-zoom>${media(p, '', true, gallery[0], true)}</div>
+      <div class="pdp-media ${p.fit === 'contain' ? 'contain' : 'photo'}" data-zoom>${media(p, '', true, gallery[0], true)}</div>
       ${gallery.length > 1 ? html`<div class="thumbs" role="group" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<button data-action="thumb" data-src="${g}" aria-label="${T('תמונה', 'Image')} ${i + 1}" aria-pressed="${i === 0}"><img src="${small(g)}" alt="" loading="lazy" width="120" height="120"></button>`)}</div>` : ''}
     </div>
     <div>

@@ -1101,3 +1101,51 @@ tr.blocked td{opacity:.55}
 .feed b,.feed small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bo-search input::-webkit-search-cancel-button{filter:grayscale(1) opacity(.5)}
 @media (max-width:860px){.feed .pill{display:none}.kpi b{font-size:1.35rem}.todo a{grid-template-columns:40px 1fr auto}.todo b{width:40px;height:40px}.bo-top{flex-direction:column;align-items:stretch}.bo-filters{flex-wrap:wrap}.bo-field input{width:100%}.bo-field{flex:1}}
+
+/* ===== Product cards v3 — studio packshots ===== */
+.grid,.shop-grid{gap:clamp(1.6rem,3vw,2.8rem) clamp(1rem,2vw,1.8rem)}
+.shop-grid{grid-template-columns:repeat(3,1fr)}
+@media (max-width:1100px){.shop-grid{grid-template-columns:repeat(2,1fr)}}
+.card{transform:none!important}
+.card .card-media,.card.wide .card-media{aspect-ratio:4/5;position:relative;display:block;overflow:hidden;border-radius:2px;box-shadow:none}
+.card .card-body h3 a::before{aspect-ratio:4/5!important}
+.card.studio .card-media{background:radial-gradient(120% 80% at 50% 35%,#FBF8F2 0%,#EFE7DA 70%,#E6DBCA 100%)}
+.card.studio .card-media::before{content:"";position:absolute;left:22%;right:22%;bottom:13%;height:16px;border-radius:50%;background:radial-gradient(closest-side,rgba(60,45,25,.28),transparent);filter:blur(3px);z-index:0}
+.card.studio .card-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:14% 16% 17%;mix-blend-mode:multiply;transition:opacity .6s ease,transform 1s cubic-bezier(.2,.7,.2,1)}
+.card.photo .card-media{background:var(--cream-2)}
+.card.photo .card-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .6s ease,transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.card .card-media .m2{opacity:0}
+.card:hover .card-media .m2,.card:focus-within .card-media .m2{opacity:1}
+.card:hover .card-media .m1{opacity:0}
+.card .card-media:not(:has(.m2)) .m1{opacity:1!important}
+.card:hover .card-media img{transform:scale(1.04)}
+.card.studio:hover .card-media img{transform:scale(1.06)}
+.card-media::after{display:none}
+.card-tag{top:14px;inset-inline-start:14px;background:rgba(255,253,249,.92);color:var(--ink);backdrop-filter:blur(4px);border:0;padding:.3rem .7rem;font-size:.72rem}
+.card-add{position:absolute;top:14px;inset-inline-end:14px;width:42px;height:42px;border-radius:50%;background:var(--ink);color:var(--cream);display:grid;place-items:center;border:0;cursor:pointer;opacity:0;transform:scale(.8);transition:opacity .3s,transform .3s,background .2s;z-index:2}
+.card-add svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none}
+.card:hover .card-add,.card:focus-within .card-add{opacity:1;transform:none}
+.card-add:hover{background:var(--gold-dark)}
+@media (hover:none){.card-add{opacity:1;transform:none;width:38px;height:38px}}
+.card-quick{display:none}
+.card-body{padding:1.1rem 0 0;gap:.3rem;align-items:flex-start}
+.card-body h3{font-family:var(--f-display);font-weight:400;font-size:1.3rem;line-height:1.2;margin:0}
+.card-body h3 a{text-decoration:none;background:linear-gradient(currentColor,currentColor) no-repeat 100% 100%/0 1px;transition:background-size .4s}
+.card:hover .card-body h3 a{background-size:100% 1px}
+.card-body small{color:var(--muted);font-size:.8rem}
+.card-body .price{font-size:.98rem;font-weight:500;margin-top:.25rem;font-family:var(--f-body)}
+@media (max-width:520px){.card-body h3{font-size:1.05rem}.card-body small{font-size:.72rem}}
+/* product page media matches */
+.pdp-gallery .pdp-media.contain{background:radial-gradient(120% 80% at 50% 35%,#FBF8F2 0%,#EFE7DA 70%,#E6DBCA 100%)}
+.pdp-media.contain img{mix-blend-mode:multiply;padding:10%}
+.pdp-gallery .pdp-media{aspect-ratio:4/5}
+.thumbs button{background:#F3EDE3}
+.thumbs img{mix-blend-mode:multiply}
+/* home device list + search tiles share the studio backdrop */
+.h-item-img{background:radial-gradient(120% 80% at 50% 35%,#FBF8F2,#E9DFCF)}
+.h-item-img img{mix-blend-mode:multiply}
+.so-img.contain{background:radial-gradient(120% 80% at 50% 35%,#FBF8F2,#E9DFCF)}
+.so-img.contain img{mix-blend-mode:multiply}
+.ftr-bottom .credit{color:var(--gold-2);text-decoration:none}.ftr-bottom .credit:hover{text-decoration:underline}
+.card.studio .card-media img{object-position:50% 100%;padding:16% 18% 21%}
+.card.studio .card-media::before{bottom:18.5%;height:14px;left:24%;right:24%}
