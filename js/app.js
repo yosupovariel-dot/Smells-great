@@ -37,7 +37,7 @@ function header() {
     <a class="brand" href="#/" aria-label="SAY Boutique — ${t('home')}"><b>SAY</b><small>BOUTIQUE</small></a>
     <div class="tools">
       <button class="icon-btn lang-btn" data-action="lang" lang="${getLang() === 'he' ? 'en' : 'he'}" aria-label="${t('langLabel')}">${getLang() === 'he' ? 'EN' : 'עב'}</button>
-      <a class="icon-btn" href="#/shop" aria-label="${t('search')}">${raw(ICONS.search)}</a>
+      <button class="icon-btn" data-action="search-open" aria-label="${t('search')}" aria-haspopup="dialog">${raw(ICONS.search)}</button>
       <a class="icon-btn" href="#/account" aria-label="${t('account')}">${raw(ICONS.user)}</a>
       <button class="icon-btn" data-action="cart-open" aria-label="${t('cart')} (${n})" aria-haspopup="dialog">${raw(ICONS.bag)}${n ? html`<span class="badge" aria-hidden="true">${n}</span>` : ''}</button>
     </div></div></header>`;
@@ -56,7 +56,7 @@ function footer() {
     <div class="ftr-bottom"><span>© ${y} SAY Boutique · ${t('rights')}</span>
       <span>${t('builtBy')} <a href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener">arielyosupov-webdesign</a> · <a href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener">arielyosupov-webdesign.com</a></span></div>
   </div></footer>
-  <a class="fab fab-wa" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(getLang() === 'he' ? 'שלום SAY Boutique, אשמח לעזרה' : 'Hello SAY Boutique')}" target="_blank" rel="noopener noreferrer" aria-label="${t('whatsapp')} ${PHONE_DISPLAY}">${raw(ICONS.wa)}</a>
+  <a class="fab fab-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer" aria-label="${t('whatsapp')} ${PHONE_DISPLAY}">${raw(ICONS.wa)}</a>
   <button class="fab fab-a11y" data-action="a11y" aria-label="${t('a11yTitle')}" aria-expanded="false" aria-controls="a11y-panel">${raw(ICONS.a11y)}</button>
   ${a11yPanel()}
   <div class="drawer-bg" data-action="cart-close"></div>
@@ -138,7 +138,7 @@ function route() {
   const parts = (location.hash.slice(2) || '').split('/').map(decodeURIComponent);
   const [a, b] = parts;
   const isBO = ['admin', 'orders', 'courier'].includes(a);
-  document.body.classList.remove('cart-open'); closeModal();
+  document.body.classList.remove('cart-open'); closeModal(); closeSearch();
   if (isBO) {
     if (!db.can(STAFF[a])) { state.authTab = 'login'; location.hash = '#/account'; return; }
     let v;
@@ -204,6 +204,24 @@ function closeCart() { document.body.classList.remove('cart-open'); releaseDrawe
 const refreshCart = () => { const d = $('#drawer'); if (d && document.body.classList.contains('cart-open')) { render(d, S.cartDrawer()); bars(); } const n = db.cart().reduce((a, l) => a + l.qty, 0); const btn = $('[data-action="cart-open"]'); if (btn) { btn.setAttribute('aria-label', `${t('cart')} (${n})`); $('.badge', btn)?.remove(); if (n) btn.insertAdjacentHTML('beforeend', `<span class="badge" aria-hidden="true">${n}</span>`); } };
 document.addEventListener('cart', refreshCart);
 
+// ---------- Search overlay ----------
+let releaseSearch;
+function openSearch() {
+  closeSearch();
+  const w = document.createElement('div'); w.className = 'search-ov'; w.id = 'search-ov';
+  w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true'); w.setAttribute('aria-label', t('search'));
+  render(w, S.searchPanel());
+  document.body.append(w); document.body.classList.add('no-scroll');
+  requestAnimationFrame(() => w.classList.add('in'));
+  releaseSearch = trapFocus(w, closeSearch);
+  setTimeout(() => $('#sq')?.focus(), 60);
+}
+function closeSearch() {
+  const w = $('#search-ov'); if (!w) return;
+  document.body.classList.remove('no-scroll'); w.remove(); releaseSearch?.(); releaseSearch = null;
+}
+const runSearch = debounce((q) => { const r = $('#search-results'); if (r) render(r, S.searchResults(q)); }, 120);
+
 // ---------- Modal ----------
 let releaseModal;
 function modal(tpl) { closeModal(); const w = document.createElement('div'); w.id = 'modal'; render(w, tpl); document.body.append(w); releaseModal = trapFocus(w.firstElementChild, closeModal); }
@@ -218,6 +236,9 @@ document.addEventListener('click', async (e) => {
     case 'menu': $('#nav').classList.add('open'); el.setAttribute('aria-expanded', 'true'); trapFocus($('#nav'), () => $('[data-action="menu-close"]').click()); break;
     case 'menu-close': $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); $('[data-action="menu"]').focus(); break;
     case 'cart-open': openCart(); break;
+    case 'search-open': openSearch(); break;
+    case 'search-close': closeSearch(); break;
+    case 'search-term': { const i = $('#sq'); i.value = el.dataset.q; runSearch(el.dataset.q); i.focus(); break; }
     case 'cart-close': closeCart(); break;
     case 'slide': showSlide(+el.dataset.i); clearInterval(slideTimer); break;
     case 'thumb': { const img = $('.pdp-media img'); if (img) img.src = el.dataset.src; $$('.thumbs button').forEach((b) => b.setAttribute('aria-pressed', b === el)); break; }
@@ -268,6 +289,7 @@ document.addEventListener('input', (e) => {
   const el = e.target; const k = el.dataset.input; if (!k) return;
   const v = clean(el.value, 60);
   if (k === 'search') { state.q = v; searchDeb(); keepFocus('#q'); }
+  if (k === 'sq') runSearch(v);
   if (k === 'pq') { state.pq = v; searchDeb(); keepFocus('#pq'); }
   if (k === 'uq') { state.uq = v; searchDeb(); keepFocus('#uq'); }
   if (k === 'oq') { state.oq = v; searchDeb(); keepFocus('#oq'); }
@@ -293,6 +315,7 @@ document.addEventListener('change', (e) => {
 });
 
 document.addEventListener('submit', async (e) => {
+  if (e.target.id === 'search-form') { e.preventDefault(); const first = $('#search-results a'); if (first) location.hash = first.getAttribute('href'); return; }
   const f = e.target; const kind = f.dataset.form; if (!kind) return;
   e.preventDefault();
   const btn = f.querySelector('[type="submit"]'); if (btn?.disabled) return;
@@ -327,7 +350,7 @@ document.addEventListener('submit', async (e) => {
     const d = Object.fromEntries(new FormData(f)); const err = $('#c-err');
     if (!valid.name(d.name) || !valid.phone(d.phone) || !clean(d.msg)) { err.textContent = `${t('required')} / ${t('badPhone')}`; return; }
     const txt = `פנייה מהאתר\nשם: ${clean(d.name, 80)}\nטלפון: ${clean(d.phone, 20)}\n${clean(d.msg, 1000)}`;
-    window.open(`https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(txt)}`, '_blank', 'noopener');
+    window.open(`https://wa.me/${PHONE_INTL}`, '_blank', 'noopener');
     f.reset(); err.textContent = ''; toast(t('sent'));
   }
   if (kind === 'product') {

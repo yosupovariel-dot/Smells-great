@@ -17,7 +17,8 @@ const catName = (id) => L(CATEGORIES.find((c) => c.id === id));
 export const subName = (s) => (he() ? s : db.SITE.site?.subEn?.[s] || s).split(/\s[–-]\s(?!\d)/)[0];
 const active = () => db.products().filter((p) => p.active !== false);
 const minPrice = (p, ws) => Math.min(...p.sizes.map((s) => (ws && s.wholesale ? s.wholesale : s.price)));
-const waLink = (txt) => `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(txt)}`;
+// Customer-facing WhatsApp links open an empty chat (no pre-written message).
+const waLink = () => `https://wa.me/${PHONE_INTL}`;
 
 export function priceTag(p) {
   if (p.quote) return html`<span class="price">${T('מחיר בהתאמה אישית', 'Price on request')}</span>`;
@@ -229,6 +230,35 @@ export function productPage(id) {
   <section class="block" aria-labelledby="comp-t"><h2 id="comp-t">${t('complements')}</h2><span class="rule"></span><div class="grid">${complements(p).map(card)}</div></section></div>`;
 }
 
+// ---------- Search ----------
+const norm = (x) => String(x || '').toLowerCase().replace(/["'׳״\-–]/g, '').replace(/\s+/g, ' ').trim();
+export function searchPanel() {
+  const popular = ['קינג דיוד', 'SAY 150', 'ערכת התנסות', 'וניל', 'בלו שאנל', 'SAY Car'];
+  return html`<div class="so-top"><div class="wrap">
+      <form id="search-form" role="search" class="so-form"><label class="sr-only" for="sq">${t('search')}</label>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="sq" type="search" autocomplete="off" placeholder="${T('מה תרצו להריח היום?', 'What would you like to smell today?')}" data-input="sq" maxlength="60">
+        <button type="button" class="so-close" data-action="search-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+      </form></div></div>
+    <div class="wrap so-body" id="search-results" aria-live="polite">${searchResults('', popular)}</div>`;
+}
+export function searchResults(q, popular = ['קינג דיוד', 'SAY 150', 'ערכת התנסות', 'וניל', 'בלו שאנל', 'SAY Car']) {
+  const n = norm(q);
+  if (!n) return html`<p class="so-label">${T('חיפושים פופולריים', 'Popular searches')}</p>
+    <div class="so-chips">${popular.map((p) => html`<button type="button" data-action="search-term" data-q="${p}">${p}</button>`)}</div>
+    <p class="so-label">${t('categories')}</p>
+    <div class="so-cats">${CATEGORIES.filter((c) => c.img).map((c) => html`<a href="#/shop/${c.id}"><img src="${small(c.img)}" alt="" loading="lazy" width="320" height="240"><span>${L(c)}</span></a>`)}</div>`;
+  const words = n.split(' ');
+  const hay = (p) => norm(`${p.name.he} ${p.name.en} ${p.sub || ''} ${catName(p.cat)} ${(p.options?.[0]?.values || []).map((v) => v.he).join(' ')}`);
+  const res = active().filter((p) => words.every((w) => hay(p).includes(w)))
+    .sort((a, b) => (norm(L(b.name)).startsWith(n) ? 1 : 0) - (norm(L(a.name)).startsWith(n) ? 1 : 0));
+  if (!res.length) return html`<p class="so-empty">${T('לא מצאנו תוצאות עבור', 'No results for')} “${q}”. ${T('נסו מילה אחרת, או', 'Try another word, or')} <a href="#/contact">${T('דברו איתנו', 'talk to us')}</a>.</p>`;
+  return html`<p class="so-label">${res.length} ${T('תוצאות', 'results')}</p>
+    <div class="so-grid">${res.slice(0, 12).map((p) => html`<a class="so-item" href="#/product/${p.id}"><span class="so-img ${p.fit === 'contain' ? 'contain' : ''}">${media(p)}</span>
+      <span class="so-t"><small>${p.sub ? subName(p.sub) : catName(p.cat)}</small><b>${L(p.name)}</b>${priceTag(p)}</span></a>`)}</div>
+    ${res.length > 12 ? html`<p><a class="u-link" href="#/shop">${T('לכל התוצאות בחנות', 'See all in the shop')}</a></p>` : ''}`;
+}
+
 export function kitUpsell() {
   const kits = active().filter((p) => p.picks);
   if (!kits.length) return '';
@@ -317,7 +347,7 @@ export function checkoutSubmit(form) {
 }
 
 export function orderDone(o) {
-  const wa = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(`הזמנה חדשה #${o.num} — ${o.customer.name}, ${o.customer.phone}, סה"כ ${o.total}₪`)}`;
+  const wa = waLink();
   return html`<div class="wrap legal" tabindex="-1" id="done"><p class="eyebrow">SAY Boutique</p><h1>${t('orderOk')}</h1><p>${t('orderNum')}: <b>#${o.num}</b></p><p>${t('orderOkText')}</p>
   <div class="hero-cta"><a class="btn" href="#/shop">${t('continueShop')}</a><a class="btn ghost" href="${wa}" target="_blank" rel="noopener noreferrer">${t('whatsapp')}</a></div></div>`;
 }
@@ -392,14 +422,9 @@ export function contact() {
   return html`<div class="contact-page">
     <header class="shop-head wrap"><nav class="crumbs" aria-label="${T('מיקום בעמוד', 'Breadcrumb')}"><a href="#/">${t('home')}</a><span aria-hidden="true">/</span>${t('contact')}</nav>
       <h1>${T('נשמח לדבר איתכם', 'Let’s talk')}</h1>
-      <p class="lead">${T('אנחנו זמינים בוואטסאפ לכל שאלה — מבחירת הניחוח הראשון ועד הזמנה לעסק. בחרו נושא, ונפתח לכם שיחה עם הודעה מוכנה.', 'We are on WhatsApp for anything — from your first scent to a business order. Pick a topic and we will open a chat with a ready message.')}</p></header>
+      <p class="lead">${T('אנחנו זמינים בוואטסאפ לכל שאלה — מבחירת הניחוח הראשון ועד הזמנה לעסק.', 'We are on WhatsApp for anything — from your first scent to a business order.')}</p></header>
     <div class="wrap">
       <div class="topics">${topics.map(([h, p, msg]) => html`<a class="topic" href="${waLink(msg)}" target="_blank" rel="noopener noreferrer"><b>${h}</b><p>${p}</p><span class="u-link">${T('לשיחה בוואטסאפ', 'Chat on WhatsApp')} <span aria-hidden="true">${he() ? '←' : '→'}</span></span></a>`)}</div>
-      <div class="contact-info">
-        <div><h2>${T('שעות פעילות', 'Hours')}</h2><p>${T('ראשון–חמישי: 9:00–19:00', 'Sun–Thu: 9:00–19:00')}<br>${T('שישי: 9:00–13:00', 'Fri: 9:00–13:00')}</p></div>
-        <div><h2>${T('טלפון ו-WhatsApp', 'Phone & WhatsApp')}</h2><p><a href="tel:+${PHONE_INTL}" dir="ltr">${PHONE_DISPLAY}</a></p></div>
-        <div><h2>${T('זמן מענה', 'Response time')}</h2><p>${T('בדרך כלל תוך שעה בשעות הפעילות.', 'Usually within an hour during opening hours.')}</p></div>
-      </div>
       <p class="contact-cta"><a class="btn" href="${waLink(T('שלום SAY Boutique, אשמח לעזרה', 'Hello SAY Boutique'))}" target="_blank" rel="noopener noreferrer">${T('פתיחת שיחה בוואטסאפ', 'Open WhatsApp chat')}</a></p>
     </div></div><div class="block"></div>`;
 }
@@ -412,5 +437,5 @@ export function about() {
 export function wholesalePage() {
   return html`<div class="wrap legal"><p class="eyebrow latin">B2B</p><h1>${t('wsTitle')}</h1><span class="rule"></span><p>${t('wsText')}</p>
   <ul class="perks"><li>${getLang() === 'he' ? 'מחירון סיטונאי ייעודי באתר' : 'Dedicated wholesale price list'}</li><li>${getLang() === 'he' ? 'אריזות גדולות 500ml–5L' : 'Bulk sizes 500ml–5L'}</li><li>${getLang() === 'he' ? 'ליווי אישי ומיתוג לעסקים' : 'Personal account manager & branding'}</li></ul>
-  <div class="hero-cta"><a class="btn" href="#/account/register">${t('wsCta')}</a><a class="btn ghost" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent('שלום, אשמח לפרטים על הזמנה סיטונאית')}" target="_blank" rel="noopener noreferrer">WhatsApp</a></div></div>`;
+  <div class="hero-cta"><a class="btn" href="#/account/register">${t('wsCta')}</a><a class="btn ghost" href="${waLink()}" target="_blank" rel="noopener noreferrer">WhatsApp</a></div></div>`;
 }
