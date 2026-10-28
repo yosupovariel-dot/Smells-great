@@ -8,13 +8,13 @@
    "assets/products/hero-4.webp"
   ],
   "subBanners": {
-   "🏨 בתי מלון ויוקרה": "assets/products/sub-hotels-luxury.webp",
-   "🛍️ חנויות ורשתות מובילות": "assets/products/oil-say-boutique-signature.webp",
-   "🔮 השראת בשמים יוקרתיים": "assets/products/oil-paco-rabanne.webp",
-   "🌿 טבע וספא": "assets/products/sub-nature-spa.webp",
-   "⚜️ ניחוחות קלאסיים": "assets/products/oil-time-rose.webp",
-   "🧼 ניקיון ורעננות": "assets/products/oil-soft-cotton.webp",
-   "🥐 מאפים ומתוקים": "assets/products/sub-bakery-sweets.webp"
+   "בתי מלון ויוקרה": "assets/products/sub-hotels-luxury.webp",
+   "חנויות ורשתות מובילות": "assets/products/oil-say-boutique-signature.webp",
+   "השראת בשמים יוקרתיים": "assets/products/oil-paco-rabanne.webp",
+   "טבע וספא": "assets/products/sub-nature-spa.webp",
+   "ניחוחות קלאסיים": "assets/products/oil-time-rose.webp",
+   "ניקיון ורעננות": "assets/products/oil-soft-cotton.webp",
+   "מאפים ומתוקים": "assets/products/sub-bakery-sweets.webp"
   },
   "oils": "assets/products/cat-oils.webp",
   "bundles": [
@@ -27,14 +27,14 @@
    "לחדרים וחללים קטנים - עד 30 מ\"ר": "Small rooms — up to 30 m²",
    "לבית וחללים בינונים - עד 150 מ\"ר": "Homes — up to 150 m²",
    "לעסקים וחללים גדולים - מעל 150 מ\"ר": "Business — over 150 m²",
-   "⭐ ערכות התנסות – מומלץ ללקוחות חדשים!": "⭐ Discovery kits",
-   "🏨 בתי מלון ויוקרה": "🏨 Hotels & luxury",
-   "🛍️ חנויות ורשתות מובילות": "🛍️ Leading stores",
-   "🔮 השראת בשמים יוקרתיים": "🔮 Fine-fragrance inspired",
-   "🌿 טבע וספא": "🌿 Nature & spa",
-   "⚜️ ניחוחות קלאסיים": "⚜️ Classics",
-   "🧼 ניקיון ורעננות": "🧼 Clean & fresh",
-   "🥐 מאפים ומתוקים": "🥐 Bakery & sweets"
+   "ערכות התנסות – מומלץ ללקוחות חדשים!": "Discovery kits",
+   "בתי מלון ויוקרה": "Hotels & luxury",
+   "חנויות ורשתות מובילות": "Leading stores",
+   "השראת בשמים יוקרתיים": "Fine-fragrance inspired",
+   "טבע וספא": "Nature & spa",
+   "ניחוחות קלאסיים": "Classics",
+   "ניקיון ורעננות": "Clean & fresh",
+   "מאפים ומתוקים": "Bakery & sweets"
   }
  },
  "subs": {
@@ -44,14 +44,14 @@
    "לעסקים וחללים גדולים - מעל 150 מ\"ר"
   ],
   "תמציות שמן": [
-   "⭐ ערכות התנסות – מומלץ ללקוחות חדשים!",
-   "🏨 בתי מלון ויוקרה",
-   "🛍️ חנויות ורשתות מובילות",
-   "🔮 השראת בשמים יוקרתיים",
-   "🌿 טבע וספא",
-   "⚜️ ניחוחות קלאסיים",
-   "🥐 מאפים ומתוקים",
-   "🧼 ניקיון ורעננות"
+   "ערכות התנסות – מומלץ ללקוחות חדשים!",
+   "בתי מלון ויוקרה",
+   "חנויות ורשתות מובילות",
+   "השראת בשמים יוקרתיים",
+   "טבע וספא",
+   "ניחוחות קלאסיים",
+   "מאפים ומתוקים",
+   "ניקיון ורעננות"
   ]
  },
  "guide": ""

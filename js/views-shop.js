@@ -13,7 +13,8 @@ export const media = (p, cls = '', eager = false, src = p.img, full = false) =>
     ? html`<img src="${full ? src : small(src)}" ${raw(full || small(src) === src ? '' : `srcset="${small(src)} 640w, ${src} 1400w" sizes="(max-width:600px) 50vw, 320px"`)} alt="${L(p.name)}" width="1200" height="900" ${raw(eager ? 'fetchpriority="high"' : 'loading="lazy"')} decoding="async" class="${cls}">`
     : raw(artSVG(p, cls));
 const catName = (id) => L(CATEGORIES.find((c) => c.id === id));
-export const subName = (s) => (he() ? s : db.SITE.site?.subEn?.[s] || s);
+// Display names drop the sheet's marketing tail ("ערכות התנסות – מומלץ…" → "ערכות התנסות").
+export const subName = (s) => (he() ? s : db.SITE.site?.subEn?.[s] || s).split(/\s[–-]\s(?!\d)/)[0];
 const active = () => db.products().filter((p) => p.active !== false);
 const minPrice = (p, ws) => Math.min(...p.sizes.map((s) => (ws && s.wholesale ? s.wholesale : s.price)));
 const waLink = (txt) => `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(txt)}`;
@@ -59,7 +60,7 @@ export function home() {
   const promo = db.SITE.site?.hero?.[4];
   const diff = all.filter((p) => p.cat === 'diffusers');
   const kits = all.filter((p) => p.picks);
-  const hotels = all.filter((p) => p.sub?.startsWith('🏨')).slice(0, 3);
+  const hotels = all.filter((p) => p.sub === 'בתי מלון ויוקרה').slice(0, 3);
   const oilsCount = all.filter((p) => p.cat === 'oils' && !p.picks).length;
   const words = ['King David', 'Royal Beach', 'Hilton', 'White Tea', 'Royal Amber', 'Pure Vanilla', 'Sea Breeze', 'Grand Heritage'];
   return html`
@@ -81,13 +82,13 @@ export function home() {
       <span class="frame" aria-hidden="true"></span>
     </div>
   </section>
-  <div class="marquee" aria-hidden="true"><div>${[...words, ...words].map((w) => html`<span>${w}</span><span class="dot">✦</span>`)}</div></div>
+  <div class="marquee" aria-hidden="true"><div>${[...words, ...words].map((w) => html`<span>${w}</span><span class="dot" aria-hidden="true"></span>`)}</div></div>
 
   <section class="block" aria-labelledby="cats-t"><div class="wrap">
     ${secHead('01', 'SAY Boutique', t('categories'), 'cats-t')}
     <nav class="cat-tiles reveal" aria-label="${t('categories')}">${CATEGORIES.map((c) => html`<a class="tile ${c.img ? '' : 'soon'}" href="#/shop/${c.id}">
       ${c.img ? html`<img src="${small(c.img)}" srcset="${small(c.img)} 640w, ${c.img} 1400w" sizes="(max-width:860px) 50vw, 40vw" alt="" loading="lazy" width="800" height="600">` : html`<img class="tile-mark" src="assets/img/mark.webp" alt="" loading="lazy" width="180" height="156">`}
-      <span><b>${L(c)}</b><small>${he() ? c.descHe : c.descEn}</small></span></a>`)}</nav>
+      <span><b>${L(c)}</b><small>${c.img ? (he() ? c.descHe : c.descEn) : 'Coming soon'}</small></span></a>`)}</nav>
   </div></section>
 
   <section class="block tight" aria-labelledby="best-t"><div class="wrap">
@@ -116,7 +117,7 @@ export function home() {
   ${promo ? html`<div class="wrap"><a class="promo reveal" href="#/shop/bundles"><img src="${promo}" alt="${T('חבילת ה-Luxury שלנו — מארז היכרות יוקרתי', 'Our Luxury bundle')}" loading="lazy" width="2000" height="968"><span class="btn gold">${T('למארזים המשתלמים', 'Shop bundles')}</span></a></div>` : ''}
 
   <section class="block" aria-labelledby="new-t"><div class="wrap">
-    ${secHead('04', T('תמציות שמן', 'Fragrance oils'), T('הניחוח של בתי המלון', 'The scent of hotels'), 'new-t', '#/shop/oils/' + encodeURIComponent('🏨 בתי מלון ויוקרה'))}
+    ${secHead('04', T('תמציות שמן', 'Fragrance oils'), T('הניחוח של בתי המלון', 'The scent of hotels'), 'new-t', '#/shop/oils/' + encodeURIComponent('בתי מלון ויוקרה'))}
     <div class="grid wide-grid three reveal">${hotels.map(card)}</div>
   </div></section>
 
@@ -149,26 +150,28 @@ export function shop(cat, q = '', sort = 'pop', sub = '') {
   const subs = (db.SITE.subs?.[c?.he] || []).filter((s) => active().some((p) => p.sub === s));
   const banner = sub && db.SITE.site?.subBanners?.[sub];
   const soon = c && !count(cat);
-  return html`<div class="wrap">
-    <div class="crumbs"><a href="#/">${t('home')}</a> / ${cat ? html`<a href="#/shop/${cat}">${catName(cat)}</a>` : t('shop')}${sub ? html` / ${subName(sub)}` : ''}</div>
-    ${banner ? html`<div class="sub-banner"><img src="${banner}" alt="" width="1600" height="700"><h1>${subName(sub)}</h1></div>` : html`<h1>${sub ? subName(sub) : cat ? catName(cat) : t('shop')}</h1>`}
-    ${subs.length > 1 ? html`<nav class="chips" aria-label="${T('תת־קטגוריות', 'Subcategories')}"><a href="#/shop/${cat}" aria-current="${!sub}">${t('all')}</a>${subs.map((s) => html`<a href="#/shop/${cat}/${encodeURIComponent(s)}" aria-current="${s === sub}">${subName(s)}</a>`)}</nav>` : ''}
-    <div class="shop">
-      <aside class="filters" aria-label="${t('categories')}"><h2>${t('categories')}</h2><ul>
-        <li><a href="#/shop" aria-current="${!cat}">${t('all')} <span>${count()}</span></a></li>
-        ${CATEGORIES.map((x) => html`<li><a href="#/shop/${x.id}" aria-current="${cat === x.id}">${L(x)} <span>${count(x.id) || T('בקרוב', 'soon')}</span></a></li>`)}
-      </ul></aside>
-      <div>
-        ${soon ? html`<div class="soon-box"><img src="assets/img/mark.webp" alt="" width="180" height="156"><h2>${T('הקטגוריה תעלה בקרוב', 'Coming soon')}</h2><p>${T('אנחנו מכינים עבורכם קולקציה חדשה. רוצים לשמוע ראשונים או להזמין כבר עכשיו?', 'A new collection is on its way. Want to hear first or order now?')}</p><a class="btn" href="${waLink(T('שלום, אשמח לפרטים על ', 'Hello, I would like details about ') + catName(cat))}" target="_blank" rel="noopener noreferrer">WhatsApp</a></div>` : html`
-        <div class="toolbar">
-          <div><label class="sr-only" for="q">${t('search')}</label><input class="input" id="q" type="search" value="${q}" placeholder="${t('search')}…" data-input="search" maxlength="60"></div>
-          <div><label for="sort" class="muted">${t('sortBy')}: </label><select class="input" id="sort" data-input="sort">
+  const title = sub ? subName(sub) : cat ? catName(cat) : t('shop');
+  return html`<div class="shop-page">
+    ${banner ? html`<div class="sub-hero"><img src="${banner}" alt="" width="1600" height="700" fetchpriority="high"><div class="wrap"><nav class="crumbs" aria-label="${T('מיקום בעמוד', 'Breadcrumb')}"><a href="#/">${t('home')}</a><span aria-hidden="true">/</span><a href="#/shop/${cat}">${catName(cat)}</a></nav><h1>${title}</h1></div></div>`
+    : html`<header class="shop-head wrap"><nav class="crumbs" aria-label="${T('מיקום בעמוד', 'Breadcrumb')}"><a href="#/">${t('home')}</a><span aria-hidden="true">/</span>${cat ? html`<a href="#/shop">${t('shop')}</a>` : t('shop')}</nav>
+      <h1>${title}</h1>${c && !soon ? html`<p class="muted">${he() ? c.descHe : c.descEn}</p>` : ''}</header>`}
+    <div class="wrap">
+      <nav class="tabs-cat" aria-label="${t('categories')}">
+        <a href="#/shop" aria-current="${!cat}">${t('all')}</a>
+        ${CATEGORIES.map((x) => html`<a href="#/shop/${x.id}" aria-current="${cat === x.id}">${L(x)}${count(x.id) ? '' : html`<small>${T('בקרוב', 'soon')}</small>`}</a>`)}
+      </nav>
+      ${subs.length > 1 ? html`<nav class="tabs-sub" aria-label="${T('תת־קטגוריות', 'Subcategories')}"><a href="#/shop/${cat}" aria-current="${!sub}">${T('כל ה', 'All ')}${catName(cat)}</a>${subs.map((s2) => html`<a href="#/shop/${cat}/${encodeURIComponent(s2)}" aria-current="${s2 === sub}">${subName(s2)}</a>`)}</nav>` : ''}
+      ${soon ? html`<div class="soon-box"><p class="eyebrow latin">Coming soon</p><h2>${T('הקולקציה תעלה בקרוב', 'The collection is coming soon')}</h2><p>${T('אנחנו מכינים עבורכם קולקציה חדשה. רוצים לשמוע ראשונים או להזמין כבר עכשיו?', 'A new collection is on its way. Want to hear first or order now?')}</p><a class="btn" href="${waLink(T('שלום, אשמח לפרטים על ', 'Hello, I would like details about ') + catName(cat))}" target="_blank" rel="noopener noreferrer">${T('לפרטים בוואטסאפ', 'Ask on WhatsApp')}</a></div>` : html`
+      <div class="toolbar">
+        <p class="count" aria-live="polite"><b>${list.length}</b> ${t('results')}</p>
+        <div class="tools-r">
+          <label class="search-f"><span class="sr-only">${t('search')}</span><input id="q" type="search" value="${q}" placeholder="${t('search')}" data-input="search" maxlength="60"></label>
+          <label class="sort-f"><span>${t('sortBy')}</span><select id="sort" data-input="sort">
             ${[['pop', 'sortPop'], ['low', 'sortLow'], ['high', 'sortHigh'], ['name', 'sortName']].map(([v, k]) => html`<option value="${v}" ${raw(sort === v ? 'selected' : '')}>${t(k)}</option>`)}
-          </select></div>
+          </select></label>
         </div>
-        <p class="muted" aria-live="polite">${list.length} ${t('results')}</p>
-        ${list.length ? html`<div class="grid ${list.every((p) => p.wide) ? 'wide-grid' : ''}">${list.map(card)}</div>` : html`<p>${t('noResults')}</p>`}`}
       </div>
+      ${list.length ? html`<div class="grid shop-grid">${list.map(card)}</div>` : html`<p class="empty">${t('noResults')}</p>`}`}
     </div></div><div class="block"></div>`;
 }
 
@@ -242,7 +245,7 @@ export function kitUpsell() {
   const kits = active().filter((p) => p.picks);
   if (!kits.length) return '';
   return html`<div class="modal-bg"><div class="modal shop-modal" role="dialog" aria-modal="true" aria-labelledby="up-t">
-    <p class="eyebrow">${T('נוסף לסל ✓', 'Added to cart ✓')}</p>
+    <p class="eyebrow">${T('נוסף לסל', 'Added to cart')}</p>
     <h2 id="up-t">${T('ומה תפיצו בו? השלימו עם ערכת התנסות', 'What will you diffuse? Add a discovery kit')}</h2>
     <p class="muted">${T('המכשיר עובד עם תמציות שמן בלבד. ערכת התנסות היא הדרך הכי טובה למצוא את הניחוח שלכם.', 'The device works with fragrance oils only. A discovery kit is the best way to find your scent.')}</p>
     <div class="up-grid">${kits.map((k) => html`<a class="up" href="#/product/${k.id}" data-action="modal-close">${media(k)}<b>${L(k.name)}</b><span>${m(k.sizes[0].price)}</span></a>`)}</div>
@@ -260,7 +263,7 @@ export function cartDrawer() {
   const left = Math.max(0, FREE_SHIP - (tt.subtotal - tt.discount));
   const ratio = Math.min(1, (tt.subtotal - tt.discount) / FREE_SHIP);
   const ups = tt.lines.length ? complements(tt.lines[0].p, 6).filter((x) => !x.quote && !tt.lines.some((l) => l.pid === x.id)).slice(0, 2) : [];
-  return html`<header><h2 id="cart-t">${t('cart')}</h2><button class="icon-btn" data-action="cart-close" aria-label="${t('close')}">✕</button></header>
+  return html`<header><h2 id="cart-t">${t('cart')}</h2><button class="icon-btn" data-action="cart-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button></header>
   <div class="drawer-body">
     ${tt.lines.length ? html`
       <p class="muted">${left ? t('toFree', { x: m(left) }) : t('gotFree')}</p>
@@ -299,7 +302,7 @@ export function checkout() {
       <label class="check"><input type="checkbox" name="agree" required aria-describedby="agree-e"><span>${t('agree')}<a href="#/terms" target="_blank">${t('terms')}</a>${t('and')}<a href="#/privacy" target="_blank">${t('privacy')}</a> *</span></label>
       <span class="err" id="agree-e" aria-live="polite"></span>
       <button class="btn block gold" type="submit">${t('placeOrder')} · ${m(tt.total)}</button>
-      <p class="secure-note"><span aria-hidden="true">🔒</span>${t('secure')}</p>
+      <p class="secure-note">${t('secure')}</p>
     </form>
     <aside class="summary" aria-label="${t('cart')}">${tt.lines.map((l) => html`<div class="mini"><div class="line-media">${media(l.p)}</div><div>${L(l.p.name)}<br><small class="muted">${l.size} × ${l.qty}${l.opt ? html`<br>${l.opt}` : ''}</small></div><b>${m(l.price * l.qty)}</b></div>`)}<hr>${totalsBlock(tt)}</aside>
   </div></div>`;
@@ -327,7 +330,7 @@ export function checkoutSubmit(form) {
 
 export function orderDone(o) {
   const wa = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(`הזמנה חדשה #${o.num} — ${o.customer.name}, ${o.customer.phone}, סה"כ ${o.total}₪`)}`;
-  return html`<div class="wrap legal" tabindex="-1" id="done"><p class="eyebrow">✦</p><h1>${t('orderOk')}</h1><p>${t('orderNum')}: <b>#${o.num}</b></p><p>${t('orderOkText')}</p>
+  return html`<div class="wrap legal" tabindex="-1" id="done"><p class="eyebrow">SAY Boutique</p><h1>${t('orderOk')}</h1><p>${t('orderNum')}: <b>#${o.num}</b></p><p>${t('orderOkText')}</p>
   <div class="hero-cta"><a class="btn" href="#/shop">${t('continueShop')}</a><a class="btn ghost" href="${wa}" target="_blank" rel="noopener noreferrer">${t('whatsapp')}</a></div></div>`;
 }
 
@@ -338,7 +341,7 @@ export function account(tab = 'login') {
     const staff = { admin: '#/admin', orders: '#/orders', courier: '#/courier' }[u.role];
     return html`<div class="wrap legal"><p class="eyebrow">${t('clubMember')}</p><h1>${t('hello')}, ${u.name}</h1>
       ${u.wsRequest && u.role === 'customer' ? html`<p class="muted">${t('wsPending')}</p>` : ''}
-      ${u.firstOrderDiscount && u.role === 'customer' ? html`<p>✦ ${t('tick3')}</p>` : ''}
+      ${u.firstOrderDiscount && u.role === 'customer' ? html`<p class="note-gold">${t('tick3')}</p>` : ''}
       ${staff ? html`<p><a class="btn gold" href="${staff}">${t('backoffice')}</a></p>` : ''}
       <h2>${t('myOrders')}</h2>
       ${mine.length ? html`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>${getLang() === 'he' ? 'תאריך' : 'Date'}</th><th>${t('total')}</th><th>${getLang() === 'he' ? 'סטטוס' : 'Status'}</th></tr></thead><tbody>

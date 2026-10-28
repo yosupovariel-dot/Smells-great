@@ -17,8 +17,6 @@ const ICONS = {
   a11y: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><circle cx="12" cy="4" r="2"/><path d="M19 8.5l-5 1v4l2.5 7h-2l-2-5.5h-1l-2 5.5h-2L10 13.5v-4l-5-1 .4-1.8L12 8l6.6-1.3z"/></svg>',
 };
 
-const TICK_ICONS = { tick1: '✈', tick2: '✦', tick3: '%', tick4: '♛', tick5: '☏' };
-
 // ---------- Layout ----------
 function header() {
   const n = db.cart().reduce((a, l) => a + l.qty, 0); const route = location.hash;
@@ -27,13 +25,13 @@ function header() {
   return html`<a class="skip" href="#main">${t('skip')}</a>
   <div class="ticker" role="region" aria-label="${getLang() === 'he' ? 'הודעות' : 'Announcements'}"><div class="wrap">
     <button class="tk-nav" data-action="tick-step" data-d="-1" aria-label="${getLang() === 'he' ? 'ההודעה הקודמת' : 'Previous message'}">${getLang() === 'he' ? '›' : '‹'}</button>
-    <div class="ticker-track" aria-live="off">${msgs.map((k, i) => html`<p class="ticker-msg ${i ? '' : 'on'}" ${raw(i ? 'aria-hidden="true"' : '')}><span class="tk-ic" aria-hidden="true">${TICK_ICONS[k]}</span>${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}">${t(k)}</a>` : html`<span>${t(k)}</span>`}</p>`)}</div>
+    <div class="ticker-track" aria-live="off">${msgs.map((k, i) => html`<p class="ticker-msg ${i ? '' : 'on'}" ${raw(i ? 'aria-hidden="true"' : '')}>${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}">${t(k)}</a>` : html`<span>${t(k)}</span>`}</p>`)}</div>
     <button class="tk-nav" data-action="tick-step" data-d="1" aria-label="${getLang() === 'he' ? 'ההודעה הבאה' : 'Next message'}">${getLang() === 'he' ? '‹' : '›'}</button>
-    <button class="tk-pause" data-action="ticker-toggle" aria-label="${t('pause')}" aria-pressed="false"><span aria-hidden="true">❚❚</span></button></div></div>
+    <button class="tk-pause" data-action="ticker-toggle" aria-label="${t('pause')}" aria-pressed="false"><svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path class="i-pause" d="M3 2h2v8H3zM7 2h2v8H7z" fill="currentColor"/><path class="i-play" d="M3 2l7 4-7 4z" fill="currentColor"/></svg></button></div></div>
   <header class="hdr"><div class="wrap">
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
-      <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}">✕</button>
+      <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
       ${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/about', t('about'))}${navLink('#/wholesale', t('wholesale'))}<a href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(getLang() === 'he' ? 'שלום SAY Boutique, אשמח לעזרה' : 'Hello SAY Boutique')}" target="_blank" rel="noopener noreferrer">${t('contact')} <span class="sr-only">(WhatsApp)</span></a>
     </nav>
     <a class="brand" href="#/" aria-label="SAY Boutique — ${t('home')}"><b>SAY</b><small>BOUTIQUE</small></a>
@@ -122,7 +120,7 @@ function maybeConsent() {
     if ($('.consent')) return;
     const d = document.createElement('div');
     d.className = 'consent'; d.setAttribute('role', 'region'); d.setAttribute('aria-labelledby', 'cs-t'); d.setAttribute('aria-live', 'polite');
-    render(d, html`<button class="consent-x" data-action="consent" data-v="essential" aria-label="${t('close')}">✕</button>
+    render(d, html`<button class="consent-x" data-action="consent" data-v="essential" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
       <div class="consent-head"><img src="assets/img/mark.webp" alt="" width="44" height="38"><h2 id="cs-t">${t('consentTitle')}</h2></div>
       <p>${t('consentText')}<a href="#/terms">${t('terms')}</a>${t('and')}<a href="#/privacy">${t('privacy')}</a>.</p>
       <div class="actions"><button class="btn sm" data-action="consent" data-v="all">${t('accept')}</button><button class="btn sm ghost" data-action="consent" data-v="essential">${t('essentialOnly')}</button></div>`);
@@ -222,7 +220,7 @@ document.addEventListener('click', async (e) => {
     case 'qty': { const i = $('#qty'); i.value = Math.max(1, Math.min(99, (parseInt(i.value) || 1) + +el.dataset.d)); break; }
     case 'line-qty': { const c = db.cart(); const l = c[+el.dataset.i]; if (!l) break; l.qty += +el.dataset.d; if (l.qty < 1) c.splice(+el.dataset.i, 1); db.saveCart(c); break; }
     case 'line-rm': { const c = db.cart(); c.splice(+el.dataset.i, 1); db.saveCart(c); break; }
-    case 'ticker-toggle': tickPaused = !tickPaused; el.setAttribute('aria-pressed', tickPaused); el.setAttribute('aria-label', tickPaused ? t('play') : t('pause')); el.firstElementChild.textContent = tickPaused ? '▶' : '❚❚'; startTicker(); break;
+    case 'ticker-toggle': tickPaused = !tickPaused; el.setAttribute('aria-pressed', tickPaused); el.setAttribute('aria-label', tickPaused ? t('play') : t('pause'));  startTicker(); break;
     case 'tick-step': stepTicker(+el.dataset.d); startTicker(); break;
     case 'a11y': { const p = $('#a11y-panel'); const open = !p.classList.contains('open'); p.classList.toggle('open', open); $('.fab-a11y').setAttribute('aria-expanded', open); if (open) $('button', p).focus(); else $('.fab-a11y').focus(); break; }
     case 'fs': a11yState.fs = Math.max(0, Math.min(3, (a11yState.fs || 0) + +el.dataset.d)); applyA11y(); break;
@@ -237,8 +235,8 @@ document.addEventListener('click', async (e) => {
     case 'block-user': { const u = db.users().find((x) => x.id === id); db.updateUser(id, { blocked: !u.blocked }); rerender(); break; }
     case 'del-user': if (confirm(getLang() === 'he' ? 'למחוק את המשתמש לצמיתות?' : 'Delete user permanently?')) { db.deleteUser(id); rerender(); } break;
     case 'order-view': modal(A.orderModal(id)); break;
-    case 'order-status': db.setOrderStatus(id, el.dataset.s, db.me()?.name); toast('✓'); rerender(); break;
-    case 'clear-demo': if (confirm(getLang() === 'he' ? 'למחוק את כל לקוחות והזמנות הדמו? (מומלץ לפני העלייה לאוויר)' : 'Delete all demo customers and orders?')) { db.clearDemoData(); toast('✓'); rerender(); } break;
+    case 'order-status': db.setOrderStatus(id, el.dataset.s, db.me()?.name); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); rerender(); break;
+    case 'clear-demo': if (confirm(getLang() === 'he' ? 'למחוק את כל לקוחות והזמנות הדמו? (מומלץ לפני העלייה לאוויר)' : 'Delete all demo customers and orders?')) { db.clearDemoData(); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); rerender(); } break;
     case 'notes-read': db.markNotesRead(); rerender(); break;
     case 'ov': state.ov = el.dataset.v; rerender(); break;
     case 'ctab': state.ctab = el.dataset.t; rerender(); break;
@@ -246,7 +244,7 @@ document.addEventListener('click', async (e) => {
     case 'export-csv': { const blob = new Blob([A.reportCSV(+el.dataset.range)], { type: 'text/csv;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `say-report-${Date.now()}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); break; }
     case 'chg-pass': {
       const pw = prompt(getLang() === 'he' ? 'סיסמה חדשה (8+ תווים, אות ומספר):' : 'New password (8+ chars, letter & number):');
-      if (pw && valid.password(pw)) { await db.changePassword(db.me().id, pw); toast('✓'); rerender(); } else if (pw) toast(t('badPass'));
+      if (pw && valid.password(pw)) { await db.changePassword(db.me().id, pw); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); rerender(); } else if (pw) toast(t('badPass'));
       break;
     }
   }
@@ -280,12 +278,12 @@ document.addEventListener('change', (e) => {
     const picked = $$('[data-input="pick"]:checked');
     if (picked.length > max) { el.checked = false; toast(getLang() === 'he' ? `אפשר לבחור עד ${max} ניחוחות` : `Up to ${max} scents`); }
     $$('[data-input="pick"]').forEach((c) => (c.disabled = sur));
-    $('#pick-count').textContent = sur ? '✓' : `${$$('[data-input="pick"]:checked').length}/${max}`;
+    $('#pick-count').textContent = sur ? (getLang() === 'he' ? 'נבחר' : 'Set') : `${$$('[data-input="pick"]:checked').length}/${max}`;
   }
   if (k === 'ws-toggle') $('#biz-f').hidden = !el.checked;
-  if (k === 'role') { db.updateUser(el.dataset.id, { role: el.value, wsRequest: el.value === 'wholesale' ? false : undefined }); toast('✓'); }
-  if (k === 'm-status') { db.setOrderStatus(el.dataset.id, el.value, db.me()?.name); toast('✓'); closeModal(); rerender(); }
-  if (k === 'm-courier') { db.assignCourier(el.dataset.id, el.value); toast('✓'); }
+  if (k === 'role') { db.updateUser(el.dataset.id, { role: el.value, wsRequest: el.value === 'wholesale' ? false : undefined }); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); }
+  if (k === 'm-status') { db.setOrderStatus(el.dataset.id, el.value, db.me()?.name); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); closeModal(); rerender(); }
+  if (k === 'm-courier') { db.assignCourier(el.dataset.id, el.value); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); }
 });
 
 document.addEventListener('submit', async (e) => {
@@ -337,7 +335,7 @@ document.addEventListener('submit', async (e) => {
     const id = f.dataset.id || (clean(d.en || d.he, 40).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'p') + '-' + Date.now().toString(36);
     db.saveProduct({ ...old, id, cat: CATEGORIES.some((c) => c.id === d.cat) ? d.cat : 'oils', name: { he: clean(d.he, 120), en: clean(d.en, 120) }, desc: { he: clean(d.dhe, 800), en: clean(d.den, 800) },
       notes: clean(d.notes, 200).split(',').map((x) => x.trim()).filter(Boolean).slice(0, 6), sizes, img, tag: d.tag === 'new' || d.tag === 'best' ? d.tag : '', active: !!d.active, stock: Math.max(0, parseInt(d.stock) || 0) });
-    closeModal(); toast('✓'); rerender();
+    closeModal(); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); rerender();
   }
 });
 

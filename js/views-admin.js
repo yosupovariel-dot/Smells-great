@@ -10,7 +10,22 @@ const m = (n) => money(n, getLang());
 const dt = (d) => new Date(d).toLocaleString(he() ? 'he-IL' : 'en-GB', { dateStyle: 'short', timeStyle: 'short' });
 const monthName = (k) => { const [y, mo] = k.split('-'); return new Date(+y, +mo - 1, 1).toLocaleDateString(he() ? 'he-IL' : 'en-GB', { month: 'short', year: '2-digit' }); };
 const lastMonths = (n) => { const out = []; const d = new Date(); for (let i = n - 1; i >= 0; i--) out.push(monthKey(new Date(d.getFullYear(), d.getMonth() - i, 1))); return out; };
-const ICON = { dash: '◧', prod: '❒', rep: '▤', users: '◉', orders: '☰', truck: '➤', store: '⌂', out: '⎋' };
+const svg = (d) => raw(`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`);
+const ICON = {
+  dash: svg('<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>'),
+  prod: svg('<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/>'),
+  rep: svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+  users: svg('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.3-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 010 7M18.5 14.8c1.6.8 2.6 2.6 3 5.2"/>'),
+  orders: svg('<path d="M6 3h12l1 18H5L6 3z"/><path d="M9 7a3 3 0 006 0"/>'),
+  truck: svg('<path d="M2 6h12v10H2zM14 9h4l3 3v4h-7"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>'),
+  store: svg('<path d="M3 10l9-7 9 7v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1V10z"/>'),
+  out: svg('<path d="M15 4h4a1 1 0 011 1v14a1 1 0 01-1 1h-4M10 17l-5-5 5-5M5 12h11"/>'),
+  nav: svg('<path d="M3 11l18-8-8 18-2-8-8-2z"/>'),
+  phone: svg('<path d="M5 3h4l2 5-2.5 1.5a11 11 0 006 6L16 13l5 2v4a2 2 0 01-2 2A16 16 0 013 5a2 2 0 012-2z"/>'),
+  box: svg('<path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/><path d="M3 7l9 4 9-4M12 11v10"/>'),
+  check: svg('<path d="M4 12l5 5L20 6"/>'),
+  bell: svg('<path d="M6 16V11a6 6 0 0112 0v5l2 2H4l2-2zM10 21h4"/>'),
+};
 
 function shell(active, title, body, tools = '') {
   const u = db.me(); const role = u.role;
@@ -202,7 +217,7 @@ export function ordersBoard(state) {
       <tbody>${list.map((o) => html`<tr><td>${o.num}</td><td>${dt(o.date)}</td><td>${o.customer.name}<br><small>${o.customer.phone}</small></td><td>${o.customer.city}</td><td>${m(o.total)}</td><td><small>${o.payment === 'paid' ? T('שולם', 'Paid') : o.payment === 'refunded' ? T('זוכה', 'Refunded') : T('ממתין', 'Pending')}</small></td><td><span class="pill st-${o.status}">${statusLabel(o.status)}</span></td><td><button class="btn sm ghost" data-action="order-view" data-id="${o.id}">${T('פרטים', 'Details')}</button></td></tr>`)}</tbody></table></div>
       <p class="muted">${list.length} ${T('הזמנות', 'orders')} · ${m(list.filter((o) => o.status !== 'cancelled').reduce((a, o) => a + o.total, 0))}</p></div>`;
   return shell('orders', T('ניהול הזמנות', 'Orders'), html`
-    ${newCount ? html`<div class="panel" role="status"><b>🔔 ${newCount} ${T('הזמנות חדשות ממתינות לטיפול', 'new orders waiting')}</b> <button class="btn sm ghost" data-action="notes-read">${T('סמן כנקרא', 'Mark read')}</button></div>` : ''}
+    ${newCount ? html`<div class="panel" role="status"><b class="with-ic">${ICON.bell} ${newCount} ${T('הזמנות חדשות ממתינות לטיפול', 'new orders waiting')}</b> <button class="btn sm ghost" data-action="notes-read">${T('סמן כנקרא', 'Mark read')}</button></div>` : ''}
     ${body}`,
     html`<div class="seg" role="group" aria-label="${T('תצוגה', 'View')}"><button aria-pressed="${view === 'board'}" data-action="ov" data-v="board">${T('לוח', 'Board')}</button><button aria-pressed="${view === 'list'}" data-action="ov" data-v="list">${T('רשימה', 'List')}</button></div>
     <label class="sr-only" for="om">${T('חודש', 'Month')}</label><select class="input" id="om" data-input="om"><option value="all">${T('כל החודשים', 'All months')}</option>${months.map((k) => html`<option value="${k}" ${raw(k === month ? 'selected' : '')}>${monthName(k)}</option>`)}</select>
@@ -241,13 +256,13 @@ export function courierView(tab = 'todo') {
     ${shown.length ? shown.map((o) => html`<article class="dcard"><div class="panel-head"><h3>${o.customer.name}</h3><span class="pill st-${o.status}">${statusLabel(o.status)}</span></div>
       <div class="addr">${addr(o)}${o.customer.apt ? html` · ${o.customer.apt}` : ''}</div>
       <small class="muted">#${o.num} · ${o.items.reduce((a, i) => a + i.qty, 0)} ${T('פריטים', 'items')}${o.payment !== 'paid' ? html` · <b>${T('לגבות', 'Collect')} ${m(o.total)}</b>` : ''}</small>
-      ${o.customer.notes ? html`<p><small>📝 ${o.customer.notes}</small></p>` : ''}
+      ${o.customer.notes ? html`<p class="cnote"><small>${T('הערה:', 'Note:')} ${o.customer.notes}</small></p>` : ''}
       ${tab === 'todo' ? html`<div class="big">
-        <a href="https://waze.com/ul?q=${encodeURIComponent(addr(o))}&navigate=yes" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">🧭</span>Waze</a>
-        <a href="tel:${o.customer.phone}"><span aria-hidden="true">📞</span>${T('חיוג', 'Call')}</a>
-        ${o.status === 'ready' ? html`<button data-action="order-status" data-id="${o.id}" data-s="shipped"><span aria-hidden="true">📦</span>${T('נאסף', 'Picked up')}</button>` : html`<button class="done" data-action="order-status" data-id="${o.id}" data-s="delivered"><span aria-hidden="true">✓</span>${T('נמסר', 'Delivered')}</button>`}
-      </div>` : ''}</article>`) : html`<p class="muted">${T('אין משלוחים כרגע', 'No deliveries right now')} ✦</p>`}
+        <a href="https://waze.com/ul?q=${encodeURIComponent(addr(o))}&navigate=yes" target="_blank" rel="noopener noreferrer">${ICON.nav}Waze</a>
+        <a href="tel:${o.customer.phone}">${ICON.phone}${T('חיוג', 'Call')}</a>
+        ${o.status === 'ready' ? html`<button data-action="order-status" data-id="${o.id}" data-s="shipped">${ICON.box}${T('נאסף', 'Picked up')}</button>` : html`<button class="done" data-action="order-status" data-id="${o.id}" data-s="delivered">${ICON.check}${T('נמסר', 'Delivered')}</button>`}
+      </div>` : ''}</article>`) : html`<p class="muted">${T('אין משלוחים כרגע', 'No deliveries right now')}</p>`}
   </div>`);
 }
 
-export const orderAlertLink = (o) => `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(`🔔 הזמנה חדשה #${o.num}\n${o.customer.name} · ${o.customer.phone}\n${o.customer.street}, ${o.customer.city}\nסה"כ: ${o.total}₪`)}`;
+export const orderAlertLink = (o) => `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(`הזמנה חדשה #${o.num}\n${o.customer.name} · ${o.customer.phone}\n${o.customer.street}, ${o.customer.city}\nסה"כ: ${o.total}₪`)}`;

@@ -563,3 +563,118 @@ html.a11y-stop .reveal{opacity:1;transform:none}
 .ftr-bottom a{color:var(--gold-2)}
 .hero.lux .hero-art .slide img{position:static!important;width:100%!important;height:100%!important;left:auto!important;bottom:auto!important;filter:none!important;object-fit:cover}
 .hero.lux .hero-art .slide{position:absolute!important;inset:0!important;width:auto!important;height:auto!important;transform:none!important;left:0!important}
+
+/* ===== Precision pass ===== */
+/* Hebrew is never letter-spaced or upper-cased — only Latin display text is. */
+html[lang="he"] .btn,html[lang="he"] .eyebrow:not(.latin),html[lang="he"] .more,html[lang="he"] .card-tag,html[lang="he"] .tabs-cat a,html[lang="he"] .tabs-sub a{letter-spacing:0;text-transform:none}
+html[lang="he"] .btn{font-size:.95rem;font-weight:500}
+html[lang="he"] .eyebrow:not(.latin){font-size:.86rem;font-weight:600;color:var(--gold-dark)}
+html[lang="he"] .card-tag{font-family:var(--f-body);font-size:.75rem;font-weight:600}
+.btn{min-height:50px;padding:.8rem 1.9rem;border-radius:0}
+.btn.sm{min-height:38px;padding:.4rem 1rem}
+
+/* Ticker: text only */
+.ticker-msg{gap:0}
+.tk-pause .i-play{display:none}.tk-pause[aria-pressed="true"] .i-play{display:inline}.tk-pause[aria-pressed="true"] .i-pause{display:none}
+
+/* Lists: thin gold rule instead of glyphs */
+.perks li{display:flex;align-items:center;gap:.8rem}
+.perks li::before{content:"";width:14px;height:1px;background:var(--gold);margin:0;flex-shrink:0}
+.rich .feat{list-style:none;padding:0}
+.rich .feat li{position:relative;padding-inline-start:1.6rem}
+.rich .feat li::before{content:"";position:absolute;inset-inline-start:0;top:.8em;width:12px;height:1px;background:var(--gold)}
+.marquee .dot{display:inline-block;width:6px;height:6px;background:var(--gold-2);transform:rotate(45deg);vertical-align:middle;margin:0 1.4rem}
+.note-gold{color:var(--gold-dark);border-inline-start:2px solid var(--gold);padding-inline-start:.8rem}
+
+/* Breadcrumbs */
+.crumbs{display:flex;gap:.5rem;align-items:center;font-size:.82rem;color:var(--muted);margin:0 0 1rem}
+.crumbs a{text-decoration:none}.crumbs a:hover{color:var(--gold-dark)}
+.crumbs span{opacity:.5}
+
+/* Shop page */
+.shop-head{padding-top:clamp(2rem,5vw,3.5rem);padding-bottom:1.6rem;text-align:start}
+.shop-head h1{font-size:clamp(2.4rem,5vw,4rem);margin:0 0 .4rem}
+.sub-hero{position:relative;height:clamp(260px,34vw,440px);overflow:hidden;margin-bottom:2rem;color:var(--white)}
+.sub-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sub-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(22,19,15,.65),rgba(22,19,15,.05) 60%)}
+.sub-hero .wrap{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:2rem}
+.sub-hero h1{color:var(--white);font-size:clamp(2.2rem,4.6vw,3.8rem);margin:0}
+.sub-hero .crumbs,.sub-hero .crumbs a{color:rgba(255,253,249,.85)}
+.tabs-cat,.tabs-sub{display:flex;gap:clamp(1rem,2.4vw,2.2rem);overflow-x:auto;scrollbar-width:none;white-space:nowrap}
+.tabs-cat::-webkit-scrollbar,.tabs-sub::-webkit-scrollbar{display:none}
+.tabs-cat{border-bottom:1px solid var(--line)}
+.tabs-cat a{text-decoration:none;padding:.9rem 0;font-size:1rem;position:relative;color:var(--ink-2)}
+.tabs-cat a small{font-size:.68rem;color:var(--gold-dark);margin-inline-start:.35rem;vertical-align:super}
+.tabs-cat a::after{content:"";position:absolute;inset-inline:0;bottom:-1px;height:2px;background:var(--ink);transform:scaleX(0);transition:transform .35s}
+.tabs-cat a:hover::after{transform:scaleX(.4)}
+.tabs-cat a[aria-current="true"]{color:var(--ink);font-weight:600}
+.tabs-cat a[aria-current="true"]::after{transform:scaleX(1)}
+.tabs-sub{gap:.5rem;padding:1.1rem 0 .2rem}
+.tabs-sub a{text-decoration:none;font-size:.88rem;padding:.45rem 1rem;border:1px solid var(--sand);background:transparent;transition:.25s}
+.tabs-sub a:hover{border-color:var(--ink)}
+.tabs-sub a[aria-current="true"]{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1.4rem 0;margin:0;flex-wrap:wrap}
+.toolbar .count{margin:0;color:var(--muted);font-size:.9rem}.toolbar .count b{color:var(--ink);font-weight:600}
+.tools-r{display:flex;gap:1.4rem;align-items:center}
+.search-f input,.sort-f select{border:0;border-bottom:1px solid var(--sand);background:transparent;padding:.5rem .2rem;min-height:40px;font-size:.92rem;border-radius:0}
+.search-f input{width:200px}
+.search-f input:focus,.sort-f select:focus{outline:none;border-color:var(--ink)}
+.sort-f{display:flex;gap:.6rem;align-items:center;font-size:.85rem;color:var(--muted)}
+.sort-f select{color:var(--ink);cursor:pointer}
+.empty{padding:3rem 0;text-align:center;color:var(--muted)}
+.soon-box{text-align:center;padding:clamp(3rem,8vw,6rem) 1rem;background:var(--ink);color:var(--cream);margin:2rem 0}
+.soon-box h2{color:var(--cream);font-size:clamp(1.8rem,3.4vw,2.6rem)}
+.soon-box p{color:#cfc5b5;max-width:30rem;margin:0 auto 1.6rem}
+.soon-box .eyebrow{color:var(--gold-2)}
+.soon-box .btn{background:var(--gold-dark);border-color:var(--gold-dark)}
+
+/* Uniform cards */
+.grid,.shop-grid{grid-template-columns:repeat(4,1fr);gap:clamp(1rem,2.2vw,2rem) clamp(.9rem,1.8vw,1.6rem)}
+.card .card-media,.card.wide .card-media{aspect-ratio:4/3}
+.card-body{padding-top:.9rem;gap:.25rem}
+.card-body small{color:var(--gold-dark)}
+.card-body h3 a::before{aspect-ratio:4/3!important}
+.card-quick{inset-inline:0;bottom:0}
+.card-quick .btn{width:100%;background:rgba(22,19,15,.88);border:0;backdrop-filter:blur(4px)}
+.grid.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:1100px){.grid,.shop-grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:760px){.grid,.shop-grid,.grid.three{grid-template-columns:1fr 1fr}.search-f input{width:140px}.tools-r{gap:.8rem;width:100%;justify-content:space-between}}
+
+/* Product page */
+.pdp{grid-template-columns:1.15fr 1fr;gap:clamp(1.6rem,5vw,5.5rem);padding:2rem 0 3rem}
+.pdp>*{min-width:0}
+.pdp h1{font-size:clamp(2rem,3.6vw,3.2rem);margin:.2rem 0 .8rem;line-height:1.1}
+.pdp .price.big{font-size:1.45rem;margin:0 0 1.6rem;padding-bottom:1.4rem;border-bottom:1px solid var(--line);display:flex;gap:.6rem;align-items:baseline}
+.sizes legend,.picker legend{font-size:.85rem;font-weight:600;color:var(--ink-2);margin-bottom:.6rem}
+.sizes{gap:.45rem;margin:0 0 1.5rem}
+.size-opt span{min-width:72px;padding:.62rem 1rem;border:1px solid var(--sand);background:transparent;font-size:.92rem;transition:border-color .2s,box-shadow .2s}
+.size-opt:hover span{border-color:var(--ink-2)}
+.size-opt input:checked+span{background:transparent;color:var(--ink);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);font-weight:600}
+.qty{border-color:var(--sand);background:transparent}
+.buy-row .btn{min-height:52px}
+.pdp-gallery .pdp-media{aspect-ratio:1;background:#fff}
+.thumbs button{border-color:var(--line)}
+.specs{margin-top:1rem}
+.specs h2,.rich .rt-h{font-size:1.5rem}
+.spec-tbl th{background:transparent;font-weight:500;color:var(--muted)}
+.spec-tbl{background:transparent;border-top:1px solid var(--ink)}
+.spec-tbl td{font-weight:500}
+.pick{border-radius:0}
+@media (max-width:860px){.pdp{grid-template-columns:1fr;padding-top:1rem}.thumbs button{flex-basis:60px;height:60px}}
+
+/* Header & tools */
+.lang-btn{border:1px solid var(--sand);height:34px;border-radius:17px;font-size:.78rem}
+.lang-btn:hover{border-color:var(--ink);background:transparent}
+.icon-btn:hover{background:transparent;color:var(--gold-dark)}
+.nav a{font-size:.95rem}
+
+/* Category tiles "soon" */
+.tile.soon{background:var(--ink);border:0}
+.tile.soon .tile-mark{display:none}
+.tile.soon span{position:static;color:var(--cream);padding:1rem}
+.tile.soon b{color:var(--cream);font-size:1.45rem}
+.tile.soon small{color:var(--gold-2);font-family:var(--f-latin);letter-spacing:.25em;text-transform:uppercase;font-size:.7rem;margin-top:.4rem}
+.tile.soon::after{border-color:rgba(201,173,122,.25)}
+.with-ic{display:inline-flex;align-items:center;gap:.5rem}
+.bo-side a svg,.bo-side button svg{flex-shrink:0}
+.dcard .big a,.dcard .big button{gap:.3rem}

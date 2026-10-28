@@ -247,9 +247,18 @@ def main():
     oils = [p['id'] for p in products if p['cat'] == 'oils' and not p.get('picks')]
     for p in products:
         if p.get('picks'): p['pickFrom'] = oils
-    json.dump(products, open(os.path.join(ROOT, 'data', 'products.json'), 'w'), ensure_ascii=False, indent=1)
-    json.dump({'site': site, 'subs': subs, 'guide': guide}, open(os.path.join(ROOT, 'data', 'site.json'), 'w'), ensure_ascii=False, indent=1)
+    json.dump(no_emoji(products), open(os.path.join(ROOT, 'data', 'products.json'), 'w'), ensure_ascii=False, indent=1)
+    json.dump(no_emoji({'site': site, 'subs': subs, 'guide': guide}), open(os.path.join(ROOT, 'data', 'site.json'), 'w'), ensure_ascii=False, indent=1)
     print(f'{len(products)} products, {len(written)} images')
+
+
+EMOJI = re.compile(r'[\U0001F000-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\uFE0F\u200D\u2300-\u23FF]')
+def no_emoji(x):
+    """The sheet uses emoji as decoration; the site's design doesn't."""
+    if isinstance(x, str): return re.sub(r'[ \t]{2,}', ' ', EMOJI.sub('', x)).strip()
+    if isinstance(x, list): return [no_emoji(i) for i in x]
+    if isinstance(x, dict): return {no_emoji(k): no_emoji(v) for k, v in x.items()}
+    return x
 
 
 num = lambda s: int(re.sub(r'[^\d]', '', s) or 0) if not re.search(r'\d+\s*-\s*\d+', s or '') else 0
