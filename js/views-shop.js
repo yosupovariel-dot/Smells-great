@@ -147,7 +147,7 @@ export function home() {
   <section class="h-quiz" aria-labelledby="qz-t"><div class="wrap">
     <header class="qz-head"><p class="kicker latin">Scent finder</p><h2 id="qz-t">${T('איפה הריח שלכם יחיה?', 'Where will your scent live?')}</h2>
       <p>${T('בחרו חלל — ובעוד שתי שאלות קצרות תקבלו המלצה אישית למכשיר ולניחוחות.', 'Pick a space — two more quick questions and you get a personal match.')}</p>
-      <ol class="qz-steps" aria-label="${T('שלבים', 'Steps')}"><li class="on">${T('חלל', 'Space')}</li><li>${T('תחושה', 'Feeling')}</li><li>${T('עוצמה', 'Strength')}</li></ol></header>
+      <p class="qz-step" aria-label="${T('שלב 1 מתוך 3', 'Step 1 of 3')}"><span>${T('שלב 1 מתוך 3', 'Step 1 of 3')}</span><i aria-hidden="true"><b></b></i></p></header>
     <div class="qz-opts">${FINDER.space.map(([k, he_, en, pid, sHe, sEn]) => { const p = db.product(pid); return html`<button class="qz-opt" data-action="fq-start" data-v="${k}"><span class="qz-img">${p ? media(p, '', false, p.pack || p.img) : ''}</span><b>${T(he_, en)}</b><small>${T(sHe, sEn)}</small><span class="qz-go" aria-hidden="true">${he() ? '←' : '→'}</span></button>`; })}</div>
     <p class="qz-foot">${T('לוקח פחות מדקה · בלי הרשמה · אפשר לשנות בכל שלב', 'Under a minute · no sign-up · change anytime')}</p>
   </div></section>
