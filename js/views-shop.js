@@ -99,6 +99,12 @@ export const HERO_SLIDES = [
 const FAMILY_EN = { 'בתי מלון ויוקרה': 'Hotels', 'חנויות ורשתות מובילות': 'Boutiques', 'השראת בשמים יוקרתיים': 'Fine fragrance', 'טבע וספא': 'Nature & spa', 'ניחוחות קלאסיים': 'Classics', 'ניקיון ורעננות': 'Fresh & clean', 'מאפים ומתוקים': 'Gourmand' };
 const arrow = () => (he() ? '←' : '→');
 
+// Circular seal text: one glyph per angle (textPath is unreliable inside RTL documents).
+function sealSVG(text) {
+  const ch = [...text]; const n = ch.length;
+  return raw(`<svg viewBox="0 0 200 200" direction="ltr" aria-hidden="true">${ch.map((c, i) => `<text x="100" y="24" text-anchor="middle" transform="rotate(${(i * 360 / n).toFixed(2)} 100 100)">${c === ' ' ? '&#160;' : c}</text>`).join('')}</svg>`);
+}
+
 export function home() {
   const all = active();
   const hero = (db.SITE.site?.hero || []).slice(0, 4);
@@ -112,32 +118,36 @@ export function home() {
     <div class="h-slides" role="region" aria-roledescription="carousel" aria-label="${T('מוצרים נבחרים', 'Featured')}">
       ${hero.map((src, i) => html`<figure class="slide ${i ? '' : 'on'}"><img src="${src}" alt="${HERO_SLIDES[i]?.[getLang()] || 'SAY Boutique'}" width="2000" height="968" ${raw(i ? 'loading="lazy"' : 'fetchpriority="high"')} decoding="async"></figure>`)}
     </div>
-    <div class="h-hero-card">
+    <div class="h-hero-copy">
       <p class="kicker latin">Luxury Home Fragrances</p>
-      <h1 id="hero-t">${t('heroTitle1')} <em>${t('heroTitle2')}</em></h1>
-      <div class="h-hero-foot">
-        <a class="btn" href="#/shop/diffusers">${T('לקולקציה', 'Explore')}</a>
-        ${hero.length ? html`<a class="h-caption" id="slide-cap" href="#/product/${HERO_SLIDES[0].pid}">${HERO_SLIDES[0][getLang()]}</a>` : ''}
-      </div>
-      ${hero.length ? html`<div class="h-progress" aria-hidden="true">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>
+      <h1 id="hero-t"><span>${t('heroTitle1')}</span> <em>${t('heroTitle2')}</em></h1>
+      <p class="h-hero-lead">${T('מפיצי ריח ותמציות שמן ברמת בתי המלון — במחיר של יבואן, עד הבית.', 'Hotel-grade diffusers and fragrance oils — at importer prices, to your door.')}</p>
+      <div class="h-hero-cta"><a class="btn" href="#/shop/diffusers">${T('לקולקציה', 'Explore')}</a><a class="u-link" href="#/finder">${T('מציאת הריח שלי', 'Find my scent')} <span aria-hidden="true">${arrow()}</span></a></div>
+      ${hero.length ? html`<div class="h-count latin" aria-hidden="true"><b id="slide-n">01</b><span class="h-progress">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</span><span>0${hero.length}</span></div>
       <div class="sr-only">${hero.map((_, i) => html`<button data-action="slide" data-i="${i}" aria-label="${T('שקופית', 'Slide')} ${i + 1}" aria-current="${i === 0}"></button>`)}</div>` : ''}
     </div>
+    ${hero.length ? html`<a class="h-tag" id="slide-cap" href="#/product/${HERO_SLIDES[0].pid}">${HERO_SLIDES[0][getLang()]}</a>` : ''}
+    <nav class="h-cats" aria-label="${t('categories')}">${CATEGORIES.map((c) => { const n = all.filter((p) => p.cat === c.id).length; return html`<a href="#/shop/${c.id}"><span>${L(c)}</span>${n ? html`<small>${n}</small>` : html`<small class="soon">${T('בקרוב', 'Soon')}</small>`}</a>`; })}</nav>
+    <a class="seal" href="#/about" aria-label="${t('about')}">
+      ${sealSVG('SAY BOUTIQUE · LUXURY HOME FRAGRANCES · ')}
+      <img src="assets/img/mark.webp" alt="" width="90" height="78">
+    </a>
   </section>
 
   <section class="h-finder" aria-labelledby="fd-t"><div class="wrap h-finder-in">
     <div class="h-finder-copy reveal"><p class="kicker latin">Scent finder</p><h2 id="fd-t">${T('54 ניחוחות.', '54 scents.')}<br><em>${T('אחד מהם שלכם.', 'One of them is yours.')}</em></h2>
       <p>${T('שלוש שאלות קצרות — איפה, איזו תחושה וכמה עוצמה — ונמליץ לכם על המכשיר והניחוחות שמתאימים בדיוק לכם.', 'Three short questions — where, which feeling, how strong — and we will match you with the right device and scents.')}</p>
       <div class="h-finder-cta"><a class="btn" href="#/finder">${T('למציאת הריח שלי', 'Find my scent')}</a><small>${T('פחות מדקה · בלי הרשמה', 'Under a minute · no sign-up')}</small></div></div>
-    <a class="fan" href="#/finder" aria-label="${T('למציאת הריח שלי', 'Find my scent')}">${families.slice(0, 5).map((x, i) => html`<span class="fan-c f${i}"><img src="${small(x.img)}" alt="" loading="lazy" width="320" height="420"><i>${subName(x.f)}</i></span>`)}</a>
+    <a class="fan" href="#/finder" aria-label="${T('למציאת הריח שלי', 'Find my scent')}">${['oil-tom-ford', 'oil-spa', 'oil-king-david', 'oil-bubbles', 'oil-vanilla-coffee'].map((id) => db.product(id)).filter(Boolean).map((x, i) => html`<span class="fan-c f${i}"><img src="${small(x.img)}" alt="" loading="lazy" width="320" height="420"><i>${L(x.name)}</i></span>`)}</a>
   </div></section>
 
   <section class="h-collection" aria-labelledby="col-t"><div class="wrap">
     <header class="h-head"><h2 id="col-t">${T('המכשירים', 'The devices')}</h2><a class="u-link" href="#/shop/diffusers">${T('כל המפיצים', 'All diffusers')} <span aria-hidden="true">${arrow()}</span></a></header>
     <div class="h-col-grid">
-      ${hero[0] ? html`<a class="h-feature reveal" href="#/product/say-300"><img src="${hero[0]}" alt="SAY 300" loading="lazy" width="2000" height="968">
-        <span><b>SAY 300</b><small>${T('לחללים של עד 300 מ"ר · Wi-Fi ובלוטות׳', 'Up to 300 m² · Wi-Fi & Bluetooth')}</small></span></a>` : ''}
+      ${(() => { const f = db.product('say-300'); return f ? html`<a class="h-feature reveal" href="#/product/say-300"><span class="h-feature-arch">${media(f, '', false, f.img, true)}</span>
+        <span class="h-feature-t"><b>SAY 300</b><small>${T('לחללים של עד 300 מ"ר · Wi-Fi ובלוטות׳', 'Up to 300 m² · Wi-Fi & Bluetooth')}</small>${priceTag(f)}</span></a>` : ''; })()}
       <div class="h-col-list reveal">${diff.filter((p) => p.id !== 'say-300').slice(0, 4).map((p) => html`<a class="h-item" href="#/product/${p.id}">
-        <span class="h-item-img">${media(p)}</span><span class="h-item-t"><b>${L(p.name)}</b><small>${subName(p.sub)}</small></span><span class="h-item-p">${m(minPrice(p))}</span></a>`)}</div>
+        <span class="h-item-img">${media(p, '', false, p.pack || p.img)}</span><span class="h-item-t"><b>${L(p.name)}</b><small>${subName(p.sub)}</small></span><span class="h-item-p">${m(minPrice(p))}</span></a>`)}</div>
     </div>
   </div></section>
 
