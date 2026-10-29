@@ -265,6 +265,7 @@ document.addEventListener('click', async (e) => {
     case 'fq': state.finder = { ...state.finder, [el.dataset.k]: el.dataset.v }; go(); break;
     case 'fq-back': { const f = state.finder; if (f.mood) delete f.mood; else delete f.space; go(); break; }
     case 'fq-reset': state.finder = {}; go(); break;
+    case 'fq-start': state.finder = { space: el.dataset.v }; location.hash = '#/finder'; break;
     case 'metric': state.metric = el.dataset.k; rerender(); break;
     case 'range': state.range = +el.dataset.n; rerender(); break;
     case 'pcat': state.pcat = el.dataset.c; rerender(); break;
