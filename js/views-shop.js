@@ -35,7 +35,42 @@ const cardImgs = (p) => {
   const studio = p.fit === 'contain' && (p.pack || p.img) !== (p.cat === 'diffusers' && !p.pack && p.id === 'say-100' ? p.img : '');
   return { main, alt: alt !== main ? alt : '', studio: p.fit === 'contain' };
 };
-export function card(p) {
+const FAMILY_TONE = { 'בתי מלון ויוקרה': 't-hotel', 'חנויות ורשתות מובילות': 't-shop', 'השראת בשמים יוקרתיים': 't-perfume', 'טבע וספא': 't-spa', 'ניחוחות קלאסיים': 't-classic', 'ניקיון ורעננות': 't-fresh', 'מאפים ומתוקים': 't-sweet' };
+const plus = raw('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>');
+
+// Oils: a perfume-label card — scene in an arched window, the bottle on hover.
+function labelCard(p) {
+  return html`<article class="card label ${FAMILY_TONE[p.sub] || ''}">
+    <a class="lbl" href="#/product/${p.id}">
+      <span class="lbl-fam latin">${(FAMILY_EN_SHORT[p.sub] || '').toUpperCase()}</span>
+      <span class="lbl-arch">${media(p, 'm1', false, p.img)}${p.pack ? media(p, 'm2', false, p.pack) : ''}</span>
+      <span class="lbl-name">${L(p.name)}</span>
+      <span class="lbl-sub">${subName(p.sub)}</span>
+      <span class="lbl-rule" aria-hidden="true"></span>
+      <span class="lbl-price">${priceTag(p)}</span>
+    </a>
+    <a class="card-add" href="#/product/${p.id}" aria-label="${T('לבחירת גודל', 'Choose a size')}: ${L(p.name)}">${plus}</a>
+  </article>`;
+}
+// Featured products: a wide editorial tile spanning two columns.
+function featureCard(p) {
+  const { main } = cardImgs(p);
+  const blurb = (he() ? p.desc?.he : p.desc?.en || p.desc?.he || '').split('\n').map((x) => x.trim()).filter((x) => x.length > 40)[0] || '';
+  return html`<article class="card feature ${p.fit === 'contain' ? 'studio' : 'photo'}">
+    <a class="card-media" href="#/product/${p.id}" tabindex="-1" aria-hidden="true">${media(p, 'm1', false, main)}</a>
+    <div class="ft-body">
+      ${p.tag ? html`<span class="ft-tag">${t('tag_' + p.tag)}</span>` : ''}
+      <h3><a href="#/product/${p.id}">${L(p.name)}</a></h3>
+      ${blurb ? html`<p>${blurb.length > 150 ? blurb.slice(0, 150).replace(/\s\S*$/, '') + '…' : blurb}</p>` : ''}
+      <div class="ft-foot">${priceTag(p)}<a class="u-link" href="#/product/${p.id}">${p.picks ? T('לבחירת הניחוחות', 'Choose your scents') : T('לפרטים', 'View')} <span aria-hidden="true">${he() ? '←' : '→'}</span></a></div>
+    </div>
+  </article>`;
+}
+const FAMILY_EN_SHORT = { 'בתי מלון ויוקרה': 'Hotel collection', 'חנויות ורשתות מובילות': 'Boutique collection', 'השראת בשמים יוקרתיים': 'Fine fragrance', 'טבע וספא': 'Nature & spa', 'ניחוחות קלאסיים': 'Classics', 'ניקיון ורעננות': 'Fresh & clean', 'מאפים ומתוקים': 'Gourmand' };
+
+export function card(p, opts = {}) {
+  if (opts.feature) return featureCard(p);
+  if (p.cat === 'oils' && p.pack) return labelCard(p);
   const { main, alt, studio } = cardImgs(p);
   const direct = !(p.quote || p.picks || p.options?.length || p.sizes.length > 1);
   return html`<article class="card ${studio ? 'studio' : 'photo'}">
@@ -90,10 +125,10 @@ export function home() {
   </section>
 
   <section class="h-finder" aria-labelledby="fd-t"><div class="wrap h-finder-in">
-    <div><p class="kicker latin">Scent finder</p><h2 id="fd-t">${T('54 ניחוחות. אחד מהם שלכם.', '54 scents. One of them is yours.')}</h2>
-      <p>${T('שלוש שאלות קצרות, ונמליץ לכם על המכשיר והניחוחות שמתאימים בדיוק לחלל ולאווירה שאתם מחפשים.', 'Three short questions and we will recommend the device and scents that fit your space and mood.')}</p>
-      <a class="btn" href="#/finder">${T('למציאת הריח שלי', 'Find my scent')}<span aria-hidden="true"> ${arrow()}</span></a><small class="fd-time">${T('לוקח פחות מדקה', 'Takes under a minute')}</small></div>
-    <ol class="h-steps"><li><b>01</b><span>${T('בוחרים חלל', 'Pick a space')}</span></li><li><b>02</b><span>${T('בוחרים תחושה', 'Pick a feeling')}</span></li><li><b>03</b><span>${T('מקבלים התאמה', 'Get your match')}</span></li></ol>
+    <div class="h-finder-copy reveal"><p class="kicker latin">Scent finder</p><h2 id="fd-t">${T('54 ניחוחות.', '54 scents.')}<br><em>${T('אחד מהם שלכם.', 'One of them is yours.')}</em></h2>
+      <p>${T('שלוש שאלות קצרות — איפה, איזו תחושה וכמה עוצמה — ונמליץ לכם על המכשיר והניחוחות שמתאימים בדיוק לכם.', 'Three short questions — where, which feeling, how strong — and we will match you with the right device and scents.')}</p>
+      <div class="h-finder-cta"><a class="btn" href="#/finder">${T('למציאת הריח שלי', 'Find my scent')}</a><small>${T('פחות מדקה · בלי הרשמה', 'Under a minute · no sign-up')}</small></div></div>
+    <a class="fan" href="#/finder" aria-label="${T('למציאת הריח שלי', 'Find my scent')}">${families.slice(0, 5).map((x, i) => html`<span class="fan-c f${i}"><img src="${small(x.img)}" alt="" loading="lazy" width="320" height="420"><i>${subName(x.f)}</i></span>`)}</a>
   </div></section>
 
   <section class="h-collection" aria-labelledby="col-t"><div class="wrap">
@@ -186,7 +221,7 @@ export function shop(cat, q = '', sort = 'pop', sub = '') {
           </select></label>
         </div>
       </div>
-      ${list.length ? html`<div class="grid shop-grid">${list.map(card)}</div>` : html`<p class="empty">${t('noResults')}</p>`}`}
+      ${list.length ? html`<div class="grid shop-grid">${list.map((p) => card(p, { feature: !q && (p.picks || (p.cat === 'bundles' && p.wide) || p.id === 'say-300') }))}</div>` : html`<p class="empty">${t('noResults')}</p>`}`}
     </div></div><div class="block"></div>`;
 }
 
