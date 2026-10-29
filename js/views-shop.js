@@ -178,7 +178,10 @@ export function home() {
       <a class="btn" href="#/product/${kit.id}">${T('לבחירת הניחוחות', 'Choose your scents')}</a></div>
   </div></section>` : ''}
 
-  ${promo ? html`<a class="h-promo reveal" href="#/shop/bundles"><img src="${promo}" alt="${T('חבילת ה-Luxury שלנו', 'Our Luxury bundle')}" loading="lazy" width="2000" height="968"></a>` : ''}
+  ${promo ? html`<section class="h-offer wrap reveal" aria-labelledby="of-t"><a class="of-img" href="#/product/bundle-car-kit"><img src="${small(promo)}" srcset="${small(promo)} 640w, ${promo} 1400w" sizes="(max-width:760px) 100vw, 45vw" alt="${T('SAY Car וערכת התנסות', 'SAY Car and discovery kit')}" loading="lazy" width="1400" height="680"></a>
+    <div class="of-t"><p class="kicker latin">Bundle</p><h2 id="of-t">${T('מארז ההיכרות: מכשיר + 14 ניחוחות', 'Starter bundle: device + 14 scents')}</h2>
+      <p>${T('SAY Car לבחירה בשלושה צבעים, יחד עם ערכת התנסות של 14 תמציות — כל מה שצריך כדי להתחיל, במארז אחד ובמחיר משתלם.', 'SAY Car in three colours with a 14-oil discovery kit — everything to begin, in one box, for less.')}</p>
+      <a class="btn" href="#/product/bundle-car-kit">${T('לפרטי המארז', 'View bundle')}</a></div></section>` : ''}
 
   <section class="h-service" aria-label="${T('שירות', 'Service')}"><div class="wrap">
     <div><b>${T('משלוח חינם', 'Free delivery')}</b><p>${T('בכל הזמנה מעל 299₪, עד הבית בתוך 3–5 ימי עסקים.', 'On orders over ₪299, at your door in 3–5 business days.')}</p></div>
