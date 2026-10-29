@@ -68,6 +68,16 @@ function featureCard(p) {
 }
 const FAMILY_EN_SHORT = { 'בתי מלון ויוקרה': 'Hotel collection', 'חנויות ורשתות מובילות': 'Boutique collection', 'השראת בשמים יוקרתיים': 'Fine fragrance', 'טבע וספא': 'Nature & spa', 'ניחוחות קלאסיים': 'Classics', 'ניקיון ורעננות': 'Fresh & clean', 'מאפים ומתוקים': 'Gourmand' };
 
+// One honest, concrete benefit per product (what the customer actually gets).
+const BENEFIT = {
+  'say-room-office': ['עד 20 מ"ר · סוללות או USB', 'Up to 20 m² · battery or USB'], 'say-car': ['נטען · חיישן תנועה', 'Rechargeable · motion sensor'],
+  'say-100': ['עד 100 מ"ר · 3 מדבקות מתנה', 'Up to 100 m² · 3 free wraps'], 'say-150': ['עד 150 מ"ר · שליטה מהאפליקציה', 'Up to 150 m² · app control'],
+  'say-300': ['עד 300 מ"ר · Wi-Fi · מכל ליטר', 'Up to 300 m² · Wi-Fi · 1L tank'], 'say-400': ['עד 2,000 מ"ק · אלומיניום', 'Up to 2,000 m³ · aluminium'],
+  'kit-14': ['14 × 10 מ"ל · בוחרים בעצמכם', '14 × 10 ml · your choice'], 'kit-4': ['4 × 30 מ"ל · מארז מתנה', '4 × 30 ml · gift box'],
+  'bundle-say100-1l': ['כולל: SAY 100 + תמצית 1 ליטר', 'Includes SAY 100 + 1L oil'], 'bundle-say150-1l': ['כולל: SAY 150 + תמצית 1 ליטר', 'Includes SAY 150 + 1L oil'],
+  'bundle-say300-1l': ['כולל: SAY 300 + תמצית 1 ליטר', 'Includes SAY 300 + 1L oil'], 'bundle-5x100': ['כולל: 5 תמציות × 100 מ"ל', 'Includes 5 × 100 ml oils'],
+  'bundle-car-kit': ['כולל: SAY Car + 14 תמציות', 'Includes SAY Car + 14 oils'],
+};
 export function card(p, opts = {}) {
   if (opts.feature) return featureCard(p);
   if (p.cat === 'oils' && p.pack) return labelCard(p);
@@ -83,8 +93,9 @@ export function card(p, opts = {}) {
       : html`<a class="card-add" href="#/product/${p.id}" aria-label="${T('לבחירת אפשרויות', 'Choose options')}: ${L(p.name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>`}
     <div class="card-body">
       <h3><a href="#/product/${p.id}">${L(p.name)}</a></h3>
-      <small>${p.sub ? subName(p.sub) : catName(p.cat)}${p.sizes.length > 1 ? html` · ${p.sizes.length} ${T('גדלים', 'sizes')}` : ''}${p.options?.[0] ? html` · ${p.options[0].values.length} ${T('צבעים', 'colours')}` : ''}</small>
-      ${priceTag(p)}
+      <small>${p.sub ? subName(p.sub) : catName(p.cat)}${p.options?.[0] ? html` · ${p.options[0].values.length} ${T('צבעים', 'colours')}` : ''}</small>
+      ${BENEFIT[p.id] ? html`<span class="benefit">${T(...BENEFIT[p.id])}</span>` : ''}
+      ${p.quote ? html`<a class="quote-cta" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('קבלו הצעה מהירה בוואטסאפ', 'Get a quick quote on WhatsApp')}</a>` : priceTag(p)}
     </div>
   </article>`;
 }

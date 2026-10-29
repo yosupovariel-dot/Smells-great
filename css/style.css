@@ -1511,3 +1511,16 @@ html.a11y-stop .seal svg{animation:none}
 .of-t h2{font-size:clamp(1.6rem,2.8vw,2.3rem);font-weight:300;margin:.3rem 0 .8rem}
 .of-t p{color:var(--ink-2);margin:0 0 1.4rem;max-width:30rem}
 @media (max-width:760px){.h-offer{grid-template-columns:1fr}}
+/* Uniform luxury frame for every non-oil card */
+.card.photo,.card.studio:not(.feature){background:var(--white);padding:10px 10px 1.2rem;position:relative;transition:box-shadow .5s,transform .5s cubic-bezier(.2,.7,.2,1)}
+.card.photo::before,.card.studio:not(.feature)::before{content:"";position:absolute;inset:5px;border:1px solid rgba(169,135,79,.3);pointer-events:none;z-index:3;transition:border-color .5s}
+.card.photo:hover,.card.studio:not(.feature):hover{box-shadow:0 30px 50px -34px rgba(22,19,15,.45);transform:translateY(-4px)!important}
+.card.photo:hover::before,.card.studio:not(.feature):hover::before{border-color:rgba(169,135,79,.7)}
+.card.photo .card-media,.card.studio .card-media{border-radius:999px 999px 4px 4px}
+.card.photo .card-body,.card.studio .card-body{align-items:center;text-align:center;padding:1.1rem .8rem 0}
+.card .card-body h3{font-size:1.35rem}
+.benefit{font-size:.8rem;color:var(--gold-dark);background:rgba(169,135,79,.1);padding:.25rem .7rem;border-radius:20px;margin:.35rem 0 .2rem}
+.quote-cta{font-size:.88rem;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:.15rem;margin-top:.3rem;position:relative;z-index:4}
+.quote-cta:hover{color:var(--gold-dark)}
+.card .card-tag{z-index:4;top:18px;inset-inline-start:18px}
+.card .card-add{z-index:4;top:18px;inset-inline-end:18px}
