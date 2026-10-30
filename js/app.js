@@ -131,7 +131,7 @@ function maybeConsent() {
 }
 
 // ---------- Router ----------
-const STAFF = { admin: ['admin'], orders: ['orders'], courier: ['courier', 'orders'] };
+const STAFF = { admin: ['admin', 'products'], orders: ['orders'], courier: ['courier', 'orders'] };
 function route() {
   const parts = (location.hash.slice(2) || '').split('/').map(decodeURIComponent);
   const [a, b] = parts;
@@ -140,7 +140,8 @@ function route() {
   if (isBO) {
     if (!db.can(STAFF[a])) { state.authTab = 'login'; location.hash = '#/account'; return; }
     let v;
-    if (a === 'admin') v = b === 'products' ? A.productsAdmin(state.pcat, state.pq) : b === 'reports' ? A.reports(state.range) : b === 'users' ? A.usersAdmin(state.uq, state.ur) : A.dashboard(state.metric);
+    if (a === 'admin' && db.me().role === 'products' && b !== 'products') { location.hash = '#/admin/products'; return; }
+    if (a === 'admin') v = b === 'products' ? A.productsAdmin(state.pcat, state.pq) : b === 'reports' ? A.reports(state.range) : b === 'users' ? A.usersAdmin(state.uq, state.ur) : b === 'team' ? A.teamAdmin() : A.dashboard(state.metric);
     if (a === 'orders') v = A.ordersBoard({ view: state.ov, month: state.om, q: state.oq, status: state.os });
     if (a === 'courier') v = A.courierView(state.ctab);
     render(app, v); applyStyleAttrs(); document.title = 'SAY · Back Office'; return;
@@ -187,7 +188,7 @@ let lastY = 0;
 addEventListener('scroll', () => {
   const y = scrollY; const b = document.body;
   b.classList.toggle('scrolled', y > 40);
-  b.classList.toggle('hdr-hide', y > 260 && y > lastY && !b.classList.contains('cart-open'));
+
   lastY = y;
 }, { passive: true });
 
@@ -270,6 +271,8 @@ document.addEventListener('click', async (e) => {
     case 'range': state.range = +el.dataset.n; rerender(); break;
     case 'pcat': state.pcat = el.dataset.c; rerender(); break;
     case 'utab': state.ur = el.dataset.t; rerender(); break;
+    case 'cust-open': if (e.target.closest('[data-action="approve-ws"]')) break; modal(A.customerDrawer(id)); break;
+    case 'staff-open': modal(A.staffDrawer(id, el.dataset.role)); break;
     case 'os-tab': state.os = el.dataset.s; rerender(); break;
     case 'user-find': state.uq = el.dataset.q; state.ur = ''; location.hash = '#/admin/users'; rerender(); break;
     case 'approve-ws': db.updateUser(id, { role: 'wholesale', wsRequest: false }); toast(getLang() === 'he' ? 'החשבון אושר כסיטונאי' : 'Approved as wholesale'); rerender(); break;
@@ -298,8 +301,8 @@ document.addEventListener('click', async (e) => {
     case 'edit-product': modal(A.productForm(id ? db.product(id) : null)); break;
     case 'del-product': if (confirm(getLang() === 'he' ? 'למחוק את המוצר?' : 'Delete product?')) { db.deleteProduct(id); closeModal(); rerender(); } break;
     case 'modal-close': closeModal(); break;
-    case 'block-user': { const u = db.users().find((x) => x.id === id); db.updateUser(id, { blocked: !u.blocked }); rerender(); break; }
-    case 'del-user': if (confirm(getLang() === 'he' ? 'למחוק את המשתמש לצמיתות?' : 'Delete user permanently?')) { db.deleteUser(id); rerender(); } break;
+    case 'block-user': { const u = db.users().find((x) => x.id === id); db.updateUser(id, { blocked: !u.blocked }); closeModal(); toast(getLang() === 'he' ? 'עודכן' : 'Updated'); rerender(); break; }
+    case 'del-user': if (confirm(getLang() === 'he' ? 'למחוק את המשתמש לצמיתות?' : 'Delete user permanently?')) { db.deleteUser(id); closeModal(); rerender(); } break;
     case 'order-view': modal(A.orderModal(id)); break;
     case 'order-status': db.setOrderStatus(id, el.dataset.s, db.me()?.name); toast(getLang() === 'he' ? 'הסטטוס עודכן' : 'Status updated'); { const keep = el.dataset.keep; closeModal(); rerender(); if (keep) modal(A.orderModal(id)); } break;
     case 'clear-demo': if (confirm(getLang() === 'he' ? 'למחוק את כל לקוחות והזמנות הדמו? (מומלץ לפני העלייה לאוויר)' : 'Delete all demo customers and orders?')) { db.clearDemoData(); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); rerender(); } break;
@@ -387,7 +390,7 @@ document.addEventListener('submit', async (e) => {
   if (kind === 'login' || kind === 'register') {
     btn.disabled = true;
     const ok = await S.authSubmit(f, kind); btn.disabled = false;
-    if (ok) { const u = db.me(); location.hash = { admin: '#/admin', orders: '#/orders', courier: '#/courier' }[u.role] || '#/account'; rerender(); }
+    if (ok) { const u = db.me(); location.hash = { admin: '#/admin', products: '#/admin/products', orders: '#/orders', courier: '#/courier' }[u.role] || '#/account'; rerender(); }
   }
   if (kind === 'contact') {
     const d = Object.fromEntries(new FormData(f)); const err = $('#c-err');
@@ -395,6 +398,24 @@ document.addEventListener('submit', async (e) => {
     const txt = `פנייה מהאתר\nשם: ${clean(d.name, 80)}\nטלפון: ${clean(d.phone, 20)}\n${clean(d.msg, 1000)}`;
     window.open(`https://wa.me/${PHONE_INTL}`, '_blank', 'noopener');
     f.reset(); err.textContent = ''; toast(t('sent'));
+  }
+  if (kind === 'customer') {
+    const d = Object.fromEntries(new FormData(f)); const err = $('#cd-err');
+    if (!valid.name(d.name)) { err.textContent = t('required'); return; }
+    if (d.email && !valid.email(d.email)) { err.textContent = t('badEmail'); return; }
+    db.updateUser(f.dataset.id, { name: clean(d.name, 80), phone: clean(d.phone, 20), email: clean(d.email, 120), role: d.role === 'wholesale' ? 'wholesale' : 'customer', wsRequest: d.role === 'wholesale' ? false : undefined, biz: clean(d.biz, 80), note: clean(d.note, 400), newsletter: !!d.newsletter });
+    closeModal(); toast(getLang() === 'he' ? 'פרטי הלקוח נשמרו' : 'Customer saved'); rerender();
+  }
+  if (kind === 'staff') {
+    const d = Object.fromEntries(new FormData(f)); const err = $('#sd-err'); const id = f.dataset.id;
+    if (!valid.name(d.name)) { err.textContent = t('required'); return; }
+    if (!valid.email(d.email)) { err.textContent = t('badEmail'); return; }
+    if ((!id || d.password) && !valid.password(d.password)) { err.textContent = t('badPass'); return; }
+    try {
+      if (id) { db.updateUser(id, { name: clean(d.name, 80), email: clean(d.email, 120), phone: clean(d.phone, 20), ...(d.role ? { role: d.role } : {}) }); if (d.password) await db.setPassword(id, d.password); }
+      else await db.addStaff({ name: clean(d.name, 80), email: clean(d.email, 120), phone: clean(d.phone, 20), role: d.role, password: d.password });
+    } catch (x) { err.textContent = x.message === 'exists' ? t('exists') : t('required'); return; }
+    closeModal(); toast(getLang() === 'he' ? 'המשתמש נשמר' : 'User saved'); rerender();
   }
   if (kind === 'product') {
     const fd = new FormData(f); const d = Object.fromEntries(fd); const err = $('#pf-err');

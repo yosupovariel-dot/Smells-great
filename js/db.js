@@ -4,7 +4,7 @@
 import { SEED_PRODUCTS } from './data.js';
 import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js';
 
-const K = (k) => 'say6_' + k;
+const K = (k) => 'say7_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
 const write = (k, v) => { try { localStorage.setItem(K(k), JSON.stringify(v)); } catch {} };
 
@@ -37,7 +37,8 @@ export const saveProduct = (p) => { const l = products(); const i = l.findIndex(
 export const deleteProduct = (id) => write('products', products().filter((p) => p.id !== id));
 
 // ---------- Users & auth ----------
-export const ROLES = ['customer', 'wholesale', 'courier', 'orders', 'admin'];
+export const ROLES = ['customer', 'wholesale', 'courier', 'orders', 'products', 'admin'];
+export const STAFF_ROLES = ['admin', 'products', 'orders', 'courier'];
 export const users = () => read('users', []);
 const saveUsers = (l) => write('users', l);
 export const publicUser = (u) => u && (({ salt, hash, ...rest }) => rest)(u);
@@ -84,11 +85,20 @@ export function me() {
 export const can = (role) => { const u = me(); if (!u) return false; if (u.role === 'admin') return true; return Array.isArray(role) ? role.includes(u.role) : u.role === role; };
 export function updateUser(id, patch) {
   const l = users(); const u = l.find((x) => x.id === id); if (!u) return;
-  const allowed = ['name', 'phone', 'role', 'blocked', 'wsRequest', 'club', 'biz'];
+  const allowed = ['name', 'phone', 'role', 'blocked', 'wsRequest', 'club', 'biz', 'note', 'newsletter'];
+  if (patch.email) { const e = String(patch.email).toLowerCase().trim(); if (!l.some((x) => x.email === e && x.id !== id)) u.email = e; }
   for (const k of allowed) if (k in patch) u[k] = patch[k];
   if (patch.role && !ROLES.includes(patch.role)) u.role = 'customer';
   saveUsers(l);
 }
+export async function addStaff({ name, email, phone, role, password }) {
+  const l = users(); email = email.toLowerCase().trim();
+  if (l.some((u) => u.email === email)) throw new Error('exists');
+  if (!STAFF_ROLES.includes(role)) throw new Error('role');
+  const { salt, hash } = await hashPw(password);
+  l.push({ id: uid('u_'), name, email, phone, role, club: false, blocked: false, mustChange: true, createdAt: Date.now(), salt, hash }); saveUsers(l);
+}
+export async function setPassword(id, pw) { const l = users(); const u = l.find((x) => x.id === id); if (!u) return; Object.assign(u, await hashPw(pw), { mustChange: true }); saveUsers(l); }
 export const deleteUser = (id) => saveUsers(users().filter((u) => u.id !== id));
 
 // ---------- Newsletter / club signups ----------
@@ -149,6 +159,7 @@ export async function seedDemo() {
   if (read('seeded', false)) return;
   const staff = [
     ['מנהל ראשי', 'admin@say-boutique.co.il', 'admin'],
+    ['מנהל מוצרים', 'products@say-boutique.co.il', 'products'],
     ['מנהל הזמנות', 'orders@say-boutique.co.il', 'orders'],
     ['שליח', 'courier@say-boutique.co.il', 'courier'],
   ];

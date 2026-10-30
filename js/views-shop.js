@@ -534,7 +534,7 @@ export function account(tab = 'login') {
   const u = db.me();
   if (u) {
     const mine = db.orders().filter((o) => o.userId === u.id);
-    const staff = { admin: '#/admin', orders: '#/orders', courier: '#/courier' }[u.role];
+    const staff = { admin: '#/admin', products: '#/admin/products', orders: '#/orders', courier: '#/courier' }[u.role];
     return html`<div class="wrap legal"><p class="eyebrow">${t('clubMember')}</p><h1>${t('hello')}, ${u.name}</h1>
       ${u.wsRequest && u.role === 'customer' ? html`<p class="muted">${t('wsPending')}</p>` : ''}
       ${u.firstOrderDiscount && u.role === 'customer' ? html`<p class="note-gold">${t('tick3')}</p>` : ''}
