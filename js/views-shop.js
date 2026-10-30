@@ -146,7 +146,7 @@ export function home() {
   </section>
 
   <section class="h-collection" aria-labelledby="col-t"><div class="wrap">
-    <header class="h-head"><h2 id="col-t">${T('המכשירים', 'The devices')}</h2><a class="u-link" href="#/shop/diffusers">${T('כל המפיצים', 'All diffusers')} <span aria-hidden="true">${arrow()}</span></a></header>
+    <header class="h-head"><h2 id="col-t">${T('מפיצי ריח', 'Diffusers')}</h2><a class="u-link" href="#/shop/diffusers">${T('כל המפיצים', 'All diffusers')} <span aria-hidden="true">${arrow()}</span></a></header>
     <div class="h-col-grid">
       ${(() => { const f = db.product('say-300'); return f ? html`<a class="h-feature reveal" href="#/product/say-300"><span class="h-feature-arch">${media(f, '', false, f.img, true)}</span>
         <span class="h-feature-t"><b>SAY 300</b><small>${T('לחללים של עד 300 מ"ר · Wi-Fi ובלוטות׳', 'Up to 300 m² · Wi-Fi & Bluetooth')}</small>${priceTag(f)}</span></a>` : ''; })()}
@@ -156,15 +156,15 @@ export function home() {
   </div></section>
 
   <section class="h-quiz" aria-labelledby="qz-t"><div class="wrap">
-    <header class="qz-head"><p class="kicker latin">Scent finder</p><h2 id="qz-t">${T('איפה הריח שלכם יחיה?', 'Where will your scent live?')}</h2>
-      <p>${T('בחרו חלל — ובעוד שתי שאלות קצרות תקבלו המלצה אישית למכשיר ולניחוחות.', 'Pick a space — two more quick questions and you get a personal match.')}</p>
+    <header class="qz-head"><p class="kicker latin">Scent finder</p><h2 id="qz-t">${T('איזה מפיץ ריח מתאים לכם?', 'Which diffuser is right for you?')}</h2>
+      <p>${T('בחרו איפה תרצו להשתמש בו, ענו על עוד שתי שאלות, ונמליץ לכם על מכשיר ותמציות.', 'Choose where you will use it, answer two more questions, and we will recommend a device and oils.')}</p>
       <p class="qz-step" aria-label="${T('שלב 1 מתוך 3', 'Step 1 of 3')}"><span>${T('שלב 1 מתוך 3', 'Step 1 of 3')}</span><i aria-hidden="true"><b></b></i></p></header>
     <div class="qz-opts">${FINDER.space.map(([k, he_, en, pid, sHe, sEn]) => { const p = db.product(pid); return html`<button class="qz-opt" data-action="fq-start" data-v="${k}"><span class="qz-img">${p ? media(p, '', false, p.pack || p.img) : ''}</span><b>${T(he_, en)}</b><small>${T(sHe, sEn)}</small><span class="qz-go" aria-hidden="true">${he() ? '←' : '→'}</span></button>`; })}</div>
     <p class="qz-foot">${T('לוקח פחות מדקה · בלי הרשמה · אפשר לשנות בכל שלב', 'Under a minute · no sign-up · change anytime')}</p>
   </div></section>
 
   ${families.length ? html`<section class="h-library" aria-labelledby="lib-t"><div class="wrap">
-    <header class="h-head"><h2 id="lib-t">${T('ספריית הניחוחות', 'The scent library')}</h2><a class="u-link" href="#/shop/oils">${T('כל התמציות', 'All oils')} <span aria-hidden="true">${arrow()}</span></a></header>
+    <header class="h-head"><h2 id="lib-t">${T('תמציות שמן לפי סוג', 'Fragrance oils by type')}</h2><a class="u-link" href="#/shop/oils">${T('כל התמציות', 'All oils')} <span aria-hidden="true">${arrow()}</span></a></header>
     <div class="h-lib">
       <ol class="h-lib-list">${families.map((x, i) => html`<li><a href="#/shop/oils/${encodeURIComponent(x.f)}" data-fam-img="${x.img}" class="${i ? '' : 'on'}">
         <span class="latin idx">${FAMILY_EN[x.f] || ''}</span><b>${subName(x.f)}</b><small>${x.n} ${T('ניחוחות', 'scents')}</small></a></li>`)}</ol>
@@ -183,8 +183,8 @@ export function home() {
 
   ${kit ? html`<section class="h-kit" aria-labelledby="kit-t"><div class="wrap h-kit-in">
     <div class="h-kit-img reveal">${media(kit, '', false, kit.img, true)}</div>
-    <div class="h-kit-copy reveal"><p class="kicker latin">Discovery</p><h2 id="kit-t">${T('ארבעה־עשר ניחוחות.', 'Fourteen scents.')}<br>${T('קופסה אחת.', 'One box.')}</h2>
-      <p>${T('הדרך הנכונה להתחיל. בוחרים 14 תמציות של 10 מ"ל, מנסים במפיץ, ומגלים איזה ריח מרגיש כמו בית.', 'The right way to begin. Choose fourteen 10 ml oils, try them in your diffuser, and find the one that feels like home.')}</p>
+    <div class="h-kit-copy reveal"><p class="kicker latin">Discovery</p><h2 id="kit-t">${T('ערכת התנסות — 14 תמציות', 'Discovery kit — 14 oils')}</h2>
+      <p>${T('בוחרים 14 תמציות של 10 מ"ל ומנסים אותן במפיץ, כדי לגלות איזה ריח הכי מתאים לכם לפני שקונים בקבוק גדול.', 'Choose fourteen 10 ml oils and try them in your diffuser before buying a large bottle.')}</p>
       <p class="h-kit-price">${m(kit.sizes[0].price)}</p>
       <a class="btn" href="#/product/${kit.id}">${T('לבחירת הניחוחות', 'Choose your scents')}</a></div>
   </div></section>` : ''}
@@ -430,18 +430,18 @@ export function finder(f = {}) {
   const back = step > 1 && step < 4 ? html`<button class="u-link fd-back" data-action="fq-back">${T('חזרה', 'Back')}</button>` : '';
   const head = (q, sub) => html`<header class="fd-head"><p class="kicker latin">Scent finder · ${step}/3</p><div class="fd-bar" aria-hidden="true"><i class="s${step}"></i></div><h1>${q}</h1><p class="lead">${sub}</p></header>`;
   let body;
-  if (step === 1) body = html`${head(T('איפה הריח יחיה?', 'Where will the scent live?'), T('נתאים מכשיר לגודל החלל.', 'We will match a device to your space.'))}
+  if (step === 1) body = html`${head(T('איפה תרצו להשתמש במפיץ?', 'Where will you use the diffuser?'), T('נתאים מכשיר לגודל החלל.', 'We will match a device to your space.'))}
     <div class="fd-opts five">${FINDER.space.map(([k, he_, en, pid, sHe, sEn]) => { const p = db.product(pid); return html`<button class="fd-opt studio" data-action="fq" data-k="space" data-v="${k}">${p ? media(p, '', false, p.pack || p.img) : ''}<b>${T(he_, en)}</b><small>${T(sHe, sEn)}</small></button>`; })}</div>`;
-  else if (step === 2) body = html`${head(T('איזו תחושה אתם מחפשים?', 'What feeling are you after?'), T('בחרו את מה שהכי מדבר אליכם — אין תשובה לא נכונה.', 'Pick what speaks to you — there is no wrong answer.'))}
+  else if (step === 2) body = html`${head(T('איזה סוג ריח אתם אוהבים?', 'What kind of scent do you like?'), T('בחרו את הסגנון שהכי מתאים לכם.', 'Pick the style that suits you best.'))}
     <div class="fd-opts">${FINDER.mood.map(([k, he_, en]) => html`<button class="fd-opt photo" data-action="fq" data-k="mood" data-v="${k}">${banners[k] ? html`<img src="${small(banners[k])}" alt="" loading="lazy" width="640" height="300">` : ''}<b>${T(he_, en)}</b><small>${subName(k)}</small></button>`)}</div>`;
-  else if (step === 3) body = html`${head(T('כמה נוכח שיהיה הריח?', 'How present should it be?'), T('את העוצמה אפשר תמיד לכוונן במכשיר.', 'You can always fine-tune the intensity.'))}
+  else if (step === 3) body = html`${head(T('כמה חזק תרצו שהריח יהיה?', 'How strong should the scent be?'), T('את העוצמה אפשר תמיד לכוונן במכשיר.', 'You can always fine-tune the intensity.'))}
     <div class="fd-opts three">${FINDER.power.map(([k, he_, en], i) => html`<button class="fd-opt text" data-action="fq" data-k="power" data-v="${k}"><span class="fd-dots" aria-hidden="true">${[0, 1, 2].map((d) => html`<i class="${d <= i ? 'on' : ''}"></i>`)}</span><b>${T(he_, en)}</b></button>`)}</div>`;
   else {
     const sp = FINDER.space.find((x) => x[0] === f.space); const dev = db.product(sp[3]);
     const scents = active().filter((p) => p.sub === f.mood).slice(0, 3);
     const kit = db.product('kit-14');
     const tip = { soft: T('הפעלה של 10–15 שניות כל כמה דקות מספיקה לנוכחות עדינה.', 'Short bursts every few minutes give a subtle presence.'), mid: T('תזמנו עבודה בשעות שאתם בבית — ככה הריח נשאר רציף בלי בזבוז.', 'Schedule it for the hours you are home.'), strong: T('לריח חתימה, מקמו את המכשיר בגובה 1.2–1.5 מטר, הרחק מחלונות פתוחים.', 'For a signature scent, place it 1.2–1.5 m high, away from open windows.') }[f.power];
-    body = html`<header class="fd-head"><p class="kicker latin">Your SAY ritual</p><h1>${T('ההתאמה שלכם', 'Your match')}</h1><p class="lead">${T('על סמך התשובות שלכם — זה השילוב שהיינו ממליצים עליו לחבר קרוב.', 'Based on your answers — the pairing we would recommend to a close friend.')}</p></header>
+    body = html`<header class="fd-head"><p class="kicker latin">Your SAY ritual</p><h1>${T('ההמלצה שלנו בשבילכם', 'Our recommendation')}</h1><p class="lead">${T('לפי התשובות שלכם, אלה המכשיר והתמציות שמתאימים לכם.', 'Based on your answers, this device and these oils suit you.')}</p></header>
       <div class="fd-result">
         ${dev ? html`<a class="fd-dev studio" href="#/product/${dev.id}"><span class="fd-dev-img">${media(dev, '', false, dev.pack || dev.img)}</span><span><small>${T('המכשיר שלכם', 'Your device')}</small><b>${L(dev.name)}</b><em>${sp[T(4, 5)]}</em>${priceTag(dev)}</span></a>` : ''}
         <div class="fd-scents"><small>${T('הניחוחות שלכם', 'Your scents')} · ${subName(f.mood)}</small><div class="grid three">${scents.map(card)}</div></div>
