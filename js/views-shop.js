@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js';
-import { t, L, getLang } from './i18n.js';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js';
-import * as db from './db.js';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261030124850';
+import { t, L, getLang } from './i18n.js?v=261030124850';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261030124850';
+import * as db from './db.js?v=261030124850';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -554,7 +554,7 @@ export function account(tab = 'login') {
     <form data-form="${isLogin ? 'login' : 'register'}" novalidate>
       ${isLogin ? '' : html`<div class="field"><label for="r-name">${t('fullName')} *</label><input class="input" id="r-name" name="name" autocomplete="name" required maxlength="80"></div>
         <div class="field"><label for="r-phone">${t('phone')} *</label><input class="input" id="r-phone" name="phone" type="tel" autocomplete="tel" required maxlength="20"></div>`}
-      <div class="field"><label for="a-email">${t('email')} *</label><input class="input" id="a-email" name="email" type="email" autocomplete="email" required maxlength="120"></div>
+      <div class="field"><label for="a-email">${isLogin ? T('אימייל או שם משתמש', 'Email or username') : t('email')} *</label><input class="input" id="a-email" name="email" type="${isLogin ? 'text' : 'email'}" autocomplete="${isLogin ? 'username' : 'email'}" autocapitalize="none" spellcheck="false" required maxlength="120"></div>
       <div class="field"><label for="a-pass">${t('password')} *</label><input class="input" id="a-pass" name="password" type="password" autocomplete="${isLogin ? 'current-password' : 'new-password'}" required minlength="8" maxlength="128" aria-describedby="a-pass-h"><small id="a-pass-h" class="muted">${isLogin ? '' : t('badPass')}</small></div>
       ${isLogin ? '' : html`
         <label class="check"><input type="checkbox" name="wholesale" data-input="ws-toggle"><span>${t('wsRequest')}</span></label>
@@ -576,7 +576,7 @@ export async function authSubmit(form, kind) {
   err.textContent = '';
   try {
     if (kind === 'login') {
-      if (!valid.email(d.email) || !d.password) throw new Error('fail');
+      if (!String(d.email).trim() || !d.password) throw new Error('fail');
       await db.login(d.email, d.password);
     } else {
       if (!valid.name(d.name)) throw new Error('name');

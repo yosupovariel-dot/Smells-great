@@ -10,12 +10,16 @@ Plain HTML/CSS/ES modules. No build step and no dependencies, which keeps the si
 GitHub Pages: `https://yosupovariel-dot.github.io/Smells-great/`
 (Settings → Pages → Source: **GitHub Actions**, then run the "Deploy preview" workflow.)
 
-## Demo staff accounts (preview only — change on first login)
-| Role | Email | Password |
+## Demo staff accounts (client preview)
+| Role | Username | Password |
 |---|---|---|
-| Admin | admin@say-boutique.co.il | Say2026!demo |
-| Orders manager | orders@say-boutique.co.il | Say2026!demo |
-| Courier | courier@say-boutique.co.il | Say2026!demo |
+| Admin | admin | 1234 |
+| Orders manager | orders | 1234 |
+| Products manager | products | 1234 |
+| Courier | courier | 1234 |
+
+Before going live, delete these and create real accounts with strong passwords (Admin → Team & roles).
+Before each push run `python3 tools/stamp.py` so browsers load the new files.
 
 ## Catalog (Google Sheet + Drive)
 The products and images come from the product sheet and the Drive folder. To update them:

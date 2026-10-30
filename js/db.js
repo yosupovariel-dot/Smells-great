@@ -1,10 +1,10 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js';
+import { SEED_PRODUCTS } from './data.js?v=261030124850';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261030124850';
 
-const K = (k) => 'say7_' + k;
+const K = (k) => 'say8_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
 const write = (k, v) => { try { localStorage.setItem(K(k), JSON.stringify(v)); } catch {} };
 
@@ -96,9 +96,9 @@ export async function addStaff({ name, email, phone, role, password }) {
   if (l.some((u) => u.email === email)) throw new Error('exists');
   if (!STAFF_ROLES.includes(role)) throw new Error('role');
   const { salt, hash } = await hashPw(password);
-  l.push({ id: uid('u_'), name, email, phone, role, club: false, blocked: false, mustChange: true, createdAt: Date.now(), salt, hash }); saveUsers(l);
+  l.push({ id: uid('u_'), name, email, phone, role, club: false, blocked: false, mustChange: false, createdAt: Date.now(), salt, hash }); saveUsers(l);
 }
-export async function setPassword(id, pw) { const l = users(); const u = l.find((x) => x.id === id); if (!u) return; Object.assign(u, await hashPw(pw), { mustChange: true }); saveUsers(l); }
+export async function setPassword(id, pw) { const l = users(); const u = l.find((x) => x.id === id); if (!u) return; Object.assign(u, await hashPw(pw), { mustChange: false }); saveUsers(l); }
 export const deleteUser = (id) => saveUsers(users().filter((u) => u.id !== id));
 
 // ---------- Newsletter / club signups ----------
@@ -157,17 +157,17 @@ export const markNotesRead = () => write('notify', notifications().map((n) => ({
 // ---------- Demo seed (preview only) ----------
 export async function seedDemo() {
   if (read('seeded', false)) return;
+  // Demo staff for the client preview — simple usernames, password 1234.
   const staff = [
-    ['מנהל ראשי', 'admin@say-boutique.co.il', 'admin'],
-    ['מנהל מוצרים', 'products@say-boutique.co.il', 'products'],
-    ['מנהל הזמנות', 'orders@say-boutique.co.il', 'orders'],
-    ['שליח', 'courier@say-boutique.co.il', 'courier'],
+    ['מנהל', 'admin', 'admin'],
+    ['אחראי הזמנות', 'orders', 'orders'],
+    ['אחראי מוצרים', 'products', 'products'],
+    ['שליח', 'courier', 'courier'],
   ];
-  const l = users();
+  const l = users().filter((u) => !STAFF_ROLES.includes(u.role));
   for (const [name, email, role] of staff) {
-    if (l.some((u) => u.email === email)) continue;
-    const { salt, hash } = await hashPw('Say2026!demo');
-    l.push({ id: uid('u_'), name, email, phone: '0523233310', role, club: false, blocked: false, mustChange: true, createdAt: Date.now(), salt, hash });
+    const { salt, hash } = await hashPw('1234');
+    l.push({ id: uid('u_'), name, email, phone: '0523233310', role, club: false, blocked: false, mustChange: false, createdAt: Date.now(), salt, hash });
   }
   saveUsers(l);
   // A simulated first year of trading (deterministic, so every viewer sees the same store).
