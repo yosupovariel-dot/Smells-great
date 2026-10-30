@@ -20,7 +20,7 @@ const ICONS = {
 // ---------- Layout ----------
 function header() {
   const n = db.cart().reduce((a, l) => a + l.qty, 0); const route = location.hash;
-  const navLink = (href, label) => html`<a href="${href}" ${raw(route === href || (href !== '#/' && route.startsWith(href)) ? 'aria-current="page"' : '')}>${label}</a>`;
+  const navLink = (href, label) => html`<a href="${href}" ${raw(route === href || (href === '#/' && !route.slice(2)) || (href !== '#/' && route.startsWith(href)) ? 'aria-current="page"' : '')}>${label}</a>`;
   const msgs = ['tick1', 'tick2', 'tick3', 'tick4', 'tick5'];
   return html`<a class="skip" href="#main">${t('skip')}</a>
   <div class="ticker" role="region" aria-label="${getLang() === 'he' ? 'הודעות' : 'Announcements'}"><div class="wrap">
@@ -29,7 +29,7 @@ function header() {
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
       <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-      ${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/contact', t('contact'))}
+      ${navLink('#/', t('home'))}${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/contact', t('contact'))}
     </nav>
     <a class="brand" href="#/" aria-label="SAY Boutique — ${t('home')}"><b>SAY</b><small>BOUTIQUE</small></a>
     <div class="tools">

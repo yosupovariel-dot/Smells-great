@@ -18,7 +18,7 @@ jobs:
       - name: Cache-bust JS/CSS with the commit id
         run: |
           V=${GITHUB_SHA::8}
-          sed -i -E "s#(from '\./[a-z-]+\.js)'#\1?v=$V'#g" js/*.js
+          sed -i -E "s#(from '\./[a-z0-9-]+\.js)'#\1?v=$V'#g" js/*.js
           sed -i -E "s#(js/app\.js|css/style\.css)\"#\1?v=$V\"#g" index.html
       - uses: actions/upload-pages-artifact@v3
         with: { path: . }
