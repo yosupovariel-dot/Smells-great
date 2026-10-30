@@ -196,7 +196,7 @@ export function home() {
 
   <section class="h-service" aria-label="${T('שירות', 'Service')}"><div class="wrap">
     <div><b>${T('משלוח חינם', 'Free delivery')}</b><p>${T('בכל הזמנה מעל 299₪, עד הבית בתוך 3–5 ימי עסקים.', 'On orders over ₪299, at your door in 3–5 business days.')}</p></div>
-    <div><b>${T('שנת אחריות', 'One-year warranty')}</b><p>${T('אחריות יבואן מלאה על כל מכשירי הבישום.', 'Full importer warranty on every device.')}</p></div>
+    <div><b>${T('אחריות יבואן', 'Importer warranty')}</b><p>${T('שנת אחריות יבואן על SAY 150, SAY 300 ו-SAY 400.', 'One-year importer warranty on SAY 150, 300 and 400.')}</p></div>
     <div><b>${T('ליווי אישי', 'Personal advice')}</b><p>${T('לא בטוחים מה מתאים לחלל שלכם? כתבו לנו ונמליץ.', 'Not sure what suits your space? Message us.')} <a href="${waLink(T('שלום, אשמח להמלצה', 'Hello, I would like a recommendation'))}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
     <div><b>${T('לעסקים', 'For business')}</b><p>${T('מחירון סיטונאי למלונות, משרדים וחנויות.', 'Wholesale pricing for hotels, offices and shops.')} <a href="#/wholesale">${T('לפרטים', 'Details')}</a></p></div>
   </div></section>
@@ -313,6 +313,9 @@ function perUnit(p, s, priceOf) {
   return { save: save >= 5 ? save : 0 };
 }
 
+// Only models whose spec sheet states a 1-year importer warranty.
+const WARRANTY = new Set(['say-150', 'say-300', 'say-400']);
+
 export function productPage(id) {
   const p = db.product(id);
   if (!p || p.active === false) return null;
@@ -352,8 +355,8 @@ export function productPage(id) {
         <p class="err" id="add-err" role="alert"></p>
       </form>`}
       ${p.cat === 'oils' && p.sizes.length > 2 ? html`<p class="unit-note">${T('ככל שהבקבוק גדול יותר — המחיר למ"ל נמוך יותר. האחוז מציין את החיסכון לעומת 10 מ"ל.', 'Bigger bottles cost less per ml — the % shows the saving vs 10 ml.')}</p>` : ''}
-      <ul class="trust" aria-label="${T('ההבטחה שלנו', 'Our promise')}"><li><b>${T('14 יום', '14 days')}</b><span>${T('להחזרה', 'to return')}</span></li><li><b>${p.cat === 'diffusers' ? T('שנה', '1 year') : T('3–5 ימים', '3–5 days')}</b><span>${p.cat === 'diffusers' ? T('אחריות יבואן', 'warranty') : T('עד הבית', 'delivery')}</span></li><li><b>SSL</b><span>${T('תשלום מאובטח', 'secure payment')}</span></li></ul>
-      <ul class="perks"><li>${t('perk1')}</li><li>${t('perk2')}</li>${p.cat === 'diffusers' ? html`<li>${T('שנת אחריות יבואן', '1-year importer warranty')}</li><li><a href="#/guide">${T('מדריך שימוש ותחזוקה', 'Use & care guide')}</a></li>` : html`<li>${t('perk3')}</li>`}</ul>
+      <ul class="trust" aria-label="${T('ההבטחה שלנו', 'Our promise')}"><li><b>${T('14 יום', '14 days')}</b><span>${T('להחזרה', 'to return')}</span></li><li><b>${WARRANTY.has(p.id) ? T('שנה', '1 year') : T('3–5 ימים', '3–5 days')}</b><span>${WARRANTY.has(p.id) ? T('אחריות יבואן', 'warranty') : T('עד הבית', 'delivery')}</span></li><li><b>SSL</b><span>${T('תשלום מאובטח', 'secure payment')}</span></li></ul>
+      <ul class="perks"><li>${t('perk1')}</li><li>${t('perk2')}</li>${WARRANTY.has(p.id) ? html`<li>${T('שנת אחריות יבואן', '1-year importer warranty')}</li>` : ''}${p.cat === 'diffusers' ? html`<li><a href="#/guide">${T('מדריך שימוש ותחזוקה', 'Use & care guide')}</a></li>` : html`<li>${t('perk3')}</li>`}</ul>
     </div>
   </div>
   ${p.specs?.length ? html`<section class="specs" aria-labelledby="spec-t"><h2 id="spec-t">${T('מפרט טכני', 'Specifications')}</h2><table class="spec-tbl"><tbody>${p.specs.map(([k, v]) => html`<tr><th scope="row">${k}</th><td>${v}</td></tr>`)}</tbody></table></section>` : ''}
