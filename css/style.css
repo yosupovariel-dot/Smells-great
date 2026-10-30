@@ -1558,3 +1558,5 @@ body.hdr-hide .hdr{transform:none}
 body.scrolled .hdr{top:12px;margin:0 clamp(10px,2.5vw,32px);border-radius:999px;border:1px solid rgba(169,135,79,.25);background:rgba(244,238,228,.9);backdrop-filter:blur(14px);box-shadow:0 18px 40px -24px rgba(22,19,15,.45)}
 body.scrolled .hdr::after{display:none}
 body.scrolled .hdr .wrap{min-height:64px}
+.of-img{aspect-ratio:2000/968}
+.of-img img{object-fit:contain;object-position:center}
