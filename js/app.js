@@ -153,7 +153,7 @@ function route() {
     case 'product': v = S.productPage(b); if (v) title = `${(db.product(b).name[getLang()])} | SAY Boutique`; break;
     case 'checkout': v = S.checkout(); break;
     case 'done': v = state.lastOrder ? S.orderDone(state.lastOrder) : S.home(); break;
-    case 'account': if (b === 'register') state.authTab = 'register'; v = S.account(state.authTab); break;
+    case 'account': if (b === 'register' || b === 'business') state.authTab = 'register'; v = S.account(state.authTab); break;
     case 'contact': v = S.contact(); break;
     case 'about': v = S.about(); break;
     case 'wholesale': v = S.wholesalePage(); break;
@@ -167,6 +167,7 @@ function route() {
   if (!v) v = html`<div class="wrap legal"><h1>404</h1><p>${t('notFound')}</p><a class="btn" href="#/">${t('backHome')}</a></div>`;
   render(app, html`${header()}<main id="main" tabindex="-1">${v}</main>${footer()}`);
   document.title = title;
+  if (location.hash === '#/account/business') { const c = $('[data-input="ws-toggle"]'); if (c) { c.checked = true; $('#biz-f').hidden = false; } }
   applyA11y(); startTicker(); bars(); startSlides(); observeReveal(); observeBuy();
 }
 

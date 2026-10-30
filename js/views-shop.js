@@ -616,7 +616,33 @@ export function about() {
 }
 
 export function wholesalePage() {
-  return html`<div class="wrap legal"><p class="eyebrow latin">B2B</p><h1>${t('wsTitle')}</h1><span class="rule"></span><p>${t('wsText')}</p>
-  <ul class="perks"><li>${getLang() === 'he' ? 'מחירון סיטונאי ייעודי באתר' : 'Dedicated wholesale price list'}</li><li>${getLang() === 'he' ? 'אריזות גדולות 500ml–5L' : 'Bulk sizes 500ml–5L'}</li><li>${getLang() === 'he' ? 'ליווי אישי ומיתוג לעסקים' : 'Personal account manager & branding'}</li></ul>
-  <div class="hero-cta"><a class="btn" href="#/account/register">${t('wsCta')}</a><a class="btn ghost" href="${waLink()}" target="_blank" rel="noopener noreferrer">WhatsApp</a></div></div>`;
+  const banners = db.SITE.site?.subBanners || {};
+  const seg = [
+    [T('מלונות וצימרים', 'Hotels & B&Bs'), T('ריח חתימה בלובי ובחדרים', 'A signature scent in lobby and rooms'), banners['בתי מלון ויוקרה']],
+    [T('חנויות ורשתות', 'Shops & chains'), T('חוויית קנייה שזוכרים', 'A shopping experience people remember'), banners['חנויות ורשתות מובילות']],
+    [T('קליניקות וספא', 'Clinics & spas'), T('אווירה רגועה ונקייה', 'A calm, clean atmosphere'), banners['טבע וספא']],
+    [T('משרדים', 'Offices'), T('סביבת עבודה נעימה ללקוחות ולצוות', 'A pleasant space for clients and staff'), banners['ניקיון ורעננות']],
+  ];
+  const s300 = db.product('say-300');
+  return html`<div class="ws-page">
+  <header class="ws-hero wrap">
+    <div><p class="kicker latin">For business</p><h1>${T('ריח לעסק שלכם, במחירי סיטונאות', 'Scent for your business, at wholesale prices')}</h1>
+      <p class="lead">${T('מכשירים ותמציות לבתי מלון, חנויות, קליניקות ומשרדים. פותחים חשבון עסקי, ואחרי אישור רואים באתר את המחירים הסיטונאיים ומזמינים ישירות.', 'Devices and oils for hotels, shops, clinics and offices. Open a business account and, once approved, see wholesale prices and order directly.')}</p>
+      <div class="hero-cta"><a class="btn" href="#/account/business">${T('פתיחת חשבון עסקי', 'Open a business account')}</a><a class="u-link" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('שאלה? דברו איתנו בוואטסאפ', 'Questions? WhatsApp us')}</a></div></div>
+    ${s300 ? html`<figure class="sp-arch studio"><img src="${s300.img}" alt="SAY 300" width="900" height="1100"></figure>` : ''}
+  </header>
+  <section class="wrap ws-sec"><h2>${T('למי זה מתאים', 'Who it is for')}</h2>
+    <div class="ws-seg">${seg.map(([h, p, img]) => html`<div class="ws-card">${img ? html`<span class="ws-img"><img src="${small(img)}" alt="" loading="lazy" width="320" height="240"></span>` : ''}<b>${h}</b><small>${p}</small></div>`)}</div></section>
+  <section class="wrap ws-sec ws-two">
+    <div><h2>${T('מה מקבלים', 'What you get')}</h2><ul class="ws-list">
+      <li><b>${T('מחירון סיטונאי באתר', 'Wholesale prices online')}</b>${T('אחרי האישור המחירים מתעדכנים אוטומטית בכל המוצרים.', 'Once approved, prices update automatically across the shop.')}</li>
+      <li><b>${T('בקבוקים גדולים', 'Large bottles')}</b>${T('תמציות ב־500 מ"ל, ליטר ו־5 ליטר — משתלם יותר לשימוש שוטף.', '500 ml, 1 L and 5 L oils — better value for daily use.')}</li>
+      <li><b>${T('מכשירים לחללים גדולים', 'Devices for large spaces')}</b>${T('SAY 300 ו־SAY 400 לחללים של מאות מ"ר.', 'SAY 300 and SAY 400 for spaces of hundreds of m².')}</li>
+      <li><b>${T('ליווי אישי', 'Personal support')}</b>${T('עזרה בבחירת ריח, מיקום המכשיר והגדרת זמני עבודה.', 'Help choosing a scent, placing the device and setting schedules.')}</li></ul></div>
+    <div><h2>${T('איך זה עובד', 'How it works')}</h2><ol class="ws-steps">
+      <li><b>${T('נרשמים', 'Register')}</b>${T('ממלאים פרטים ומסמנים "אני בית עסק".', 'Fill in your details and tick “I am a business”.')}</li>
+      <li><b>${T('מאשרים', 'We approve')}</b>${T('אנחנו בודקים ומאשרים את החשבון.', 'We review and approve the account.')}</li>
+      <li><b>${T('מזמינים', 'Order')}</b>${T('נכנסים לאתר ורואים מחירי סיטונאות בכל מוצר.', 'Sign in and see wholesale prices on every product.')}</li></ol>
+      <a class="btn" href="#/account/business">${T('פתיחת חשבון עסקי', 'Open a business account')}</a></div>
+  </section></div><div class="block"></div>`;
 }
