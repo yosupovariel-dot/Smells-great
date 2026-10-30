@@ -1560,3 +1560,4 @@ body.scrolled .hdr::after{display:none}
 body.scrolled .hdr .wrap{min-height:64px}
 .of-img{aspect-ratio:2000/968}
 .of-img img{object-fit:contain;object-position:center}
+body.scrolled .hdr{top:6px}body.scrolled .hdr .wrap{min-height:58px}
