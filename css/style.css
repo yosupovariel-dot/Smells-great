@@ -1673,3 +1673,8 @@ html,body{overflow-x:clip}
 .hh1{grid-row:span 2;border-radius:999px 999px 18px 18px}
 .hh4{display:none}
 @media (max-width:860px){.h-hair-in{grid-template-columns:1fr}.h-hair-grid{order:-1}}
+.auth.glass{width:min(720px,100%);padding:clamp(1.6rem,4vw,2.8rem) clamp(1.4rem,4.5vw,3.2rem)}
+.auth.glass form[data-form="register"]{display:grid;grid-template-columns:1fr 1fr;gap:0 1.2rem}
+.auth.glass form[data-form="register"]>.check,.auth.glass form[data-form="register"]>.err,.auth.glass form[data-form="register"]>.btn{grid-column:1/-1}
+.auth.glass form[data-form="login"]{max-width:480px;margin:0 auto}
+@media (max-width:600px){.auth.glass form[data-form="register"]{grid-template-columns:1fr}}
