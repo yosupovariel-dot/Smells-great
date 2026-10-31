@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031213825';
-import { t, L, getLang } from './i18n.js?v=261031213825';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031213825';
-import * as db from './db.js?v=261031213825';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031213859';
+import { t, L, getLang } from './i18n.js?v=261031213859';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031213859';
+import * as db from './db.js?v=261031213859';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -10,7 +10,7 @@ const T = (a, b) => (he() ? a : b);
 export const small = (src) => (/^assets\/products\/.+\.webp$/.test(src) && !src.endsWith('-sm.webp') ? src.replace(/\.webp$/, '-sm.webp') : src);
 export const media = (p, cls = '', eager = false, src = p.img, full = false) =>
   src
-    ? html`<img src="${full ? src : small(src)}" ${raw(full || small(src) === src ? '' : `srcset="${small(src)} 640w, ${src} 1400w" sizes="(max-width:600px) 50vw, 320px"`)} alt="${L(p.name)}" width="1200" height="900" ${raw(eager ? 'fetchpriority="high"' : 'loading="lazy"')} decoding="async" class="${cls}">`
+    ? html`<img src="${full ? src : small(src)}" ${raw(full || small(src) === src ? '' : `srcset="${small(src)} 560w, ${src} 1400w" sizes="(max-width:600px) 50vw, 320px"`)} alt="${L(p.name)}" width="1200" height="900" ${raw(eager ? 'fetchpriority="high"' : 'loading="lazy"')} decoding="async" class="${cls}">`
     : raw(artSVG(p, cls));
 const catName = (id) => L(CATEGORIES.find((c) => c.id === id));
 // Display names drop the sheet's marketing tail ("ערכות התנסות – מומלץ…" → "ערכות התנסות").
@@ -189,7 +189,7 @@ export function home() {
       <a class="btn" href="#/product/${kit.id}">${T('לבחירת הניחוחות', 'Choose your scents')}</a></div>
   </div></section>` : ''}
 
-  ${promo ? html`<section class="h-offer wrap reveal" aria-labelledby="of-t"><a class="of-img" href="#/product/bundle-car-kit"><img src="${small(promo)}" srcset="${small(promo)} 640w, ${promo} 1400w" sizes="(max-width:760px) 100vw, 45vw" alt="${T('SAY Car וערכת התנסות', 'SAY Car and discovery kit')}" loading="lazy" width="1400" height="680"></a>
+  ${promo ? html`<section class="h-offer wrap reveal" aria-labelledby="of-t"><a class="of-img" href="#/product/bundle-car-kit"><img src="${small(promo)}" srcset="${small(promo)} 560w, ${promo} 1400w" sizes="(max-width:760px) 100vw, 45vw" alt="${T('SAY Car וערכת התנסות', 'SAY Car and discovery kit')}" loading="lazy" width="1400" height="680"></a>
     <div class="of-t"><p class="kicker latin">Bundle</p><h2 id="of-t">${T('מארז ההיכרות: מכשיר + 14 ניחוחות', 'Starter bundle: device + 14 scents')}</h2>
       <p>${T('SAY Car לבחירה בשלושה צבעים, יחד עם ערכת התנסות של 14 תמציות — כל מה שצריך כדי להתחיל, במארז אחד ובמחיר משתלם.', 'SAY Car in three colours with a 14-oil discovery kit — everything to begin, in one box, for less.')}</p>
       <a class="btn" href="#/product/bundle-car-kit">${T('לפרטי המארז', 'View bundle')}</a></div></section>` : ''}
@@ -257,7 +257,7 @@ export function shop(cat, q = '', sort = 'pop', sub = '') {
       <div class="wrap">${catTabs('')}
         ${cats.map((x) => { const items = active().filter((p) => p.cat === x.id); return html`<section class="rail-sec" aria-labelledby="r-${x.id}">
           <header class="rail-h"><div><h2 id="r-${x.id}">${L(x)}</h2><p>${T(...(CAT_LEAD[x.id] || ['', '']))}</p></div><a class="u-link" href="#/shop/${x.id}">${T('לכל ה', 'All ')}${L(x)} (${items.length}) <span aria-hidden="true">${he() ? '←' : '→'}</span></a></header>
-          <div class="rail">${items.slice(0, 8).map((p) => card(p))}</div></section>`; })}
+          <div class="rail">${raw(String(html`${items.slice(0, 8).map((p) => card(p))}`).replace(/loading="lazy"/g, 'loading="eager"'))}</div></section>`; })}
       </div></div><div class="block"></div>`;
   }
 
