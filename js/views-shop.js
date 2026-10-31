@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031215702';
-import { t, L, getLang } from './i18n.js?v=261031215702';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031215702';
-import * as db from './db.js?v=261031215702';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031225055';
+import { t, L, getLang } from './i18n.js?v=261031225055';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031225055';
+import * as db from './db.js?v=261031225055';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -549,7 +549,7 @@ export function account(tab = 'login', aud = 'retail') {
   }
   const isLogin = tab === 'login';
   const ws = aud === 'ws';
-  return html`<div class="wrap"><div class="auth">
+  return html`<div class="auth-page ${ws ? 'ws' : ''}"><div class="auth glass">
     <div class="aud" role="tablist" aria-label="${T('סוג לקוח', 'Customer type')}">
       <a href="#/account" role="tab" aria-selected="${!ws}"><b>${T('לקוחות פרטיים', 'Private customers')}</b><small>${T('מועדון לקוחות', 'Members club')}</small></a>
       <a href="#/account/ws" role="tab" aria-selected="${ws}"><b>${T('סיטונאים ועסקים', 'Wholesale & business')}</b><small>${T('מחירון סיטונאי', 'Wholesale pricing')}</small></a>
