@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261031175647';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261031175647';
-import { CATEGORIES } from './data.js?v=261031175647';
-import * as db from './db.js?v=261031175647';
-import * as S from './views-shop.js?v=261031175647';
-import * as Lg from './views-legal.js?v=261031175647';
-import * as A from './views-admin.js?v=261031175647';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261031204453';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261031204453';
+import { CATEGORIES } from './data.js?v=261031204453';
+import * as db from './db.js?v=261031204453';
+import * as S from './views-shop.js?v=261031204453';
+import * as Lg from './views-legal.js?v=261031204453';
+import * as A from './views-admin.js?v=261031204453';
 
 const app = $('#app');
 const state = { finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -100,6 +100,9 @@ let slideTimer, slideIdx = 0;
 function showSlide(i) {
   const ss = $$('.slide'); if (!ss.length) return;
   slideIdx = (i + ss.length) % ss.length;
+  // Never reveal a slide whose image hasn't finished loading — keep the current one instead.
+  const img = ss[slideIdx].querySelector('img');
+  if (img && !img.complete) { const prev = (slideIdx - 1 + ss.length) % ss.length; img.addEventListener('load', () => showSlide(slideIdx), { once: true }); slideIdx = prev; return; }
   ss.forEach((s, k) => s.classList.toggle('on', k === slideIdx));
   $$('.dots button').forEach((b, k) => b.setAttribute('aria-current', k === slideIdx));
   const n = $('#slide-n'); if (n) n.textContent = String(slideIdx + 1).padStart(2, '0');

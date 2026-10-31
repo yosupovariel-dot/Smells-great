@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031175647';
-import { t, L, getLang } from './i18n.js?v=261031175647';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031175647';
-import * as db from './db.js?v=261031175647';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031204453';
+import { t, L, getLang } from './i18n.js?v=261031204453';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031204453';
+import * as db from './db.js?v=261031204453';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -127,7 +127,7 @@ export function home() {
   return html`
   <section class="h-hero" aria-labelledby="hero-t">
     <div class="h-slides" role="region" aria-roledescription="carousel" aria-label="${T('מוצרים נבחרים', 'Featured')}">
-      ${hero.map((src, i) => html`<figure class="slide ${i ? '' : 'on'}"><img src="${src}" alt="${HERO_SLIDES[i]?.[getLang()] || 'SAY Boutique'}" width="2000" height="968" ${raw(i ? 'loading="lazy"' : 'fetchpriority="high"')} decoding="async"></figure>`)}
+      ${hero.map((src, i) => html`<figure class="slide ${i ? '' : 'on'}"><img src="${src}" alt="${HERO_SLIDES[i]?.[getLang()] || 'SAY Boutique'}" width="2000" height="968" ${raw(i ? 'fetchpriority="low"' : 'fetchpriority="high"')} decoding="async"></figure>`)}
     </div>
     <div class="h-hero-copy">
       <p class="kicker latin">Luxury Home Fragrances</p>
