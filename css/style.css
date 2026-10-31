@@ -1631,3 +1631,12 @@ html,body{overflow-x:clip}
   .h-hero-copy h1{font-size:2.2rem}
   .consent{bottom:70px}
 }
+.auth-h{font-size:clamp(1.8rem,3vw,2.3rem);margin:.2rem 0 .3rem}
+.auth-sub{color:var(--muted);font-size:.9rem;margin:0 0 1.4rem}
+.auth-switch{text-align:center;margin:1.4rem 0 0;font-size:.9rem;color:var(--muted);border-top:1px solid var(--line);padding-top:1.1rem}
+.auth-switch a{color:var(--ink);font-weight:500}
+.staff-login{min-height:70vh;display:grid;place-items:center;padding:3rem 16px;background:linear-gradient(160deg,#1c1813,#2a231b)}
+.staff-card{margin:0;border-top:3px solid var(--gold);text-align:center}
+.staff-card form{text-align:start}
+.sl-mark{width:56px;margin:0 auto .6rem;mix-blend-mode:multiply}
+.staff-card{background:var(--cream)}

@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031204453';
-import { t, L, getLang } from './i18n.js?v=261031204453';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031204453';
-import * as db from './db.js?v=261031204453';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031213825';
+import { t, L, getLang } from './i18n.js?v=261031213825';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031213825';
+import * as db from './db.js?v=261031213825';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -549,6 +549,8 @@ export function account(tab = 'login') {
   }
   const isLogin = tab === 'login';
   return html`<div class="wrap"><div class="auth">
+    <p class="kicker latin">Customers</p><h1 class="auth-h">${T('כניסת לקוחות', 'Customer sign-in')}</h1>
+    <p class="auth-sub">${T('לחברי מועדון ולקוחות עסקיים (סיטונאים).', 'For club members and business (wholesale) customers.')}</p>
     <div class="tabs" role="tablist"><button role="tab" aria-selected="${isLogin}" data-action="auth-tab" data-tab="login">${t('login')}</button><button role="tab" aria-selected="${!isLogin}" data-action="auth-tab" data-tab="register">${t('register')}</button></div>
     <h1 class="sr-only">${isLogin ? t('login') : t('register')}</h1>
     <form data-form="${isLogin ? 'login' : 'register'}" novalidate>
@@ -563,7 +565,8 @@ export function account(tab = 'login') {
         <label class="check"><input type="checkbox" name="agree" required><span>${t('agree')}<a href="#/terms">${t('terms')}</a>${t('and')}<a href="#/privacy">${t('privacy')}</a> *</span></label>`}
       <p class="err" id="auth-err" role="alert"></p>
       <button class="btn block" type="submit">${isLogin ? t('login') : t('register')}</button>
-    </form></div></div>`;
+    </form>
+    <p class="auth-switch">${T('עובדים ב-SAY?', 'SAY staff?')} <a href="#/staff">${T('לכניסת צוות', 'Staff sign-in')}</a></p></div></div>`;
 }
 
 export const statusLabel = (s) => ({
@@ -571,13 +574,30 @@ export const statusLabel = (s) => ({
   en: { new: 'New', processing: 'Processing', ready: 'Ready', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled' },
 })[getLang()][s] || s;
 
+export function staffLogin() {
+  return html`<div class="staff-login"><div class="auth staff-card">
+    <img src="assets/img/mark.webp" alt="" width="70" height="60" class="sl-mark">
+    <p class="kicker latin">Back office</p><h1 class="auth-h">${T('כניסת צוות', 'Staff sign-in')}</h1>
+    <p class="auth-sub">${T('מנהלים, אחראי הזמנות, אחראי מוצרים ושליחים.', 'Admins, order and product managers, couriers.')}</p>
+    <form data-form="staff-login" novalidate>
+      <div class="field"><label for="a-email">${T('שם משתמש', 'Username')} *</label><input class="input" id="a-email" name="email" autocomplete="username" autocapitalize="none" spellcheck="false" required maxlength="120"></div>
+      <div class="field"><label for="a-pass">${t('password')} *</label><input class="input" id="a-pass" name="password" type="password" autocomplete="current-password" required maxlength="128"></div>
+      <p class="err" id="auth-err" role="alert"></p>
+      <button class="btn block gold" type="submit">${T('כניסה לממשק הניהול', 'Enter back office')}</button>
+    </form>
+    <p class="auth-switch">${T('לקוחות?', 'Customer?')} <a href="#/account">${T('לכניסת לקוחות', 'Customer sign-in')}</a></p></div></div>`;
+}
+
 export async function authSubmit(form, kind) {
   const d = Object.fromEntries(new FormData(form)); const err = form.querySelector('#auth-err');
   err.textContent = '';
   try {
-    if (kind === 'login') {
+    if (kind === 'login' || kind === 'staff-login') {
       if (!String(d.email).trim() || !d.password) throw new Error('fail');
       await db.login(d.email, d.password);
+      const isStaff = db.STAFF_ROLES.includes(db.me()?.role);
+      if (kind === 'login' && isStaff) { db.logout(); throw new Error('use-staff'); }
+      if (kind === 'staff-login' && !isStaff) { db.logout(); throw new Error('use-customer'); }
     } else {
       if (!valid.name(d.name)) throw new Error('name');
       if (!valid.phone(d.phone)) throw new Error('phone');
@@ -588,7 +608,7 @@ export async function authSubmit(form, kind) {
     }
     return true;
   } catch (e) {
-    err.textContent = { fail: t('loginFail'), locked: t('locked'), exists: t('exists'), name: t('fullName') + ': ' + t('required'), phone: t('badPhone'), email: t('badEmail'), pass: t('badPass'), agree: t('mustAgree') }[e.message] || t('loginFail');
+    err.textContent = { 'use-staff': T('זהו חשבון צוות — היכנסו דרך "כניסת צוות".', 'This is a staff account — use Staff sign-in.'), 'use-customer': T('זהו חשבון לקוח — היכנסו דרך "כניסת לקוחות".', 'This is a customer account — use Customer sign-in.'), fail: t('loginFail'), locked: t('locked'), exists: t('exists'), name: t('fullName') + ': ' + t('required'), phone: t('badPhone'), email: t('badEmail'), pass: t('badPass'), agree: t('mustAgree') }[e.message] || t('loginFail');
     return false;
   }
 }
