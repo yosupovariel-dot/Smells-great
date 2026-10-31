@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031225055';
-import { t, L, getLang } from './i18n.js?v=261031225055';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031225055';
-import * as db from './db.js?v=261031225055';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031231624';
+import { t, L, getLang } from './i18n.js?v=261031231624';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031231624';
+import * as db from './db.js?v=261031231624';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -155,12 +155,16 @@ export function home() {
     </div>
   </div></section>
 
-  <section class="h-quiz" aria-labelledby="qz-t"><div class="wrap">
-    <header class="qz-head"><p class="kicker latin">Scent finder</p><h2 id="qz-t">${T('איזה מפיץ ריח מתאים לכם?', 'Which diffuser is right for you?')}</h2>
-      <p>${T('בחרו איפה תרצו להשתמש בו, ענו על עוד שתי שאלות, ונמליץ לכם על מכשיר ותמציות.', 'Choose where you will use it, answer two more questions, and we will recommend a device and oils.')}</p>
-      <p class="qz-step" aria-label="${T('שלב 1 מתוך 3', 'Step 1 of 3')}"><span>${T('שלב 1 מתוך 3', 'Step 1 of 3')}</span><i aria-hidden="true"><b></b></i></p></header>
-    <div class="qz-opts">${FINDER.space.map(([k, he_, en, pid, sHe, sEn]) => { const p = db.product(pid); return html`<button class="qz-opt" data-action="fq-start" data-v="${k}"><span class="qz-img">${p ? media(p, '', false, p.pack || p.img) : ''}</span><b>${T(he_, en)}</b><small>${T(sHe, sEn)}</small><span class="qz-go" aria-hidden="true">${he() ? '←' : '→'}</span></button>`; })}</div>
-    <p class="qz-foot">${T('לוקח פחות מדקה · בלי הרשמה · אפשר לשנות בכל שלב', 'Under a minute · no sign-up · change anytime')}</p>
+  <section class="h-oils" aria-labelledby="oil-t"><div class="wrap">
+    <header class="h-head"><div><p class="kicker latin">Fragrance oils</p><h2 id="oil-t">${T('תמציות שמן', 'Fragrance oils')}</h2><p class="h-sub">${T('54 ניחוחות בהשראת בתי מלון, בשמים וטבע — מ־10 מ"ל ועד 5 ליטר.', '54 scents inspired by hotels, perfumes and nature — 10 ml to 5 L.')}</p></div><a class="u-link" href="#/shop/oils">${T('לכל התמציות', 'All oils')} <span aria-hidden="true">${arrow()}</span></a></header>
+    <div class="rail">${raw(String(html`${['oil-king-david', 'oil-hilton', 'oil-tom-ford', 'oil-white-tea', 'oil-pure-vanilla', 'oil-sea-breeze', 'oil-royal-amber', 'oil-coco-chanel'].map((id) => db.product(id)).filter(Boolean).map((p) => card(p))}`).replace(/loading="lazy"/g, 'loading="eager"'))}</div>
+  </div></section>
+
+  <section class="h-hair" aria-labelledby="hair-t"><div class="wrap h-hair-in">
+    <div class="h-hair-copy"><p class="kicker latin">Hair care · Coming soon</p><h2 id="hair-t">${T('טיפוח השיער', 'Hair care')}</h2>
+      <p>${T('קולקציית טיפוח שיער חדשה מגיעה בקרוב לבוטיק — שמפו, מסכות, סרומים ומוצרי עיצוב לכל סוגי השיער.', 'A new hair-care collection is coming soon — shampoos, masks, serums and styling for every hair type.')}</p>
+      <div class="hero-cta"><a class="btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לפרטים בוואטסאפ', 'Ask on WhatsApp')}</a><a class="u-link" href="#/shop/hair">${T('לעמוד הקטגוריה', 'Category page')}</a></div></div>
+    <div class="h-hair-grid">${[1, 2, 3, 4].map((i) => html`<span class="hh hh${i}"><img src="assets/products/hair-${i}-sm.webp" alt="" loading="lazy" width="560" height="560"></span>`)}</div>
   </div></section>
 
   ${families.length ? html`<section class="h-library" aria-labelledby="lib-t"><div class="wrap">

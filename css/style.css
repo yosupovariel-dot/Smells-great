@@ -1660,3 +1660,16 @@ html,body{overflow-x:clip}
 .auth.glass .auth-sub{color:var(--ink-2)}
 @supports not (backdrop-filter:blur(1px)){.auth.glass{background:rgba(255,253,249,.94)}}
 @media (max-width:600px){.auth-page{padding:1.2rem 12px 5rem;min-height:0}.auth.glass{border-radius:20px;padding:1.2rem}.aud a{padding:.6rem .5rem}.aud a b{font-size:.92rem}.aud a small{font-size:.7rem}.auth-h{font-size:1.6rem}}
+.h-oils{padding:clamp(3.5rem,8vw,6rem) 0 clamp(2rem,5vw,3rem)}
+.h-sub{color:var(--muted);margin:.3rem 0 0}
+.h-hair{padding:clamp(3.5rem,8vw,6rem) 0;background:linear-gradient(180deg,var(--cream),#EEE3D7)}
+.h-hair-in{display:grid;grid-template-columns:1fr 1.15fr;gap:clamp(2rem,5vw,5rem);align-items:center}
+.h-hair h2{font-size:clamp(2rem,3.8vw,3.2rem);margin:.3rem 0 1rem}
+.h-hair p{color:var(--ink-2);max-width:30rem}
+.h-hair-grid{display:grid;grid-template-columns:1.2fr 1fr;grid-template-rows:1fr 1fr;gap:.8rem;aspect-ratio:5/4}
+.hh{overflow:hidden;border-radius:18px;background:#e9e0d4}
+.hh img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.hh:hover img{transform:scale(1.05)}
+.hh1{grid-row:span 2;border-radius:999px 999px 18px 18px}
+.hh4{display:none}
+@media (max-width:860px){.h-hair-in{grid-template-columns:1fr}.h-hair-grid{order:-1}}
