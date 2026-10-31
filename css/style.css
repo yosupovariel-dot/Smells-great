@@ -6,8 +6,11 @@
   --blush:#EADBD0; --sage:#DDE0D2; --line:rgba(22,19,15,.12);
   --ok:#3F6B4A; --warn:#9A6A1F; --err:#9B2C2C;
   --radius:2px; --shadow:0 18px 40px -24px rgba(22,19,15,.35);
-  --f-display:"Frank Ruhl Libre","Cormorant Garamond",Georgia,serif;
-  --f-body:"Assistant","Helvetica Neue",Arial,sans-serif;
+  --f-display:"Bellefair","Cormorant Garamond",Georgia,serif;
+  --f-body:"Alef","Assistant","Helvetica Neue",Arial,sans-serif;
+  --f-friendly:"Varela Round","Alef",sans-serif;
+  --f-formal:"David Libre","Frank Ruhl Libre",Georgia,serif;
+  --f-ui:"Assistant","Alef",sans-serif;
   --f-latin:"Cormorant Garamond",Georgia,serif;
   --fs:1rem; --wrap:1240px;
 }
@@ -1579,3 +1582,22 @@ body.scrolled .hdr{top:6px}body.scrolled .hdr .wrap{min-height:58px}
 .ws-steps{counter-reset:s}.ws-steps li{counter-increment:s;border:0;padding-inline-start:3rem;position:relative}
 .ws-steps li::before{content:counter(s);position:absolute;inset-inline-start:0;top:0;width:2.1rem;height:2.1rem;border-radius:50%;background:var(--ink);color:var(--cream);display:grid;place-items:center;font-size:.9rem}
 @media (max-width:860px){.ws-hero,.ws-two{grid-template-columns:1fr}.ws-seg{grid-template-columns:1fr 1fr}}
+
+/* ===== Typography by mood ===== */
+/* Bellefair has a single weight: keep headings regular, never faux-bold. */
+h1,h2,h3,.lbl-name,.card-body h3,.ft-body h3,.h-item-t b,.tile b{font-weight:400!important;letter-spacing:0}
+.h-hero-copy h1,.sp-head h1,.qz-head h2,.fd-head h1{letter-spacing:-.005em}
+em{font-style:normal}
+.h-hero-copy h1 em,.h-finder h2 em,.h2 em{font-style:normal;color:var(--gold-dark)}
+/* friendly: finder & quiz */
+.qz-head h2,.fd-head h1,.qz-opt b,.fd-opt b,.fd-dev b,.fd-tip,.qz-step,.qz-foot{font-family:var(--f-friendly)}
+.qz-head h2,.fd-head h1{font-size:clamp(1.9rem,3.6vw,3rem)}
+/* formal: terms, privacy, returns, accessibility */
+.legal h1,.legal h2{font-family:var(--f-formal);font-weight:500!important}
+.legal p,.legal li{font-family:var(--f-formal);font-size:1.06rem;line-height:1.8}
+/* functional: back office keeps a crisp UI font */
+.bo,.bo .btn,.bo input,.bo select,.bo textarea,.modal-bg .bo-drawer{font-family:var(--f-ui)}
+.bo-top h1,.dr-head h2{font-family:var(--f-display)}
+/* body text: Alef reads best slightly larger */
+body{font-size:1.02rem}
+.btn{font-family:var(--f-body);font-weight:700;letter-spacing:.02em}
