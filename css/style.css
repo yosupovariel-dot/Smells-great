@@ -1640,3 +1640,8 @@ html,body{overflow-x:clip}
 .staff-card form{text-align:start}
 .sl-mark{width:56px;margin:0 auto .6rem;mix-blend-mode:multiply}
 .staff-card{background:var(--cream)}
+.aud{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:0 0 1.6rem}
+.aud a{display:flex;flex-direction:column;gap:.15rem;padding:.9rem 1rem;border:1px solid var(--sand);text-decoration:none;text-align:center;transition:.2s}
+.aud a small{color:var(--muted);font-size:.78rem}
+.aud a[aria-selected="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--cream)}
+.aud a:hover{border-color:var(--ink-2)}

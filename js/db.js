@@ -1,10 +1,10 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261031213859';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261031213859';
+import { SEED_PRODUCTS } from './data.js?v=261031215702';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261031215702';
 
-const K = (k) => 'say8_' + k;
+const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
 const write = (k, v) => { try { localStorage.setItem(K(k), JSON.stringify(v)); } catch {} };
 
@@ -22,14 +22,18 @@ const safeEq = (a, b) => { if (a.length !== b.length) return false; let r = 0; f
 // ---------- Products ----------
 export let SITE = { site: {}, subs: {}, guide: '' };
 export async function loadCatalog() {
-  try { const r = await fetch('data/site.json'); if (r.ok) SITE = await r.json(); } catch {}
-  if (read('products', null)) return;
-  let list = SEED_PRODUCTS;
-  try {
-    const r = await fetch('data/products.json');
-    if (r.ok) { const j = await r.json(); if (Array.isArray(j) && j.length) list = j; }
-  } catch {}
-  write('products', list);
+  try { const r = await fetch('data/site.json', { cache: 'no-cache' }); if (r.ok) SITE = await r.json(); } catch {}
+  let fresh = null;
+  try { const r = await fetch('data/products.json', { cache: 'no-cache' }); if (r.ok) { const j = await r.json(); if (Array.isArray(j) && j.length) fresh = j; } } catch {}
+  const stored = read('products', null);
+  if (!stored) { write('products', fresh || SEED_PRODUCTS); return; }
+  if (!fresh) return;
+  // Keep admin edits (prices, stock, visibility…) but always take image paths from the server,
+  // so a browser holding an older copy never shows missing pictures. New catalog items are added.
+  const byId = Object.fromEntries(fresh.map((p) => [p.id, p]));
+  const merged = stored.map((p) => (byId[p.id] ? { ...p, img: byId[p.id].img, gallery: byId[p.id].gallery, pack: byId[p.id].pack, options: byId[p.id].options || p.options } : p));
+  for (const p of fresh) if (!stored.some((x) => x.id === p.id)) merged.push(p);
+  write('products', merged);
 }
 export const products = () => read('products', SEED_PRODUCTS);
 export const product = (id) => products().find((p) => p.id === id);

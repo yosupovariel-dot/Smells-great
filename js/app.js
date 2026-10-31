@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261031213859';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261031213859';
-import { CATEGORIES } from './data.js?v=261031213859';
-import * as db from './db.js?v=261031213859';
-import * as S from './views-shop.js?v=261031213859';
-import * as Lg from './views-legal.js?v=261031213859';
-import * as A from './views-admin.js?v=261031213859';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261031215702';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261031215702';
+import { CATEGORIES } from './data.js?v=261031215702';
+import * as db from './db.js?v=261031215702';
+import * as S from './views-shop.js?v=261031215702';
+import * as Lg from './views-legal.js?v=261031215702';
+import * as A from './views-admin.js?v=261031215702';
 
 const app = $('#app');
 const state = { finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -48,7 +48,7 @@ function footer() {
         <p><a href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a> · <a href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
       <div><h2>${t('shop')}</h2><ul>${CATEGORIES.map((c) => html`<li><a href="#/shop/${c.id}">${c[getLang()]}</a></li>`)}</ul></div>
       <div><h2>${t('service')}</h2><ul><li><a href="#/contact">${t('contact')}</a></li><li><a href="#/account">${t('club')}</a></li><li><a href="#/wholesale">${t('wholesale')}</a></li><li><a href="#/returns">${t('returns')}</a></li></ul></div>
-      <div><h2>${t('info')}</h2><ul><li><a href="#/terms">${t('terms')}</a></li><li><a href="#/privacy">${t('privacy')}</a></li><li><a href="#/accessibility">${t('accessibility')}</a></li><li><a href="#/staff">${getLang() === 'he' ? 'כניסת צוות' : 'Staff sign-in'}</a></li><li><a href="#/about">${t('about')}</a></li></ul></div>
+      <div><h2>${t('info')}</h2><ul><li><a href="#/terms">${t('terms')}</a></li><li><a href="#/privacy">${t('privacy')}</a></li><li><a href="#/accessibility">${t('accessibility')}</a></li><li><a href="#/about">${t('about')}</a></li></ul></div>
     </div>
     <div class="ftr-bottom"><span>© ${y} SAY Boutique · ${t('rights')}</span>
       <a class="credit" href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener">${t('builtBy')}</a></div>
@@ -141,7 +141,7 @@ function route() {
   const isBO = ['admin', 'orders', 'courier'].includes(a);
   document.body.classList.remove('cart-open'); closeModal(); closeSearch();
   if (isBO) {
-    if (!db.can(STAFF[a])) { location.hash = '#/staff'; return; }
+    if (!db.can(STAFF[a])) { state.authTab = 'login'; location.hash = '#/account'; return; }
     let v;
     if (a === 'admin' && db.me().role === 'products' && b !== 'products') { location.hash = '#/admin/products'; return; }
     if (a === 'admin') v = b === 'products' ? A.productsAdmin(state.pcat, state.pq) : b === 'reports' ? A.reports(state.range) : b === 'users' ? A.usersAdmin(state.uq, state.ur) : b === 'team' ? A.teamAdmin() : A.dashboard(state.metric);
@@ -156,12 +156,12 @@ function route() {
     case 'product': v = S.productPage(b); if (v) title = `${(db.product(b).name[getLang()])} | SAY Boutique`; break;
     case 'checkout': v = S.checkout(); break;
     case 'done': v = state.lastOrder ? S.orderDone(state.lastOrder) : S.home(); break;
-    case 'account': if (b === 'register' || b === 'business') state.authTab = 'register'; v = S.account(state.authTab); break;
+    case 'account': if (b === 'register') state.authTab = 'register'; v = S.account(state.authTab, b === 'ws' ? 'ws' : 'retail'); break;
     case 'contact': v = S.contact(); break;
     case 'about': v = S.about(); break;
     case 'wholesale': v = S.wholesalePage(); break;
     case 'guide': v = S.guide(); break;
-    case 'staff': v = S.staffLogin(); title = 'SAY · Staff'; break;
+    case 'staff': location.hash = '#/account'; return;
     case 'finder': v = S.finder(state.finder); title = (getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder') + ' | SAY Boutique'; break;
     case 'terms': v = Lg.terms(); break;
     case 'returns': v = Lg.returns(); break;
@@ -171,7 +171,6 @@ function route() {
   if (!v) v = html`<div class="wrap legal"><h1>404</h1><p>${t('notFound')}</p><a class="btn" href="#/">${t('backHome')}</a></div>`;
   render(app, html`${header()}<main id="main" tabindex="-1">${v}</main>${footer()}`);
   document.title = title;
-  if (location.hash === '#/account/business') { const c = $('[data-input="ws-toggle"]'); if (c) { c.checked = true; $('#biz-f').hidden = false; } }
   applyA11y(); startTicker(); bars(); startSlides(); observeReveal(); observeBuy();
 }
 
@@ -392,7 +391,7 @@ document.addEventListener('submit', async (e) => {
     btn.disabled = true;
     try { const o = S.checkoutSubmit(f); if (o) { state.lastOrder = o; location.hash = '#/done'; } } finally { btn.disabled = false; }
   }
-  if (kind === 'login' || kind === 'register' || kind === 'staff-login') {
+  if (kind === 'login' || kind === 'register') {
     btn.disabled = true;
     const ok = await S.authSubmit(f, kind); btn.disabled = false;
     if (ok) { const u = db.me(); location.hash = { admin: '#/admin', products: '#/admin/products', orders: '#/orders', courier: '#/courier' }[u.role] || '#/account'; rerender(); }

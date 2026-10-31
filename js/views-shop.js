@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031213859';
-import { t, L, getLang } from './i18n.js?v=261031213859';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031213859';
-import * as db from './db.js?v=261031213859';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031215702';
+import { t, L, getLang } from './i18n.js?v=261031215702';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031215702';
+import * as db from './db.js?v=261031215702';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -533,7 +533,7 @@ export function orderDone(o) {
   <div class="hero-cta"><a class="btn" href="#/shop">${t('continueShop')}</a><a class="btn ghost" href="${wa}" target="_blank" rel="noopener noreferrer">${t('whatsapp')}</a></div></div>`;
 }
 
-export function account(tab = 'login') {
+export function account(tab = 'login', aud = 'retail') {
   const u = db.me();
   if (u) {
     const mine = db.orders().filter((o) => o.userId === u.id);
@@ -548,45 +548,33 @@ export function account(tab = 'login') {
       <p><button class="btn ghost" data-action="logout">${t('logout')}</button></p></div>`;
   }
   const isLogin = tab === 'login';
+  const ws = aud === 'ws';
   return html`<div class="wrap"><div class="auth">
-    <p class="kicker latin">Customers</p><h1 class="auth-h">${T('כניסת לקוחות', 'Customer sign-in')}</h1>
-    <p class="auth-sub">${T('לחברי מועדון ולקוחות עסקיים (סיטונאים).', 'For club members and business (wholesale) customers.')}</p>
-    <div class="tabs" role="tablist"><button role="tab" aria-selected="${isLogin}" data-action="auth-tab" data-tab="login">${t('login')}</button><button role="tab" aria-selected="${!isLogin}" data-action="auth-tab" data-tab="register">${t('register')}</button></div>
-    <h1 class="sr-only">${isLogin ? t('login') : t('register')}</h1>
-    <form data-form="${isLogin ? 'login' : 'register'}" novalidate>
-      ${isLogin ? '' : html`<div class="field"><label for="r-name">${t('fullName')} *</label><input class="input" id="r-name" name="name" autocomplete="name" required maxlength="80"></div>
+    <div class="aud" role="tablist" aria-label="${T('סוג לקוח', 'Customer type')}">
+      <a href="#/account" role="tab" aria-selected="${!ws}"><b>${T('לקוחות פרטיים', 'Private customers')}</b><small>${T('מועדון לקוחות', 'Members club')}</small></a>
+      <a href="#/account/ws" role="tab" aria-selected="${ws}"><b>${T('סיטונאים ועסקים', 'Wholesale & business')}</b><small>${T('מחירון סיטונאי', 'Wholesale pricing')}</small></a>
+    </div>
+    <h1 class="auth-h">${ws ? T('כניסת סיטונאים', 'Wholesale sign-in') : T('כניסת לקוחות', 'Customer sign-in')}</h1>
+    <p class="auth-sub">${ws ? T('לבתי עסק עם חשבון סיטונאי מאושר. אין לכם חשבון? פתחו בקשה — נאשר תוך יום עסקים.', 'For approved business accounts. No account? Apply — we approve within a business day.') : T('חברי מועדון: התחברו כדי לראות הזמנות והטבות. הצטרפות חינם עם 10% הנחה לקנייה הראשונה.', 'Club members: sign in for orders and perks. Free to join, 10% off your first order.')}</p>
+    <div class="tabs" role="tablist"><button role="tab" aria-selected="${isLogin}" data-action="auth-tab" data-tab="login">${t('login')}</button><button role="tab" aria-selected="${!isLogin}" data-action="auth-tab" data-tab="register">${ws ? T('בקשה לחשבון סיטונאי', 'Apply for wholesale') : t('register')}</button></div>
+    <form data-form="${isLogin ? 'login' : 'register'}" data-aud="${ws ? 'ws' : 'retail'}" novalidate>
+      ${isLogin ? '' : html`<div class="field"><label for="r-name">${ws ? T('שם איש קשר', 'Contact name') : t('fullName')} *</label><input class="input" id="r-name" name="name" autocomplete="name" required maxlength="80"></div>
+        ${ws ? html`<div class="field"><label for="r-biz">${t('bizName')} *</label><input class="input" id="r-biz" name="biz" required maxlength="80"></div><input type="hidden" name="wholesale" value="1">` : ''}
         <div class="field"><label for="r-phone">${t('phone')} *</label><input class="input" id="r-phone" name="phone" type="tel" autocomplete="tel" required maxlength="20"></div>`}
       <div class="field"><label for="a-email">${isLogin ? T('אימייל או שם משתמש', 'Email or username') : t('email')} *</label><input class="input" id="a-email" name="email" type="${isLogin ? 'text' : 'email'}" autocomplete="${isLogin ? 'username' : 'email'}" autocapitalize="none" spellcheck="false" required maxlength="120"></div>
-      <div class="field"><label for="a-pass">${t('password')} *</label><input class="input" id="a-pass" name="password" type="password" autocomplete="${isLogin ? 'current-password' : 'new-password'}" required minlength="8" maxlength="128" aria-describedby="a-pass-h"><small id="a-pass-h" class="muted">${isLogin ? '' : t('badPass')}</small></div>
+      <div class="field"><label for="a-pass">${t('password')} *</label><input class="input" id="a-pass" name="password" type="password" autocomplete="${isLogin ? 'current-password' : 'new-password'}" required minlength="${isLogin ? 1 : 8}" maxlength="128" aria-describedby="a-pass-h"><small id="a-pass-h" class="muted">${isLogin ? '' : t('badPass')}</small></div>
       ${isLogin ? '' : html`
-        <label class="check"><input type="checkbox" name="wholesale" data-input="ws-toggle"><span>${t('wsRequest')}</span></label>
-        <div class="field" id="biz-f" hidden><label for="r-biz">${t('bizName')}</label><input class="input" id="r-biz" name="biz" maxlength="80"></div>
         <label class="check"><input type="checkbox" name="newsletter"><span>${t('newsletter')}</span></label>
         <label class="check"><input type="checkbox" name="agree" required><span>${t('agree')}<a href="#/terms">${t('terms')}</a>${t('and')}<a href="#/privacy">${t('privacy')}</a> *</span></label>`}
       <p class="err" id="auth-err" role="alert"></p>
-      <button class="btn block" type="submit">${isLogin ? t('login') : t('register')}</button>
-    </form>
-    <p class="auth-switch">${T('עובדים ב-SAY?', 'SAY staff?')} <a href="#/staff">${T('לכניסת צוות', 'Staff sign-in')}</a></p></div></div>`;
+      <button class="btn block ${ws ? 'gold' : ''}" type="submit">${isLogin ? t('login') : ws ? T('שליחת בקשה', 'Send application') : t('register')}</button>
+    </form></div></div>`;
 }
 
 export const statusLabel = (s) => ({
   he: { new: 'חדשה', processing: 'בטיפול', ready: 'מוכנה למשלוח', shipped: 'בדרך', delivered: 'נמסרה', cancelled: 'בוטלה' },
   en: { new: 'New', processing: 'Processing', ready: 'Ready', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled' },
 })[getLang()][s] || s;
-
-export function staffLogin() {
-  return html`<div class="staff-login"><div class="auth staff-card">
-    <img src="assets/img/mark.webp" alt="" width="70" height="60" class="sl-mark">
-    <p class="kicker latin">Back office</p><h1 class="auth-h">${T('כניסת צוות', 'Staff sign-in')}</h1>
-    <p class="auth-sub">${T('מנהלים, אחראי הזמנות, אחראי מוצרים ושליחים.', 'Admins, order and product managers, couriers.')}</p>
-    <form data-form="staff-login" novalidate>
-      <div class="field"><label for="a-email">${T('שם משתמש', 'Username')} *</label><input class="input" id="a-email" name="email" autocomplete="username" autocapitalize="none" spellcheck="false" required maxlength="120"></div>
-      <div class="field"><label for="a-pass">${t('password')} *</label><input class="input" id="a-pass" name="password" type="password" autocomplete="current-password" required maxlength="128"></div>
-      <p class="err" id="auth-err" role="alert"></p>
-      <button class="btn block gold" type="submit">${T('כניסה לממשק הניהול', 'Enter back office')}</button>
-    </form>
-    <p class="auth-switch">${T('לקוחות?', 'Customer?')} <a href="#/account">${T('לכניסת לקוחות', 'Customer sign-in')}</a></p></div></div>`;
-}
 
 export async function authSubmit(form, kind) {
   const d = Object.fromEntries(new FormData(form)); const err = form.querySelector('#auth-err');
@@ -595,20 +583,20 @@ export async function authSubmit(form, kind) {
     if (kind === 'login' || kind === 'staff-login') {
       if (!String(d.email).trim() || !d.password) throw new Error('fail');
       await db.login(d.email, d.password);
-      const isStaff = db.STAFF_ROLES.includes(db.me()?.role);
-      if (kind === 'login' && isStaff) { db.logout(); throw new Error('use-staff'); }
-      if (kind === 'staff-login' && !isStaff) { db.logout(); throw new Error('use-customer'); }
+      const role = db.me()?.role;
+      if (form.dataset.aud === 'ws' && role === 'customer') { db.logout(); throw new Error('not-ws'); }
     } else {
       if (!valid.name(d.name)) throw new Error('name');
       if (!valid.phone(d.phone)) throw new Error('phone');
       if (!valid.email(d.email)) throw new Error('email');
       if (!valid.password(d.password)) throw new Error('pass');
+      if (d.wholesale && !clean(d.biz)) throw new Error('biz');
       if (!d.agree) throw new Error('agree');
       await db.register({ name: clean(d.name, 80), phone: clean(d.phone, 20), email: clean(d.email, 120), password: d.password, wholesale: !!d.wholesale, biz: clean(d.biz, 80), newsletter: !!d.newsletter });
     }
     return true;
   } catch (e) {
-    err.textContent = { 'use-staff': T('זהו חשבון צוות — היכנסו דרך "כניסת צוות".', 'This is a staff account — use Staff sign-in.'), 'use-customer': T('זהו חשבון לקוח — היכנסו דרך "כניסת לקוחות".', 'This is a customer account — use Customer sign-in.'), fail: t('loginFail'), locked: t('locked'), exists: t('exists'), name: t('fullName') + ': ' + t('required'), phone: t('badPhone'), email: t('badEmail'), pass: t('badPass'), agree: t('mustAgree') }[e.message] || t('loginFail');
+    err.textContent = { 'not-ws': T('החשבון הזה הוא חשבון לקוח פרטי. אם ביקשתם חשבון סיטונאי — הוא ממתין לאישור.', 'This is a retail account. Wholesale requests await approval.'), 'use-staff': T('זהו חשבון צוות — היכנסו דרך "כניסת צוות".', 'This is a staff account — use Staff sign-in.'), 'use-customer': T('זהו חשבון לקוח — היכנסו דרך "כניסת לקוחות".', 'This is a customer account — use Customer sign-in.'), fail: t('loginFail'), locked: t('locked'), exists: t('exists'), name: t('fullName') + ': ' + t('required'), phone: t('badPhone'), email: t('badEmail'), pass: t('badPass'), biz: t('bizName') + ': ' + t('required'), agree: t('mustAgree') }[e.message] || t('loginFail');
     return false;
   }
 }
@@ -648,7 +636,7 @@ export function wholesalePage() {
   <header class="ws-hero wrap">
     <div><p class="kicker latin">For business</p><h1>${T('ריח לעסק שלכם, במחירי סיטונאות', 'Scent for your business, at wholesale prices')}</h1>
       <p class="lead">${T('מכשירים ותמציות לבתי מלון, חנויות, קליניקות ומשרדים. פותחים חשבון עסקי, ואחרי אישור רואים באתר את המחירים הסיטונאיים ומזמינים ישירות.', 'Devices and oils for hotels, shops, clinics and offices. Open a business account and, once approved, see wholesale prices and order directly.')}</p>
-      <div class="hero-cta"><a class="btn" href="#/account/business">${T('פתיחת חשבון עסקי', 'Open a business account')}</a><a class="u-link" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('שאלה? דברו איתנו בוואטסאפ', 'Questions? WhatsApp us')}</a></div></div>
+      <div class="hero-cta"><a class="btn" href="#/account/ws">${T('פתיחת חשבון עסקי', 'Open a business account')}</a><a class="u-link" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('שאלה? דברו איתנו בוואטסאפ', 'Questions? WhatsApp us')}</a></div></div>
     ${s300 ? html`<figure class="sp-arch studio"><img src="${s300.img}" alt="SAY 300" width="900" height="1100"></figure>` : ''}
   </header>
   <section class="wrap ws-sec"><h2>${T('למי זה מתאים', 'Who it is for')}</h2>
@@ -663,6 +651,6 @@ export function wholesalePage() {
       <li><b>${T('נרשמים', 'Register')}</b>${T('ממלאים פרטים ומסמנים "אני בית עסק".', 'Fill in your details and tick “I am a business”.')}</li>
       <li><b>${T('מאשרים', 'We approve')}</b>${T('אנחנו בודקים ומאשרים את החשבון.', 'We review and approve the account.')}</li>
       <li><b>${T('מזמינים', 'Order')}</b>${T('נכנסים לאתר ורואים מחירי סיטונאות בכל מוצר.', 'Sign in and see wholesale prices on every product.')}</li></ol>
-      <a class="btn" href="#/account/business">${T('פתיחת חשבון עסקי', 'Open a business account')}</a></div>
+      <a class="btn" href="#/account/ws">${T('פתיחת חשבון עסקי', 'Open a business account')}</a></div>
   </section></div><div class="block"></div>`;
 }
