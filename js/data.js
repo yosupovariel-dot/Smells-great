@@ -3,11 +3,11 @@
 export const CATEGORIES = [
   { id: 'diffusers', he: 'מפיצי ריח', en: 'Diffusers', descHe: 'מכשירי בישום חכמים', descEn: 'Smart scent devices', img: 'assets/products/say-150-3.webp' },
   { id: 'oils', he: 'תמציות שמן', en: 'Fragrance Oils', descHe: 'בהשראת מלונות ובשמים', descEn: 'Hotel & perfume inspired', img: 'assets/products/cat-oils.webp' },
-  { id: 'bundles', he: 'מארזים משתלמים', en: 'Value Bundles', descHe: 'מכשיר + מילוי במחיר מיוחד', descEn: 'Device + refill deals', img: 'assets/products/bundle-3.webp' },
   { id: 'dubai', he: 'בשמי דובאי', en: 'Dubai Perfumes', descHe: 'בקרוב', descEn: 'Coming soon' },
   { id: 'hair', he: 'טיפוח השיער', en: 'Hair Care', descHe: 'בקרוב', descEn: 'Coming soon' },
-  { id: 'home', he: 'ניקיון ואווירה', en: 'Home & Ambience', descHe: 'מקלות, נרות ובישום כביסה — בקרוב', descEn: 'Reeds, candles, laundry — soon' },
+  { id: 'home', he: 'ניקיון ואווירה', en: 'Cleaning & Ambience', descHe: 'בקרוב', descEn: 'Coming soon' },
   { id: 'glass', he: 'תמונות זכוכית', en: 'Glass Art', descHe: 'בקרוב', descEn: 'Coming soon' },
+  { id: 'bundles', he: 'מארזים משתלמים', en: 'Value Bundles', descHe: 'מכשיר + מילוי במחיר מיוחד', descEn: 'Device + refill deals', img: 'assets/products/bundle-3.webp' },
 ];
 
 export const SEED_PRODUCTS = [];
