@@ -1678,3 +1678,4 @@ html,body{overflow-x:clip}
 .auth.glass form[data-form="register"]>.check,.auth.glass form[data-form="register"]>.err,.auth.glass form[data-form="register"]>.btn{grid-column:1/-1}
 .auth.glass form[data-form="login"]{max-width:480px;margin:0 auto}
 @media (max-width:600px){.auth.glass form[data-form="register"]{grid-template-columns:1fr}}
+.auth.glass{max-width:none;width:min(760px,100%)}
