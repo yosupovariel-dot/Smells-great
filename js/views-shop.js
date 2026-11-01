@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261101223419';
-import { t, L, getLang } from './i18n.js?v=261101223419';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261101223419';
-import * as db from './db.js?v=261101223419';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261101223529';
+import { t, L, getLang } from './i18n.js?v=261101223529';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261101223529';
+import * as db from './db.js?v=261101223529';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -261,6 +261,7 @@ export function shop(cat, q = '', sort = 'pop', sub = '') {
       <div class="wrap">${catTabs('')}
         ${cats.map((x) => { const items = active().filter((p) => p.cat === x.id); return html`<section class="rail-sec" aria-labelledby="r-${x.id}">
           <header class="rail-h"><div><h2 id="r-${x.id}">${L(x)}</h2><p>${T(...(CAT_LEAD[x.id] || ['', '']))}</p></div><a class="u-link" href="#/shop/${x.id}">${T('לכל ה', 'All ')}${L(x)} (${items.length}) <span aria-hidden="true">${he() ? '←' : '→'}</span></a></header>
+          ${(() => { const subs = (db.SITE.subs?.[x.he] || []).filter((s2) => active().some((p) => p.sub === s2)); return subs.length > 1 ? html`<nav class="stories mini" aria-label="${T('תת־קטגוריות', 'Subcategories')} — ${L(x)}">${subs.map((s2) => html`<a href="#/shop/${x.id}/${encodeURIComponent(s2)}"><span class="st-img ${x.id === 'diffusers' ? 'studio' : ''}"><img src="${small(subImg(x.id, s2))}" alt="" width="120" height="120" loading="lazy"></span><b>${subName(s2)}</b></a>`)}</nav>` : ''; })()}
           <div class="rail">${items.slice(0, 8).map((p, i) => (i < 4 ? raw(String(card(p)).replace(/loading="lazy"/g, 'loading="eager"')) : card(p)))}</div></section>`; })}
       </div></div><div class="block"></div>`;
   }
