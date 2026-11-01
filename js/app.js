@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261101122216';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261101122216';
-import { CATEGORIES } from './data.js?v=261101122216';
-import * as db from './db.js?v=261101122216';
-import * as S from './views-shop.js?v=261101122216';
-import * as Lg from './views-legal.js?v=261101122216';
-import * as A from './views-admin.js?v=261101122216';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261101160435';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261101160435';
+import { CATEGORIES } from './data.js?v=261101160435';
+import * as db from './db.js?v=261101160435';
+import * as S from './views-shop.js?v=261101160435';
+import * as Lg from './views-legal.js?v=261101160435';
+import * as A from './views-admin.js?v=261101160435';
 
 const app = $('#app');
 const state = { finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -31,7 +31,7 @@ function header() {
       <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
       ${navLink('#/', t('home'))}${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/contact', t('contact'))}
     </nav>
-    <a class="brand" href="#/" aria-label="SAY Boutique — ${t('home')}"><b>SAY</b><small>BOUTIQUE</small></a>
+    <a class="brand logo" href="#/" aria-label="SAY Boutique — ${t('home')}"><img src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400" fetchpriority="high"></a>
     <div class="tools">
       <button class="icon-btn lang-btn" data-action="lang" lang="${getLang() === 'he' ? 'en' : 'he'}" aria-label="${t('langLabel')}">${getLang() === 'he' ? 'EN' : 'עב'}</button>
       <button class="icon-btn" data-action="search-open" aria-label="${t('search')}" aria-haspopup="dialog">${raw(ICONS.search)}</button>
@@ -44,7 +44,7 @@ function footer() {
   const y = new Date().getFullYear();
   return html`<footer class="ftr"><div class="wrap">
     <div class="ftr-grid">
-      <div><a class="brand" href="#/" aria-label="SAY Boutique"><b>SAY</b><small>BOUTIQUE</small></a><p class="muted">Luxury Home Fragrances<br>${t('tick2')}</p>
+      <div><a class="brand logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-full-light.png" alt="SAY Boutique — Luxury Home Fragrances" width="360" height="478" loading="lazy"></a><p class="muted">${t('tick2')}</p>
         <p><a href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a> · <a href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
       <div><h2>${t('shop')}</h2><ul>${CATEGORIES.map((c) => html`<li><a href="#/shop/${c.id}">${c[getLang()]}</a></li>`)}</ul></div>
       <div><h2>${t('service')}</h2><ul><li><a href="#/contact">${t('contact')}</a></li><li><a href="#/account">${t('club')}</a></li><li><a href="#/wholesale">${t('wholesale')}</a></li><li><a href="#/returns">${t('returns')}</a></li></ul></div>

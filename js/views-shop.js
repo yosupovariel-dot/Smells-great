@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261101122216';
-import { t, L, getLang } from './i18n.js?v=261101122216';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261101122216';
-import * as db from './db.js?v=261101122216';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261101160435';
+import { t, L, getLang } from './i18n.js?v=261101160435';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261101160435';
+import * as db from './db.js?v=261101160435';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -623,7 +623,7 @@ export function contact() {
 }
 
 export function about() {
-  return html`<div class="wrap"><section class="block story"><div class="story-art" aria-hidden="true"><img src="assets/img/logo.webp" alt="" width="290" height="450"></div>
+  return html`<div class="wrap"><section class="block story"><div class="story-art" aria-hidden="true"><img src="assets/img/logo-full.png" alt="" width="360" height="478"></div>
   <div><p class="eyebrow">${t('storyEyebrow')}</p><h1>${t('storyTitle')}</h1><span class="rule"></span><p>${t('storyText')}</p><a class="btn" href="#/shop">${t('shopNow')}</a></div></section></div>${clubBlock()}`;
 }
 

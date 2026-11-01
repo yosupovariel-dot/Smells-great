@@ -1693,3 +1693,15 @@ html.a11y-stop .card-media,html.a11y-stop .lbl-arch{animation:none}
 /* diffusers: no colour swap on hover (keeps the device steady) */
 .card.studio .card-media .m2{display:none}
 .card.studio:hover .card-media .m1{opacity:1}
+/* Original logo */
+.brand.logo{display:block;line-height:0}
+.hdr .brand.logo img{height:64px;width:auto;transition:height .35s}
+body.scrolled .hdr .brand.logo img{height:50px}
+.ftr .brand.logo img{height:150px;width:auto}
+.story-art img[src*="logo-full"]{width:auto;height:72%;mix-blend-mode:normal}
+@media (max-width:900px){.hdr .brand.logo img{height:52px}body.scrolled .hdr .brand.logo img{height:46px}.ftr .brand.logo img{height:120px}}
+.hdr .brand.logo img{height:82px}
+body.scrolled .hdr .brand.logo img{height:58px}
+.hdr .wrap{min-height:96px}
+body.scrolled .hdr .wrap{min-height:66px}
+@media (max-width:900px){.hdr .brand.logo img{height:56px}.hdr .wrap{min-height:72px}}
