@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261031233310';
-import { t, L, getLang } from './i18n.js?v=261031233310';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261031233310';
-import * as db from './db.js?v=261031233310';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261101122216';
+import { t, L, getLang } from './i18n.js?v=261101122216';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261101122216';
+import * as db from './db.js?v=261101122216';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -157,7 +157,7 @@ export function home() {
 
   <section class="h-oils" aria-labelledby="oil-t"><div class="wrap">
     <header class="h-head"><div><p class="kicker latin">Fragrance oils</p><h2 id="oil-t">${T('תמציות שמן', 'Fragrance oils')}</h2><p class="h-sub">${T('54 ניחוחות בהשראת בתי מלון, בשמים וטבע — מ־10 מ"ל ועד 5 ליטר.', '54 scents inspired by hotels, perfumes and nature — 10 ml to 5 L.')}</p></div><a class="u-link" href="#/shop/oils">${T('לכל התמציות', 'All oils')} <span aria-hidden="true">${arrow()}</span></a></header>
-    <div class="rail">${raw(String(html`${['oil-king-david', 'oil-hilton', 'oil-tom-ford', 'oil-white-tea', 'oil-pure-vanilla', 'oil-sea-breeze', 'oil-royal-amber', 'oil-coco-chanel'].map((id) => db.product(id)).filter(Boolean).map((p) => card(p))}`).replace(/loading="lazy"/g, 'loading="eager"'))}</div>
+    <div class="rail">${['oil-king-david', 'oil-hilton', 'oil-tom-ford', 'oil-white-tea', 'oil-pure-vanilla', 'oil-sea-breeze', 'oil-royal-amber', 'oil-coco-chanel'].map((id) => db.product(id)).filter(Boolean).map((p) => card(p))}</div>
   </div></section>
 
   <section class="h-hair" aria-labelledby="hair-t"><div class="wrap h-hair-in">
@@ -261,7 +261,7 @@ export function shop(cat, q = '', sort = 'pop', sub = '') {
       <div class="wrap">${catTabs('')}
         ${cats.map((x) => { const items = active().filter((p) => p.cat === x.id); return html`<section class="rail-sec" aria-labelledby="r-${x.id}">
           <header class="rail-h"><div><h2 id="r-${x.id}">${L(x)}</h2><p>${T(...(CAT_LEAD[x.id] || ['', '']))}</p></div><a class="u-link" href="#/shop/${x.id}">${T('לכל ה', 'All ')}${L(x)} (${items.length}) <span aria-hidden="true">${he() ? '←' : '→'}</span></a></header>
-          <div class="rail">${raw(String(html`${items.slice(0, 8).map((p) => card(p))}`).replace(/loading="lazy"/g, 'loading="eager"'))}</div></section>`; })}
+          <div class="rail">${items.slice(0, 8).map((p, i) => (i < 4 ? raw(String(card(p)).replace(/loading="lazy"/g, 'loading="eager"')) : card(p)))}</div></section>`; })}
       </div></div><div class="block"></div>`;
   }
 

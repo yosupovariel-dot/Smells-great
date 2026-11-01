@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261031233310';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261031233310';
-import { CATEGORIES } from './data.js?v=261031233310';
-import * as db from './db.js?v=261031233310';
-import * as S from './views-shop.js?v=261031233310';
-import * as Lg from './views-legal.js?v=261031233310';
-import * as A from './views-admin.js?v=261031233310';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261101122216';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261101122216';
+import { CATEGORIES } from './data.js?v=261101122216';
+import * as db from './db.js?v=261101122216';
+import * as S from './views-shop.js?v=261101122216';
+import * as Lg from './views-legal.js?v=261101122216';
+import * as A from './views-admin.js?v=261101122216';
 
 const app = $('#app');
 const state = { finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -171,7 +171,7 @@ function route() {
   if (!v) v = html`<div class="wrap legal"><h1>404</h1><p>${t('notFound')}</p><a class="btn" href="#/">${t('backHome')}</a></div>`;
   render(app, html`${header()}<main id="main" tabindex="-1">${v}</main>${footer()}`);
   document.title = title;
-  applyA11y(); startTicker(); bars(); startSlides(); observeReveal(); observeBuy();
+  applyA11y(); startTicker(); bars(); startSlides(); observeReveal(); observeBuy(); watchRails(); markCached();
 }
 
 // Fade-in on scroll (skipped when reduced motion / a11y "stop animations" is on).
@@ -233,6 +233,19 @@ function applyStyleAttrs(root = document) {
   $$('[style-w]', root).forEach((e) => (e.style.width = e.getAttribute('style-w') + '%'));
   $$('[style-a]', root).forEach((e) => e.style.setProperty('--a', e.getAttribute('style-a')));
 }
+
+// Images: mark loaded ones (fade-in, hover swaps only when ready) and retry a failed image once.
+document.addEventListener('load', (e) => { if (e.target.tagName === 'IMG') e.target.classList.add('ld'); }, true);
+document.addEventListener('error', (e) => {
+  const i = e.target; if (i.tagName !== 'IMG' || i.dataset.retry) return;
+  i.dataset.retry = '1'; const src = i.getAttribute('src'); i.removeAttribute('srcset');
+  setTimeout(() => { i.src = src + (src.includes('?') ? '&' : '?') + 'r=' + Date.now(); }, 400);
+}, true);
+// Images already in cache fire 'load' before listeners see them.
+const markCached = () => $$('img').forEach((i) => { if (i.complete && i.naturalWidth) i.classList.add('ld'); });
+// Horizontal rails: native lazy-loading ignores sideways scrolling, so load a rail's images once it nears the viewport.
+const railObs = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { en.target.querySelectorAll('img[loading="lazy"]').forEach((im) => (im.loading = 'eager')); railObs.unobserve(en.target); } }), { rootMargin: '300px' }) : null;
+const watchRails = () => railObs && $$('.rail').forEach((r) => railObs.observe(r));
 
 // ---------- Search overlay ----------
 let releaseSearch;

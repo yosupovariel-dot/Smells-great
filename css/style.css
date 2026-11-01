@@ -1679,3 +1679,17 @@ html,body{overflow-x:clip}
 .auth.glass form[data-form="login"]{max-width:480px;margin:0 auto}
 @media (max-width:600px){.auth.glass form[data-form="register"]{grid-template-columns:1fr}}
 .auth.glass{max-width:none;width:min(760px,100%)}
+/* Image loading: soft placeholder, fade-in, swap only when ready */
+.card-media,.lbl-arch,.sp-arch,.st-img img,.h-item-img,.qz-img,.ws-img,.sp-cat-img,.hh,.h-lib-view,.h-kit-img,.of-img,.h-feature-arch,.tile,.so-img,.pdp-media{background-color:#EDE4D6}
+.card-media,.lbl-arch,.hh,.sp-cat-img,.ws-img,.of-img,.h-lib-view{background-image:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);background-size:220% 100%;animation:shim 1.6s linear infinite}
+@keyframes shim{to{background-position:-220% 0}}
+html.a11y-stop .card-media,html.a11y-stop .lbl-arch{animation:none}
+.card-media img,.lbl-arch img,.hh img,.sp-cat-img img,.ws-img img,.of-img img,.h-lib-view img,.h-kit-img img,.h-item-img img,.qz-img img,.so-img img{opacity:0;transition:opacity .45s ease,transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.card-media img.ld,.lbl-arch img.ld,.hh img.ld,.sp-cat-img img.ld,.ws-img img.ld,.of-img img.ld,.h-lib-view img.ld,.h-kit-img img.ld,.h-item-img img.ld,.qz-img img.ld,.so-img img.ld{opacity:1}
+.card .card-media .m2,.card .card-media .m2.ld,.lbl-arch .m2,.lbl-arch .m2.ld{opacity:0}
+.card:hover .card-media .m2.ld,.card.label:hover .lbl-arch .m2.ld{opacity:1}
+.card:hover .card-media .m1,.card.label:hover .lbl-arch .m1{opacity:1}
+.card:hover .card-media:has(.m2.ld) .m1,.card.label:hover .lbl-arch:has(.m2.ld) .m1{opacity:0}
+/* diffusers: no colour swap on hover (keeps the device steady) */
+.card.studio .card-media .m2{display:none}
+.card.studio:hover .card-media .m1{opacity:1}
