@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261101160435';
-import { t, L, getLang } from './i18n.js?v=261101160435';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261101160435';
-import * as db from './db.js?v=261101160435';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261101160935';
+import { t, L, getLang } from './i18n.js?v=261101160935';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261101160935';
+import * as db from './db.js?v=261101160935';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -202,7 +202,7 @@ export function home() {
     <div><b>${T('משלוח חינם', 'Free delivery')}</b><p>${T('בכל הזמנה מעל 299₪, עד הבית בתוך 3–5 ימי עסקים.', 'On orders over ₪299, at your door in 3–5 business days.')}</p></div>
     <div><b>${T('אחריות יבואן', 'Importer warranty')}</b><p>${T('שנת אחריות יבואן על SAY 150, SAY 300 ו-SAY 400.', 'One-year importer warranty on SAY 150, 300 and 400.')}</p></div>
     <div><b>${T('ליווי אישי', 'Personal advice')}</b><p>${T('לא בטוחים מה מתאים לחלל שלכם? כתבו לנו ונמליץ.', 'Not sure what suits your space? Message us.')} <a href="${waLink(T('שלום, אשמח להמלצה', 'Hello, I would like a recommendation'))}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
-    <div><b>${T('לעסקים', 'For business')}</b><p>${T('מחירון סיטונאי למלונות, משרדים וחנויות.', 'Wholesale pricing for hotels, offices and shops.')} <a href="#/wholesale">${T('לפרטים', 'Details')}</a></p></div>
+    <div><b>${T('לעסקים', 'For business')}</b><p>${T('מחירי סיטונאות והתקנת סטנדים.', 'Wholesale prices and stand installation.')} <a href="#/wholesale">${T('לפרטים', 'Details')}</a></p></div>
   </div></section>
   ${clubBlock()}`;
 }
@@ -543,7 +543,6 @@ export function account(tab = 'login', aud = 'retail') {
     const mine = db.orders().filter((o) => o.userId === u.id);
     const staff = { admin: '#/admin', products: '#/admin/products', orders: '#/orders', courier: '#/courier' }[u.role];
     return html`<div class="wrap legal"><p class="eyebrow">${t('clubMember')}</p><h1>${t('hello')}, ${u.name}</h1>
-      ${u.wsRequest && u.role === 'customer' ? html`<p class="muted">${t('wsPending')}</p>` : ''}
       ${u.firstOrderDiscount && u.role === 'customer' ? html`<p class="note-gold">${t('tick3')}</p>` : ''}
       ${staff ? html`<p><a class="btn gold" href="${staff}">${t('backoffice')}</a></p>` : ''}
       <h2>${t('myOrders')}</h2>
@@ -552,18 +551,13 @@ export function account(tab = 'login', aud = 'retail') {
       <p><button class="btn ghost" data-action="logout">${t('logout')}</button></p></div>`;
   }
   const isLogin = tab === 'login';
-  const ws = aud === 'ws';
-  return html`<div class="auth-page ${ws ? 'ws' : ''}"><div class="auth glass">
-    <div class="aud" role="tablist" aria-label="${T('סוג לקוח', 'Customer type')}">
-      <a href="#/account" role="tab" aria-selected="${!ws}"><b>${T('לקוחות פרטיים', 'Private customers')}</b><small>${T('מועדון לקוחות', 'Members club')}</small></a>
-      <a href="#/account/ws" role="tab" aria-selected="${ws}"><b>${T('סיטונאים ועסקים', 'Wholesale & business')}</b><small>${T('מחירון סיטונאי', 'Wholesale pricing')}</small></a>
-    </div>
-    <h1 class="auth-h">${ws ? T('כניסת סיטונאים', 'Wholesale sign-in') : T('כניסת לקוחות', 'Customer sign-in')}</h1>
-    <p class="auth-sub">${ws ? T('לבתי עסק עם חשבון סיטונאי מאושר. אין לכם חשבון? פתחו בקשה — נאשר תוך יום עסקים.', 'For approved business accounts. No account? Apply — we approve within a business day.') : T('חברי מועדון: התחברו כדי לראות הזמנות והטבות. הצטרפות חינם עם 10% הנחה לקנייה הראשונה.', 'Club members: sign in for orders and perks. Free to join, 10% off your first order.')}</p>
-    <div class="tabs" role="tablist"><button role="tab" aria-selected="${isLogin}" data-action="auth-tab" data-tab="login">${t('login')}</button><button role="tab" aria-selected="${!isLogin}" data-action="auth-tab" data-tab="register">${ws ? T('בקשה לחשבון סיטונאי', 'Apply for wholesale') : t('register')}</button></div>
-    <form data-form="${isLogin ? 'login' : 'register'}" data-aud="${ws ? 'ws' : 'retail'}" novalidate>
-      ${isLogin ? '' : html`<div class="field"><label for="r-name">${ws ? T('שם איש קשר', 'Contact name') : t('fullName')} *</label><input class="input" id="r-name" name="name" autocomplete="name" required maxlength="80"></div>
-        ${ws ? html`<div class="field"><label for="r-biz">${t('bizName')} *</label><input class="input" id="r-biz" name="biz" required maxlength="80"></div><input type="hidden" name="wholesale" value="1">` : ''}
+  return html`<div class="auth-page"><div class="auth glass">
+    <h1 class="auth-h">${T('כניסת לקוחות', 'Customer sign-in')}</h1>
+    <p class="auth-sub">${T('חברי מועדון: התחברו כדי לראות הזמנות והטבות. הצטרפות חינם עם 10% הנחה לקנייה הראשונה.', 'Club members: sign in for orders and perks. Free to join, 10% off your first order.')}</p>
+    <div class="tabs" role="tablist"><button role="tab" aria-selected="${isLogin}" data-action="auth-tab" data-tab="login">${t('login')}</button><button role="tab" aria-selected="${!isLogin}" data-action="auth-tab" data-tab="register">${t('register')}</button></div>
+    <form data-form="${isLogin ? 'login' : 'register'}" novalidate>
+      ${isLogin ? '' : html`<div class="field"><label for="r-name">${t('fullName')} *</label><input class="input" id="r-name" name="name" autocomplete="name" required maxlength="80"></div>
+        
         <div class="field"><label for="r-phone">${t('phone')} *</label><input class="input" id="r-phone" name="phone" type="tel" autocomplete="tel" required maxlength="20"></div>`}
       <div class="field"><label for="a-email">${isLogin ? T('אימייל או שם משתמש', 'Email or username') : t('email')} *</label><input class="input" id="a-email" name="email" type="${isLogin ? 'text' : 'email'}" autocomplete="${isLogin ? 'username' : 'email'}" autocapitalize="none" spellcheck="false" required maxlength="120"></div>
       <div class="field"><label for="a-pass">${t('password')} *</label><input class="input" id="a-pass" name="password" type="password" autocomplete="${isLogin ? 'current-password' : 'new-password'}" required minlength="${isLogin ? 1 : 8}" maxlength="128" aria-describedby="a-pass-h"><small id="a-pass-h" class="muted">${isLogin ? '' : t('badPass')}</small></div>
@@ -571,7 +565,7 @@ export function account(tab = 'login', aud = 'retail') {
         <label class="check"><input type="checkbox" name="newsletter"><span>${t('newsletter')}</span></label>
         <label class="check"><input type="checkbox" name="agree" required><span>${t('agree')}<a href="#/terms">${t('terms')}</a>${t('and')}<a href="#/privacy">${t('privacy')}</a> *</span></label>`}
       <p class="err" id="auth-err" role="alert"></p>
-      <button class="btn block ${ws ? 'gold' : ''}" type="submit">${isLogin ? t('login') : ws ? T('שליחת בקשה', 'Send application') : t('register')}</button>
+      <button class="btn block" type="submit">${isLogin ? t('login') : t('register')}</button>
     </form></div></div>`;
 }
 
@@ -588,13 +582,12 @@ export async function authSubmit(form, kind) {
       if (!String(d.email).trim() || !d.password) throw new Error('fail');
       await db.login(d.email, d.password);
       const role = db.me()?.role;
-      if (form.dataset.aud === 'ws' && role === 'customer') { db.logout(); throw new Error('not-ws'); }
+
     } else {
       if (!valid.name(d.name)) throw new Error('name');
       if (!valid.phone(d.phone)) throw new Error('phone');
       if (!valid.email(d.email)) throw new Error('email');
       if (!valid.password(d.password)) throw new Error('pass');
-      if (d.wholesale && !clean(d.biz)) throw new Error('biz');
       if (!d.agree) throw new Error('agree');
       await db.register({ name: clean(d.name, 80), phone: clean(d.phone, 20), email: clean(d.email, 120), password: d.password, wholesale: !!d.wholesale, biz: clean(d.biz, 80), newsletter: !!d.newsletter });
     }
@@ -629,32 +622,28 @@ export function about() {
 
 export function wholesalePage() {
   const banners = db.SITE.site?.subBanners || {};
-  const seg = [
-    [T('מלונות וצימרים', 'Hotels & B&Bs'), T('ריח חתימה בלובי ובחדרים', 'A signature scent in lobby and rooms'), banners['בתי מלון ויוקרה']],
-    [T('חנויות ורשתות', 'Shops & chains'), T('חוויית קנייה שזוכרים', 'A shopping experience people remember'), banners['חנויות ורשתות מובילות']],
-    [T('קליניקות וספא', 'Clinics & spas'), T('אווירה רגועה ונקייה', 'A calm, clean atmosphere'), banners['טבע וספא']],
-    [T('משרדים', 'Offices'), T('סביבת עבודה נעימה ללקוחות ולצוות', 'A pleasant space for clients and staff'), banners['ניקיון ורעננות']],
-  ];
   const s300 = db.product('say-300');
+  const seg = [
+    [T('מלונות וצימרים', 'Hotels & B&Bs'), banners['בתי מלון ויוקרה']], [T('חנויות ורשתות', 'Shops & chains'), banners['חנויות ורשתות מובילות']],
+    [T('קליניקות וספא', 'Clinics & spas'), banners['טבע וספא']], [T('משרדים', 'Offices'), banners['ניקיון ורעננות']],
+  ];
   return html`<div class="ws-page">
   <header class="ws-hero wrap">
-    <div><p class="kicker latin">For business</p><h1>${T('ריח לעסק שלכם, במחירי סיטונאות', 'Scent for your business, at wholesale prices')}</h1>
-      <p class="lead">${T('מכשירים ותמציות לבתי מלון, חנויות, קליניקות ומשרדים. פותחים חשבון עסקי, ואחרי אישור רואים באתר את המחירים הסיטונאיים ומזמינים ישירות.', 'Devices and oils for hotels, shops, clinics and offices. Open a business account and, once approved, see wholesale prices and order directly.')}</p>
-      <div class="hero-cta"><a class="btn" href="#/account/ws">${T('פתיחת חשבון עסקי', 'Open a business account')}</a><a class="u-link" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('שאלה? דברו איתנו בוואטסאפ', 'Questions? WhatsApp us')}</a></div></div>
+    <div><p class="kicker latin">For business</p><h1>${T('מחירי סיטונאות והתקנת סטנדים לעסקים', 'Wholesale prices & stand installation')}</h1>
+      <p class="lead">${T('מלון, חנות, קליניקה או משרד? כתבו לנו בוואטסאפ ונחזור אליכם עם הצעת מחיר סיטונאית — למכשירים, לתמציות בכמויות ולהתקנת סטנד ריח בעסק.', 'Hotel, shop, clinic or office? Message us on WhatsApp for a wholesale quote — devices, bulk oils and in-store scent stands.')}</p>
+      <div class="hero-cta"><a class="btn wa-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לבירור מחירי סיטונאות בוואטסאפ', 'Ask about wholesale on WhatsApp')}</a></div></div>
     ${s300 ? html`<figure class="sp-arch studio"><img src="${s300.img}" alt="SAY 300" width="900" height="1100"></figure>` : ''}
   </header>
-  <section class="wrap ws-sec"><h2>${T('למי זה מתאים', 'Who it is for')}</h2>
-    <div class="ws-seg">${seg.map(([h, p, img]) => html`<div class="ws-card">${img ? html`<span class="ws-img"><img src="${small(img)}" alt="" loading="lazy" width="320" height="240"></span>` : ''}<b>${h}</b><small>${p}</small></div>`)}</div></section>
   <section class="wrap ws-sec ws-two">
-    <div><h2>${T('מה מקבלים', 'What you get')}</h2><ul class="ws-list">
-      <li><b>${T('מחירון סיטונאי באתר', 'Wholesale prices online')}</b>${T('אחרי האישור המחירים מתעדכנים אוטומטית בכל המוצרים.', 'Once approved, prices update automatically across the shop.')}</li>
-      <li><b>${T('בקבוקים גדולים', 'Large bottles')}</b>${T('תמציות ב־500 מ"ל, ליטר ו־5 ליטר — משתלם יותר לשימוש שוטף.', '500 ml, 1 L and 5 L oils — better value for daily use.')}</li>
-      <li><b>${T('מכשירים לחללים גדולים', 'Devices for large spaces')}</b>${T('SAY 300 ו־SAY 400 לחללים של מאות מ"ר.', 'SAY 300 and SAY 400 for spaces of hundreds of m².')}</li>
-      <li><b>${T('ליווי אישי', 'Personal support')}</b>${T('עזרה בבחירת ריח, מיקום המכשיר והגדרת זמני עבודה.', 'Help choosing a scent, placing the device and setting schedules.')}</li></ul></div>
-    <div><h2>${T('איך זה עובד', 'How it works')}</h2><ol class="ws-steps">
-      <li><b>${T('נרשמים', 'Register')}</b>${T('ממלאים פרטים ומסמנים "אני בית עסק".', 'Fill in your details and tick “I am a business”.')}</li>
-      <li><b>${T('מאשרים', 'We approve')}</b>${T('אנחנו בודקים ומאשרים את החשבון.', 'We review and approve the account.')}</li>
-      <li><b>${T('מזמינים', 'Order')}</b>${T('נכנסים לאתר ורואים מחירי סיטונאות בכל מוצר.', 'Sign in and see wholesale prices on every product.')}</li></ol>
-      <a class="btn" href="#/account/ws">${T('פתיחת חשבון עסקי', 'Open a business account')}</a></div>
-  </section></div><div class="block"></div>`;
+    <div><h2>${T('במה אפשר לעזור', 'What we offer')}</h2><ul class="ws-list">
+      <li><b>${T('מחירי סיטונאות', 'Wholesale pricing')}</b>${T('מחירים מיוחדים לעסקים על מכשירים ותמציות.', 'Special business prices on devices and oils.')}</li>
+      <li><b>${T('התקנת סטנדים', 'Stand installation')}</b>${T('סטנד ריח מעוצב בעסק שלכם — אנחנו מגיעים, מתקינים ומכוונים.', 'A designed scent stand in your business — we install and set it up.')}</li>
+      <li><b>${T('תמציות בכמויות', 'Bulk oils')}</b>${T('בקבוקים של 500 מ"ל, ליטר ו־5 ליטר לשימוש שוטף.', '500 ml, 1 L and 5 L bottles.')}</li>
+      <li><b>${T('ליווי אישי', 'Personal support')}</b>${T('בחירת ריח, מיקום המכשיר והגדרת זמני עבודה.', 'Scent choice, placement and scheduling.')}</li></ul></div>
+    <div><h2>${T('למי זה מתאים', 'Who it is for')}</h2>
+      <div class="ws-seg two">${seg.map(([h, img]) => html`<div class="ws-card">${img ? html`<span class="ws-img"><img src="${small(img)}" alt="" loading="lazy" width="320" height="240"></span>` : ''}<b>${h}</b></div>`)}</div></div>
+  </section>
+  <section class="wrap ws-cta"><h2>${T('רוצים הצעת מחיר?', 'Want a quote?')}</h2><p>${T('שלחו לנו הודעה — נענה בהקדם.', 'Send us a message — we will reply soon.')}</p>
+    <a class="btn wa-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">WhatsApp · ${PHONE_DISPLAY}</a></section>
+  </div><div class="block"></div>`;
 }

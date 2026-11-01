@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261101160435';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261101160435';
-import { CATEGORIES } from './data.js?v=261101160435';
-import * as db from './db.js?v=261101160435';
-import * as S from './views-shop.js?v=261101160435';
-import * as Lg from './views-legal.js?v=261101160435';
-import * as A from './views-admin.js?v=261101160435';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261101160935';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261101160935';
+import { CATEGORIES } from './data.js?v=261101160935';
+import * as db from './db.js?v=261101160935';
+import * as S from './views-shop.js?v=261101160935';
+import * as Lg from './views-legal.js?v=261101160935';
+import * as A from './views-admin.js?v=261101160935';
 
 const app = $('#app');
 const state = { finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -420,7 +420,7 @@ document.addEventListener('submit', async (e) => {
     const d = Object.fromEntries(new FormData(f)); const err = $('#cd-err');
     if (!valid.name(d.name)) { err.textContent = t('required'); return; }
     if (d.email && !valid.email(d.email)) { err.textContent = t('badEmail'); return; }
-    db.updateUser(f.dataset.id, { name: clean(d.name, 80), phone: clean(d.phone, 20), email: clean(d.email, 120), role: d.role === 'wholesale' ? 'wholesale' : 'customer', wsRequest: d.role === 'wholesale' ? false : undefined, biz: clean(d.biz, 80), note: clean(d.note, 400), newsletter: !!d.newsletter });
+    db.updateUser(f.dataset.id, { name: clean(d.name, 80), phone: clean(d.phone, 20), email: clean(d.email, 120), biz: clean(d.biz, 80), note: clean(d.note, 400), newsletter: !!d.newsletter });
     closeModal(); toast(getLang() === 'he' ? 'פרטי הלקוח נשמרו' : 'Customer saved'); rerender();
   }
   if (kind === 'staff') {

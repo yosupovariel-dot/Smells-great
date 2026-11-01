@@ -1,8 +1,8 @@
-import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261101160435';
-import { L, getLang } from './i18n.js?v=261101160435';
-import { CATEGORIES } from './data.js?v=261101160435';
-import * as db from './db.js?v=261101160435';
-import { media, statusLabel, small, subName } from './views-shop.js?v=261101160435';
+import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261101160935';
+import { L, getLang } from './i18n.js?v=261101160935';
+import { CATEGORIES } from './data.js?v=261101160935';
+import * as db from './db.js?v=261101160935';
+import { media, statusLabel, small, subName } from './views-shop.js?v=261101160935';
 
 const he = () => getLang() === 'he';
 const T = (h, e) => (he() ? h : e);
@@ -152,7 +152,6 @@ export function dashboard(metric = 'rev') {
     [orders.filter((o) => o.status === 'processing').length, T('בהכנה', 'Being prepared'), '#/orders', 'processing'],
     [orders.filter((o) => o.status === 'ready').length, T('מוכנות לאיסוף שליח', 'Ready for courier'), '#/courier', 'ready'],
     [db.products().filter((p) => !p.quote && p.stock <= 12).length, T('מוצרים במלאי נמוך', 'Low-stock products'), '#/admin/products', 'low'],
-    [db.users().filter((u) => u.wsRequest && u.role === 'customer').length, T('בקשות סיטונאי לאישור', 'Wholesale requests'), '#/admin/users', 'ws'],
   ];
   const catTotal = Object.values(cats).reduce((a, b) => a + b, 0) || 1;
   const metrics = [['rev', T('הכנסות', 'Revenue')], ['profit', T('רווח גולמי', 'Gross profit')], ['n', T('הזמנות', 'Orders')]];
@@ -282,7 +281,8 @@ export function productForm(p) {
 const custStats = () => { const st = {}; for (const o of db.orders()) if (o.userId && o.status !== 'cancelled') { const x = (st[o.userId] ||= { n: 0, t: 0, last: 0 }); x.n++; x.t += o.total; x.last = Math.max(x.last, o.date); } return st; };
 export function usersAdmin(q = '', tab = '') {
   const all = db.users().map(db.publicUser).filter((u) => ['customer', 'wholesale'].includes(u.role));
-  const groups = [['', T('לקוחות פרטיים', 'Retail'), (u) => u.role === 'customer'], ['wholesale', T('סיטונאים', 'Wholesale'), (u) => u.role === 'wholesale'], ['ws-req', T('בקשות סיטונאי', 'Wholesale requests'), (u) => u.wsRequest && u.role === 'customer']];
+  tab = '';
+  const groups = [['', T('לקוחות', 'Customers'), () => true]];
   const g = groups.find((x) => x[0] === tab) || groups[0];
   let list = all.filter(g[2]);
   if (q) list = list.filter((u) => (u.name + u.email + (u.phone || '') + (u.biz || '')).toLowerCase().includes(q.toLowerCase()));
@@ -293,18 +293,15 @@ export function usersAdmin(q = '', tab = '') {
   return shell('admin/users', T('לקוחות', 'Customers'), html`
     <section class="kpis">
       <div class="kpi"><div class="kpi-h"><small>${T('לקוחות פרטיים', 'Retail customers')}</small></div><b>${all.filter((u) => u.role === 'customer').length}</b><small>${m(sum((u) => u.role === 'customer'))} ${T('רכישות', 'spent')}</small></div>
-      <div class="kpi"><div class="kpi-h"><small>${T('סיטונאים', 'Wholesale')}</small></div><b>${all.filter((u) => u.role === 'wholesale').length}</b><small>${m(sum((u) => u.role === 'wholesale'))} ${T('רכישות', 'spent')}</small></div>
-      <div class="kpi"><div class="kpi-h"><small>${T('ממתינים לאישור סיטונאי', 'Awaiting approval')}</small></div><b>${all.filter(groups[2][2]).length}</b><small>&nbsp;</small></div>
       <div class="kpi"><div class="kpi-h"><small>${T('נרשמים לדיוור', 'Newsletter')}</small></div><b>${all.filter((u) => u.newsletter).length + db.clubList().length}</b><small>&nbsp;</small></div>
     </section>
-    <nav class="bo-tabs">${groups.map(([k, l, fn]) => html`<button aria-pressed="${(tab || '') === k}" data-action="utab" data-t="${k}" class="${k === 'ws-req' && all.filter(fn).length ? 'hot' : ''}">${l} <em>${all.filter(fn).length}</em></button>`)}</nav>
     <section class="panel flush"><div class="tbl-wrap"><table class="tbl users">
-      <thead><tr><th>${isWs ? T('עסק', 'Business') : T('לקוח', 'Customer')}</th><th>${T('טלפון', 'Phone')}</th><th>${T('הזמנות', 'Orders')}</th><th>${T('סה״כ רכישות', 'Total spent')}</th><th>${T('רכישה אחרונה', 'Last order')}</th><th></th></tr></thead>
+      <thead><tr><th>${T('לקוח', 'Customer')}</th><th>${T('טלפון', 'Phone')}</th><th>${T('הזמנות', 'Orders')}</th><th>${T('סה״כ רכישות', 'Total spent')}</th><th>${T('רכישה אחרונה', 'Last order')}</th><th></th></tr></thead>
       <tbody>${shown.map((u) => html`<tr class="clickable ${u.blocked ? 'blocked' : ''}" data-action="cust-open" data-id="${u.id}">
         <td><div class="who">${avatar(u.name)}<span><b>${u.name}</b><small>${u.email}</small></span></div></td>
         <td><small>${u.phone || '—'}</small></td><td>${st[u.id]?.n || 0}</td><td><b>${m(st[u.id]?.t || 0)}</b></td>
         <td><small>${st[u.id] ? new Date(st[u.id].last).toLocaleDateString(getLang()) : '—'}</small></td>
-        <td class="row-acts">${u.wsRequest && u.role === 'customer' ? html`<button class="btn sm gold" data-action="approve-ws" data-id="${u.id}">${T('אישור כסיטונאי', 'Approve')}</button>` : html`<span class="link-btn">${T('לכרטיס הלקוח', 'Open')}</span>`}${u.blocked ? html`<span class="tag red">${T('חסום', 'Blocked')}</span>` : ''}</td></tr>`)}</tbody></table></div>
+        <td class="row-acts"><span class="link-btn">${T('לכרטיס הלקוח', 'Open')}</span>${u.blocked ? html`<span class="tag red">${T('חסום', 'Blocked')}</span>` : ''}</td></tr>`)}</tbody></table></div>
       ${!shown.length ? html`<p class="muted pad">${T('אין לקוחות ברשימה זו', 'No customers here')}</p>` : ''}
       ${list.length > shown.length ? html`<p class="muted pad">${T('מוצגים', 'Showing')} ${shown.length} ${T('מתוך', 'of')} ${list.length} — ${T('השתמשו בחיפוש לצמצום', 'use search')}</p>` : ''}</section>`,
     html`<label class="bo-field">${ICON2.search}<span class="sr-only">${T('חיפוש', 'Search')}</span><input id="uq" type="search" value="${q}" placeholder="${T('שם, אימייל, טלפון או עסק', 'Name, email, phone or business')}" data-input="uq"></label>`,
@@ -324,7 +321,6 @@ export function customerDrawer(id) {
       <section class="dr-sec"><h3>${T('פרטים', 'Details')}</h3>
         <div class="row2"><div class="field"><label for="c-n">${T('שם', 'Name')}</label><input class="input" id="c-n" name="name" value="${u.name}" maxlength="80" required></div><div class="field"><label for="c-p">${T('טלפון', 'Phone')}</label><input class="input" id="c-p" name="phone" value="${u.phone || ''}" maxlength="20"></div></div>
         <div class="field"><label for="c-e">${T('אימייל', 'Email')}</label><input class="input" id="c-e" name="email" type="email" value="${u.email}" maxlength="120"></div>
-        <div class="field"><span class="lbl">${T('סוג לקוח', 'Customer type')}</span><div class="seg wide" role="radiogroup"><label><input type="radio" name="role" value="customer" ${raw(u.role === 'customer' ? 'checked' : '')}><span>${T('פרטי', 'Retail')}</span></label><label><input type="radio" name="role" value="wholesale" ${raw(u.role === 'wholesale' ? 'checked' : '')}><span>${T('סיטונאי', 'Wholesale')}</span></label></div></div>
         <div class="field"><label for="c-b">${T('שם עסק / ח.פ.', 'Business / VAT ID')}</label><input class="input" id="c-b" name="biz" value="${u.biz || ''}" maxlength="80"></div>
         <div class="field"><label for="c-note">${T('הערה פנימית', 'Internal note')}</label><textarea class="input" id="c-note" name="note" rows="2" maxlength="400">${u.note || ''}</textarea></div>
         <label class="switch big"><input type="checkbox" name="newsletter" ${raw(u.newsletter ? 'checked' : '')}><span></span>${T('מקבל דיוור', 'Newsletter')}</label>
