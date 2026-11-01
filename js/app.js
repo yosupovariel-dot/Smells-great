@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261101160935';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261101160935';
-import { CATEGORIES } from './data.js?v=261101160935';
-import * as db from './db.js?v=261101160935';
-import * as S from './views-shop.js?v=261101160935';
-import * as Lg from './views-legal.js?v=261101160935';
-import * as A from './views-admin.js?v=261101160935';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261101223419';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261101223419';
+import { CATEGORIES } from './data.js?v=261101223419';
+import * as db from './db.js?v=261101223419';
+import * as S from './views-shop.js?v=261101223419';
+import * as Lg from './views-legal.js?v=261101223419';
+import * as A from './views-admin.js?v=261101223419';
 
 const app = $('#app');
 const state = { finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -117,6 +117,32 @@ function startSlides() {
 }
 
 // ---------- Consent ----------
+// ---------- Sign-up promo (glass), 7s after load, only for visitors who aren't signed in ----------
+function maybePromo() {
+  let seen; try { seen = +localStorage.getItem('say_promo') || 0; } catch {}
+  if (seen && Date.now() - seen < 3 * 864e5) return; // shown in the last 3 days
+  setTimeout(function show() {
+    if (db.me() || /^#\/(account|admin|orders|courier|checkout)/.test(location.hash) || $('#promo')) return;
+    if ($('.consent') || document.body.classList.contains('cart-open') || $('#modal') || $('#search-ov')) { setTimeout(show, 2500); return; }
+    try { localStorage.setItem('say_promo', String(Date.now())); } catch {}
+    const he = getLang() === 'he';
+    const w = document.createElement('div'); w.id = 'promo'; w.className = 'promo-bg';
+    render(w, html`<div class="supromo glass-card" role="dialog" aria-modal="true" aria-labelledby="pr-t">
+      <button class="promo-x" data-action="promo-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+      <img class="promo-logo" src="assets/img/logo-header.png" alt="" width="360" height="400">
+      <p class="promo-k">${he ? 'מועדון הלקוחות של SAY' : 'SAY Members Club'}</p>
+      <h2 id="pr-t">${he ? '10% הנחה על ההזמנה הראשונה' : '10% off your first order'}</h2>
+      <ul class="promo-list"><li>${he ? 'הצטרפות חינם, בלי התחייבות' : 'Free to join, no commitment'}</li><li>${he ? 'הטבות ומבצעים לחברי מועדון בלבד' : 'Members-only offers'}</li><li>${he ? 'מעקב אחרי ההזמנות שלכם' : 'Track your orders'}</li></ul>
+      <a class="btn block" href="#/account/register" data-action="promo-join">${he ? 'להצטרפות חינם' : 'Join free'}</a>
+      <button class="promo-later" data-action="promo-close">${he ? 'אולי בפעם אחרת' : 'Maybe later'}</button>
+    </div>`);
+    document.body.append(w); requestAnimationFrame(() => w.classList.add('in'));
+    promoRelease = trapFocus(w.firstElementChild, closePromo);
+  }, 7000);
+}
+let promoRelease;
+function closePromo() { const w = $('#promo'); if (!w) return; w.remove(); promoRelease?.(); promoRelease = null; }
+
 function maybeConsent() {
   let ok; try { ok = localStorage.getItem('say_consent'); } catch {}
   if (ok || location.hash.match(/^#\/(admin|orders|courier)/)) return;
@@ -280,6 +306,8 @@ document.addEventListener('click', async (e) => {
     case 'menu-close': $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); $('[data-action="menu"]').focus(); break;
     case 'cart-open': openCart(); break;
     case 'search-open': openSearch(); break;
+    case 'promo-close': closePromo(); break;
+    case 'promo-join': closePromo(); state.authTab = 'register'; break;
     case 'fq': state.finder = { ...state.finder, [el.dataset.k]: el.dataset.v }; go(); break;
     case 'fq-back': { const f = state.finder; if (f.mood) delete f.mood; else delete f.space; go(); break; }
     case 'fq-reset': state.finder = {}; go(); break;
@@ -339,6 +367,7 @@ document.addEventListener('click', async (e) => {
 document.addEventListener('click', (e) => {
   const zoom = e.target.closest('[data-zoom]'); if (zoom && zoom.querySelector('img')) zoom.classList.toggle('zoom');
   if (e.target.classList?.contains('modal-bg')) closeModal();
+  if (e.target.id === 'promo') closePromo();
   const p = $('#a11y-panel'); if (p?.classList.contains('open') && !e.target.closest('#a11y-panel,.fab-a11y')) { p.classList.remove('open'); $('.fab-a11y')?.setAttribute('aria-expanded', 'false'); }
 });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { const p = $('#a11y-panel'); if (p?.classList.contains('open')) $('.fab-a11y').click(); } });
@@ -459,5 +488,5 @@ window.addEventListener('hashchange', go);
   go();
   await db.seedDemo();
   if (/^#\/(admin|orders|courier|account)/.test(location.hash)) rerender();
-  maybeConsent();
+  maybeConsent(); maybePromo();
 })();

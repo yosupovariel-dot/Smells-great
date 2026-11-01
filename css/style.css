@@ -1720,3 +1720,19 @@ h1,h2,h3,.lbl-name,.card-body h3,.ft-body h3,.h-item-t b,.tile b,.qz-opt b,.fd-o
 .ws-cta{text-align:center;padding:clamp(3rem,6vw,4.5rem) 16px;margin-top:2rem;background:var(--white);border-radius:24px}
 .ws-cta h2{margin-bottom:.4rem}.ws-cta p{color:var(--muted)}
 .ws-seg.two{grid-template-columns:1fr 1fr}
+/* Sign-up promo — glass */
+.promo-bg{position:fixed;inset:0;z-index:150;display:grid;place-items:center;padding:16px;background:rgba(22,19,15,.28);backdrop-filter:blur(3px);opacity:0;transition:opacity .4s}
+.promo-bg.in{opacity:1}
+.supromo{position:relative;width:min(420px,100%);text-align:center;padding:2rem 1.8rem 1.4rem;border-radius:28px;background:rgba(255,253,249,.6);backdrop-filter:blur(24px) saturate(1.5);-webkit-backdrop-filter:blur(24px) saturate(1.5);border:1px solid rgba(255,255,255,.7);box-shadow:0 40px 80px -30px rgba(22,19,15,.6),inset 0 1px 0 rgba(255,255,255,.85);transform:translateY(16px) scale(.97);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.promo-bg.in .supromo{transform:none}
+.promo-logo{height:78px;width:auto;margin:0 auto .6rem}
+.promo-k{font-size:.78rem;font-weight:600;color:var(--gold-dark);margin:0 0 .3rem;letter-spacing:.06em}
+.supromo h2{font-size:1.7rem;margin:0 0 1rem;line-height:1.2}
+.promo-list{list-style:none;padding:0;margin:0 0 1.3rem;display:grid;gap:.45rem;font-size:.95rem}
+.promo-list li::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-inline-end:.55rem;vertical-align:middle}
+.supromo .btn{border-radius:14px;min-height:52px}
+.promo-later{background:none;border:0;color:var(--muted);font-size:.88rem;margin-top:.8rem;cursor:pointer;text-decoration:underline;text-underline-offset:.25em}
+.promo-x{position:absolute;top:12px;inset-inline-end:12px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.55);cursor:pointer;display:grid;place-items:center}
+.promo-x:hover{background:#fff}
+@supports not (backdrop-filter:blur(1px)){.supromo{background:rgba(255,253,249,.96)}}
+@media (prefers-reduced-motion:reduce){.supromo,.promo-bg{transition:none}}
