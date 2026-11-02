@@ -1841,3 +1841,18 @@ h1,h2,h3,.lbl-name,.card-body h3,.ft-body h3,.h-item-t b,.tile b,.qz-opt b,.fd-o
   .ftr-col summary::after{content:"+"!important;width:auto!important;height:auto!important;border:0!important;transform:none!important;margin:0!important;color:var(--gold-2);font-size:1.5rem;font-weight:300;line-height:1}
   .ftr-col[open] summary::after{content:"−"!important;transform:none!important}
 }
+/* Desktop footer: tidy, balanced */
+@media (min-width:801px){
+  .ftr{padding-top:4rem}
+  .ftr-grid{grid-template-columns:1.3fr 1fr 1fr 1fr;gap:3rem;align-items:start}
+  .ftr-grid>div:first-child{display:flex;flex-direction:column;align-items:flex-start;gap:.9rem;padding-inline-end:2rem;border-inline-end:1px solid rgba(201,173,122,.18)}
+  .ftr-grid>div:first-child .brand.logo img{height:130px}
+  .ftr-grid>div:first-child p{margin:0}
+  .ftr-contact{gap:.6rem}
+  .ftr-col summary h2{font-size:.95rem;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid rgba(201,173,122,.25)}
+  .ftr-col ul{gap:.55rem}
+  .ftr-col ul a{color:#cfc5b5;font-size:.94rem;transition:color .2s}
+  .ftr-col ul a:hover{color:var(--gold-2);text-decoration:none}
+}
+.ftr-bottom{justify-content:center;flex-direction:column;align-items:center;text-align:center;gap:.35rem;padding:1.4rem 90px 1.6rem}
+@media (max-width:800px){.ftr-bottom{padding:1.2rem 70px 5.5rem}}
