@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261102231319';
-import { t, L, getLang } from './i18n.js?v=261102231319';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261102231319';
-import * as db from './db.js?v=261102231319';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261102231919';
+import { t, L, getLang } from './i18n.js?v=261102231919';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261102231919';
+import * as db from './db.js?v=261102231919';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -83,7 +83,9 @@ export function card(p, opts = {}) {
   if (p.cat === 'oils' && p.pack) return labelCard(p);
   const { main, alt, studio } = cardImgs(p);
   const direct = !(p.quote || p.picks || p.options?.length || p.sizes.length > 1);
+  const fam = p.picks ? 'DISCOVERY KIT' : ({ diffusers: 'DIFFUSERS', bundles: 'BUNDLE', oils: 'FRAGRANCE OIL' })[p.cat] || '';
   return html`<article class="card ${studio ? 'studio' : 'photo'}">
+    <span class="lbl-fam latin card-fam">${fam}</span>
     <a class="card-media" href="#/product/${p.id}" tabindex="-1" aria-hidden="true">
       ${media(p, 'm1', false, main)}${alt ? media(p, 'm2', false, alt) : ''}
     </a>

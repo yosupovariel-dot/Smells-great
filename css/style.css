@@ -1935,3 +1935,19 @@ kbd{font-family:var(--f-body);font-size:.7rem;background:#F1ECE3;border:1px soli
   .cmdk-btn kbd{display:none}
   .bulk{bottom:80px}
 }
+/* ===== Unified card layout (products + oil labels share one structure) ===== */
+.grid{align-items:stretch}
+.card.photo,.card.studio:not(.feature){display:flex;flex-direction:column;align-items:center;padding:1.4rem 1.4rem 1.5rem;height:100%}
+.card.photo::before,.card.studio:not(.feature)::before{inset:8px}
+.card-fam{display:block;margin:.4rem 0 1rem;text-align:center}
+.card.photo .card-media,.card.studio .card-media{width:100%;aspect-ratio:4/3!important;border-radius:70px 70px 6px 6px!important}
+.card.studio .card-media img{padding:10% 14% 12%}
+.card.label .lbl-arch{width:100%}
+.card .card-body,.card.label .lbl{flex:1}
+.card .card-body{display:flex;flex-direction:column;align-items:center;width:100%;padding:1.1rem 0 0}
+.card .card-body .price,.card .card-body .quote-cta,.lbl-price{margin-top:auto;padding-top:.6rem}
+.lbl{justify-content:flex-start}
+.card .card-body h3{min-height:2.6em;display:flex;align-items:center;justify-content:center;text-align:center}
+.lbl-name{min-height:2.6em;display:flex;align-items:center;justify-content:center}
+.card .card-tag{top:44px}
+@media (max-width:600px){.card.photo,.card.studio:not(.feature){padding:1rem .8rem 1.1rem}.card.photo .card-media,.card.studio .card-media{border-radius:40px 40px 6px 6px!important}}
