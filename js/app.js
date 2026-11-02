@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261102215956';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261102215956';
-import { CATEGORIES } from './data.js?v=261102215956';
-import * as db from './db.js?v=261102215956';
-import * as S from './views-shop.js?v=261102215956';
-import * as Lg from './views-legal.js?v=261102215956';
-import * as A from './views-admin.js?v=261102215956';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261102220313';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261102220313';
+import { CATEGORIES } from './data.js?v=261102220313';
+import * as db from './db.js?v=261102220313';
+import * as S from './views-shop.js?v=261102220313';
+import * as Lg from './views-legal.js?v=261102220313';
+import * as A from './views-admin.js?v=261102220313';
 
 const app = $('#app');
 const state = { finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -46,10 +46,10 @@ function footer() {
   return html`<footer class="ftr"><div class="wrap">
     <div class="ftr-grid">
       <div><a class="brand logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-full-light.png" alt="SAY Boutique — Luxury Home Fragrances" width="360" height="478" loading="lazy"></a><p class="muted">${t('tick2')}</p>
-        <p><a href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a> · <a href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
-      <div><h2>${t('shop')}</h2><ul>${CATEGORIES.map((c) => html`<li><a href="#/shop/${c.id}">${c[getLang()]}</a></li>`)}</ul></div>
-      <div><h2>${t('service')}</h2><ul><li><a href="#/contact">${t('contact')}</a></li><li><a href="#/account">${t('club')}</a></li><li><a href="#/wholesale">${t('wholesale')}</a></li><li><a href="#/returns">${t('returns')}</a></li></ul></div>
-      <div><h2>${t('info')}</h2><ul><li><a href="#/terms">${t('terms')}</a></li><li><a href="#/privacy">${t('privacy')}</a></li><li><a href="#/accessibility">${t('accessibility')}</a></li><li><a href="#/about">${t('about')}</a></li></ul></div>
+        <p class="ftr-contact"><a class="fc-btn" href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a><a class="fc-btn wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
+      <details class=\"ftr-col\" open><summary><h2>${t('shop')}</h2></summary><ul>${CATEGORIES.map((c) => html`<li><a href="#/shop/${c.id}">${c[getLang()]}</a></li>`)}</ul></details>
+      <details class=\"ftr-col\" open><summary><h2>${t('service')}</h2></summary><ul><li><a href="#/contact">${t('contact')}</a></li><li><a href="#/account">${t('club')}</a></li><li><a href="#/wholesale">${t('wholesale')}</a></li><li><a href="#/returns">${t('returns')}</a></li></ul></details>
+      <details class=\"ftr-col\" open><summary><h2>${t('info')}</h2></summary><ul><li><a href="#/terms">${t('terms')}</a></li><li><a href="#/privacy">${t('privacy')}</a></li><li><a href="#/accessibility">${t('accessibility')}</a></li><li><a href="#/about">${t('about')}</a></li></ul></div>
     </div>
     <div class="ftr-bottom"><span>© ${y} SAY Boutique · ${t('rights')}</span>
       <a class="credit" href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener">${t('builtBy')}</a></div>
@@ -198,6 +198,7 @@ function route() {
   if (!v) v = html`<div class="wrap legal"><h1>404</h1><p>${t('notFound')}</p><a class="btn" href="#/">${t('backHome')}</a></div>`;
   render(app, html`${header()}<main id="main" tabindex="-1">${v}</main>${footer()}`);
   document.title = title;
+  if (matchMedia('(max-width:800px)').matches) $$('.ftr-col').forEach((d) => d.removeAttribute('open'));
   applyA11y(); startTicker(); bars(); startSlides(); observeReveal(); observeBuy(); watchRails(); markCached();
 }
 
