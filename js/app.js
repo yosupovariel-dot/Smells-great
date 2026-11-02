@@ -1,13 +1,13 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261102221803';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261102221803';
-import { CATEGORIES } from './data.js?v=261102221803';
-import * as db from './db.js?v=261102221803';
-import * as S from './views-shop.js?v=261102221803';
-import * as Lg from './views-legal.js?v=261102221803';
-import * as A from './views-admin.js?v=261102221803';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261102222403';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261102222403';
+import { CATEGORIES } from './data.js?v=261102222403';
+import * as db from './db.js?v=261102222403';
+import * as S from './views-shop.js?v=261102222403';
+import * as Lg from './views-legal.js?v=261102222403';
+import * as A from './views-admin.js?v=261102222403';
 
 const app = $('#app');
-const state = { finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
+const state = { sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
 const ICONS = {
   search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
   user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>',
@@ -152,7 +152,7 @@ function closePromo() { const w = $('#promo'); if (!w) return; w.remove(); promo
 function maybeConsent() {
   if (db.me() || location.hash.match(/^#\/(admin|orders|courier)/)) return;
   setTimeout(() => {
-    if ($('.consent')) return;
+    if ($('.consent') || db.me() || /^#\/(admin|orders|courier)/.test(location.hash)) return;
     const d = document.createElement('div');
     d.className = 'consent'; d.setAttribute('role', 'region'); d.setAttribute('aria-labelledby', 'cs-t'); d.setAttribute('aria-live', 'polite');
     render(d, html`<button class="consent-x" data-action="consent" data-v="essential" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
@@ -175,9 +175,10 @@ function route() {
     if (!db.can(STAFF[a])) { state.authTab = 'login'; location.hash = '#/account'; return; }
     let v;
     if (a === 'admin' && db.me().role === 'products' && b !== 'products') { location.hash = '#/admin/products'; return; }
-    if (a === 'admin') v = b === 'products' ? A.productsAdmin(state.pcat, state.pq) : b === 'reports' ? A.reports(state.range) : b === 'users' ? A.usersAdmin(state.uq, state.ur) : b === 'team' ? A.teamAdmin() : A.dashboard(state.metric);
-    if (a === 'orders') v = A.ordersBoard({ view: state.ov, month: state.om, q: state.oq, status: state.os });
+    if (a === 'admin') v = b === 'products' ? A.productsAdmin(state.pcat, state.pq, state.pv) : b === 'reports' ? A.reports(state.range) : b === 'users' ? A.usersAdmin(state.uq, state.ur) : b === 'team' ? A.teamAdmin() : A.dashboard(state.metric);
+    if (a === 'orders') v = A.ordersBoard({ view: state.ov, month: state.om, q: state.oq, status: state.os, sel: state.sel });
     if (a === 'courier') v = A.courierView(state.ctab);
+    $('.consent')?.remove(); closePromo();
     render(app, v); applyStyleAttrs(); document.title = 'SAY · Back Office'; return;
   }
   let v, title = 'SAY Boutique';
@@ -280,6 +281,31 @@ const markCached = () => $$('img').forEach((i) => { if (i.complete && i.naturalW
 const railObs = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { en.target.querySelectorAll('img[loading="lazy"]').forEach((im) => (im.loading = 'eager')); railObs.unobserve(en.target); } }), { rootMargin: '300px' }) : null;
 const watchRails = () => railObs && $$('.rail').forEach((r) => railObs.observe(r));
 
+// ---------- Back-office command palette (Ctrl/⌘+K) ----------
+let ckRelease;
+function openPalette() {
+  if ($('#cmdk')) return;
+  const w = document.createElement('div'); w.id = 'cmdk'; w.className = 'cmdk-bg';
+  render(w, html`<div class="cmdk" role="dialog" aria-modal="true" aria-label="${getLang() === 'he' ? 'חיפוש ופקודות' : 'Search & commands'}">
+    <input id="ck-q" type="search" autocomplete="off" placeholder="${getLang() === 'he' ? 'מה לעשות? חפשו הזמנה, מוצר, לקוח או פעולה' : 'Search orders, products, customers or actions'}" data-input="ck-q">
+    <div class="ck-list" id="ck-list">${A.palette('')}</div>
+    <p class="ck-foot"><kbd>↑</kbd><kbd>↓</kbd> ${getLang() === 'he' ? 'ניווט' : 'navigate'} · <kbd>Enter</kbd> ${getLang() === 'he' ? 'בחירה' : 'select'} · <kbd>Esc</kbd> ${getLang() === 'he' ? 'סגירה' : 'close'}</p></div>`);
+  document.body.append(w); markActive(0);
+  ckRelease = trapFocus(w.firstElementChild, closePalette);
+  setTimeout(() => $('#ck-q')?.focus(), 30);
+}
+function closePalette() { const w = $('#cmdk'); if (!w) return; w.remove(); ckRelease?.(); ckRelease = null; }
+function markActive(i) { const it = $$('#ck-list .ck-i'); it.forEach((x, k) => x.classList.toggle('act', k === i)); it[i]?.scrollIntoView({ block: 'nearest' }); }
+document.addEventListener('keydown', (e) => {
+  const bo = /^#\/(admin|orders|courier)/.test(location.hash);
+  if (bo && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#cmdk') ? closePalette() : openPalette(); return; }
+  if (!$('#cmdk')) return;
+  const it = $$('#ck-list .ck-i'); let i = it.findIndex((x) => x.classList.contains('act'));
+  if (e.key === 'ArrowDown') { e.preventDefault(); markActive(Math.min(it.length - 1, i + 1)); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); markActive(Math.max(0, i - 1)); }
+  if (e.key === 'Enter' && e.target.id === 'ck-q') { e.preventDefault(); it[i]?.click(); }
+});
+
 // ---------- Search overlay ----------
 let releaseSearch;
 function openSearch() {
@@ -307,12 +333,24 @@ function closeModal() { $('#modal')?.remove(); releaseModal?.(); releaseModal = 
 document.addEventListener('click', async (e) => {
   const el = e.target.closest('[data-action]'); if (!el) return;
   const { action, id } = el.dataset;
+  if (el.closest('#cmdk') && action !== 'cmdk-close') closePalette();
   switch (action) {
     case 'lang': setLang(getLang() === 'he' ? 'en' : 'he'); rerender(); break;
     case 'menu': $('#nav').classList.add('open'); el.setAttribute('aria-expanded', 'true'); trapFocus($('#nav'), () => $('[data-action="menu-close"]').click()); break;
     case 'menu-close': $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); $('[data-action="menu"]').focus(); break;
     case 'cart-open': openCart(); break;
     case 'search-open': openSearch(); break;
+    case 'cmdk-open': openPalette(); break;
+    case 'cmdk-close': closePalette(); break;
+    case 'goto-new': closePalette(); state.os = 'new'; state.ov = 'list'; location.hash = '#/orders'; rerender(); break;
+    case 'pv': state.pv = el.dataset.v; rerender(); break;
+    case 'noop': { const cb = el.querySelector('input'); if (cb && e.target !== cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true })); } break; }
+    case 'sel-clear': state.sel.clear(); rerender(); break;
+    case 'bulk-print': {
+      let area = $('#print-area'); if (!area) { area = document.createElement('div'); area.id = 'print-area'; document.body.append(area); }
+      render(area, A.packingSlips([...state.sel])); document.body.classList.add('printing');
+      addEventListener('afterprint', () => document.body.classList.remove('printing'), { once: true }); print(); break;
+    }
     case 'promo-close': closePromo(); break;
     case 'promo-join': closePromo(); state.authTab = 'register'; break;
     case 'fq': state.finder = { ...state.finder, [el.dataset.k]: el.dataset.v }; go(); break;
@@ -392,6 +430,7 @@ document.addEventListener('input', (e) => {
   if (k === 'uq') { state.uq = v; searchDeb(); keepFocus('#uq'); }
   if (k === 'oq') { state.oq = v; searchDeb(); keepFocus('#oq'); }
   if (k === 'bo-q') boSearchDeb(v);
+  if (k === 'ck-q') { const l = $('#ck-list'); if (l) { render(l, A.palette(v)); markActive(0); } }
 });
 function keepFocus(sel) { setTimeout(() => { const i = $(sel); if (i && document.activeElement !== i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 300); }
 document.addEventListener('change', (e) => {
@@ -408,6 +447,11 @@ document.addEventListener('change', (e) => {
     $('#pick-count').textContent = sur ? (getLang() === 'he' ? 'נבחר' : 'Set') : `${$$('[data-input="pick"]:checked').length}/${max}`;
   }
   if (k === 'ws-toggle') $('#biz-f').hidden = !el.checked;
+  if (k === 'sel') { el.checked ? state.sel.add(el.dataset.id) : state.sel.delete(el.dataset.id); rerender(); }
+  if (k === 'sel-all') { $$('[data-input="sel"]').forEach((c) => (el.checked ? state.sel.add(c.dataset.id) : state.sel.delete(c.dataset.id))); rerender(); }
+  if (k === 'bulk-status' && el.value) { const n = state.sel.size; state.sel.forEach((oid) => db.setOrderStatus(oid, el.value, db.me()?.name)); state.sel.clear(); toast(getLang() === 'he' ? `${n} הזמנות עודכנו` : `${n} orders updated`); rerender(); }
+  if (k === 'p-stock') { const p = db.product(el.dataset.id); db.saveProduct({ ...p, stock: Math.max(0, parseInt(el.value) || 0) }); toast(getLang() === 'he' ? 'המלאי עודכן' : 'Stock updated'); }
+  if (k === 'p-price') { const p = db.product(el.dataset.id); const v2 = Math.max(0, +el.value || 0); if (v2) { const sizes = p.sizes.map((x, i) => (i ? x : { ...x, price: v2 })); db.saveProduct({ ...p, sizes }); toast(getLang() === 'he' ? 'המחיר עודכן' : 'Price updated'); } }
   if (k === 'p-active') { const p = db.product(el.dataset.id); db.saveProduct({ ...p, active: el.checked }); toast(el.checked ? (getLang() === 'he' ? 'המוצר מוצג באתר' : 'Product is live') : (getLang() === 'he' ? 'המוצר הוסתר' : 'Product hidden')); rerender(); }
   if (k === 'role') { db.updateUser(el.dataset.id, { role: el.value, wsRequest: el.value === 'wholesale' ? false : undefined }); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); }
   if (k === 'm-status') { db.setOrderStatus(el.dataset.id, el.value, db.me()?.name); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); closeModal(); rerender(); }

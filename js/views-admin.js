@@ -1,8 +1,8 @@
-import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261102221803';
-import { L, getLang } from './i18n.js?v=261102221803';
-import { CATEGORIES } from './data.js?v=261102221803';
-import * as db from './db.js?v=261102221803';
-import { media, statusLabel, small, subName } from './views-shop.js?v=261102221803';
+import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261102222403';
+import { L, getLang } from './i18n.js?v=261102222403';
+import { CATEGORIES } from './data.js?v=261102222403';
+import * as db from './db.js?v=261102222403';
+import { media, statusLabel, small, subName } from './views-shop.js?v=261102222403';
 
 const he = () => getLang() === 'he';
 const T = (h, e) => (he() ? h : e);
@@ -42,6 +42,7 @@ const initials = (n) => String(n || '?').trim().split(/\s+/).map((w) => w[0]).sl
 const avatar = (n) => html`<span class="av" aria-hidden="true">${initials(n)}</span>`;
 const roleName = (r) => ({ customer: T('לקוח פרטי', 'Retail customer'), wholesale: T('סיטונאי', 'Wholesale'), courier: T('שליח', 'Courier'), orders: T('מנהל הזמנות', 'Orders manager'), products: T('מנהל מוצרים', 'Products manager'), admin: T('מנהל ראשי', 'Admin') })[r] || r;
 const ROLE_DESC = { admin: ['גישה מלאה לכל המערכת', 'Full access'], products: ['עריכת מוצרים, מחירים ומלאי', 'Products, prices & stock'], orders: ['טיפול בהזמנות ושיבוץ שליחים', 'Orders & courier assignment'], courier: ['רשימת משלוחים בנייד', 'Delivery list on mobile'] };
+const ago = (ts) => { const mn = Math.max(1, Math.round((Date.now() - ts) / 6e4)); if (mn < 60) return T(`לפני ${mn} דק׳`, `${mn}m ago`); const h = Math.round(mn / 60); if (h < 24) return T(`לפני ${h} ש׳`, `${h}h ago`); const d = Math.round(h / 24); return T(`לפני ${d} ימים`, `${d}d ago`); };
 const statusPill = (s) => html`<span class="pill st-${s}"><i></i>${statusLabel(s)}</span>`;
 const greeting = () => { const h = new Date().getHours(); return h < 12 ? T('בוקר טוב', 'Good morning') : h < 17 ? T('צהריים טובים', 'Good afternoon') : h < 21 ? T('ערב טוב', 'Good evening') : T('לילה טוב', 'Good night'); };
 
@@ -64,20 +65,48 @@ function shell(active, title, body, tools = '', sub = '') {
   const today = new Date().toLocaleDateString(he() ? 'he-IL' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
   return html`<div class="bo">
     <nav class="bo-side" aria-label="${T('ניווט ניהול', 'Admin navigation')}">
-      <a class="bo-brand" href="#/admin"><img src="assets/img/mark.webp" alt="" width="36" height="31"><span><b>SAY</b><small>Back office</small></span></a>
+      <a class="bo-brand" href="#/admin"><img src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400"><small>Back office</small></a>
       ${links.map(([g, l]) => html`<p class="bo-group">${g}</p>${l.map(([k, href, ic, label]) => html`<a href="${href}" aria-current="${active === k ? 'page' : 'false'}">${ICON[ic]}<span>${label}</span>${k === 'orders' && unread ? html`<em class="bo-count" aria-label="${unread} ${T('חדשות', 'new')}">${unread}</em>` : ''}</a>`)}`)}
       <span class="spacer"></span>
       <div class="bo-me">${avatar(u.name)}<span><b>${u.name}</b><small>${roleName(u.role)}</small></span><button data-action="logout" aria-label="${T('יציאה', 'Sign out')}" title="${T('יציאה', 'Sign out')}">${ICON.out}</button></div>
     </nav>
     <main class="bo-main" id="main" tabindex="-1">
       <header class="bo-bar">
-        <div class="bo-search">${ICON2.search}<label class="sr-only" for="bo-q">${T('חיפוש', 'Search')}</label><input id="bo-q" type="search" autocomplete="off" placeholder="${T('חיפוש הזמנה, מוצר או לקוח…', 'Search orders, products, customers…')}" data-input="bo-q" maxlength="60"><div class="bo-results" id="bo-results" role="listbox" hidden></div></div>
+        <button class="cmdk-btn" data-action="cmdk-open" aria-haspopup="dialog">${ICON2.search}<span>${T('חיפוש או פקודה…', 'Search or run a command…')}</span><kbd>Ctrl K</kbd></button>
         <div class="bo-bar-r"><a class="bo-bell" href="#/orders" aria-label="${unread} ${T('הזמנות חדשות', 'new orders')}">${ICON.bell}${unread ? html`<em>${unread}</em>` : ''}</a><a class="btn sm ghost" href="#/">${ICON.store}<span>${T('לאתר', 'Store')}</span></a></div>
       </header>
       ${u.mustChange ? html`<div class="bo-alert" role="alert">${ICON2.alert}<span>${T('מומלץ להחליף את סיסמת ברירת המחדל.', 'Please change the default password.')}</span><button class="link-btn" data-action="chg-pass">${T('החלפת סיסמה', 'Change password')}</button></div>` : ''}
       <div class="bo-top"><div><p class="bo-date">${sub || today}</p><h1>${title}</h1></div><div class="bo-filters">${tools}</div></div>
       ${body}
     </main></div>`;
+}
+
+export function palette(q = '') {
+  const role = db.me().role; const isA = role === 'admin';
+  const n = String(q).trim().toLowerCase();
+  const pages = [
+    ['#/admin', T('לוח בקרה', 'Dashboard'), ['admin']], ['#/orders', T('הזמנות', 'Orders'), ['admin', 'orders']], ['#/courier', T('משלוחים', 'Deliveries'), ['admin', 'orders', 'courier']],
+    ['#/admin/products', T('מוצרים', 'Products'), ['admin', 'products']], ['#/admin/users', T('לקוחות', 'Customers'), ['admin']], ['#/admin/team', T('צוות והרשאות', 'Team & roles'), ['admin']], ['#/admin/reports', T('דוחות', 'Reports'), ['admin']], ['#/', T('מעבר לאתר', 'Open store'), ['admin', 'orders', 'products', 'courier']],
+  ].filter((x) => x[2].includes(role));
+  const acts = [
+    [T('הזמנות חדשות לטיפול', 'New orders to handle'), 'goto-new', '', ['admin', 'orders']],
+    [T('מוצר חדש', 'New product'), 'edit-product', '', ['admin', 'products']],
+    [T('משתמש צוות חדש', 'New staff user'), 'staff-open', '', ['admin']],
+    [T('ייצוא דוח מכירות (CSV)', 'Export sales report (CSV)'), 'export-csv', '6', ['admin']],
+    [T('החלפת שפה', 'Switch language'), 'lang', '', ['admin', 'orders', 'products', 'courier']],
+  ].filter((x) => x[3].includes(role));
+  const hit = (str) => !n || String(str).toLowerCase().includes(n);
+  const os = n && ['admin', 'orders'].includes(role) ? db.orders().filter((o) => hit(o.num + ' ' + o.customer.name + ' ' + o.customer.phone)).slice(0, 6) : [];
+  const ps = n && ['admin', 'products'].includes(role) ? db.products().filter((p) => hit(p.name.he + ' ' + p.name.en)).slice(0, 6) : [];
+  const us = n && isA ? db.users().filter((u) => ['customer', 'wholesale'].includes(u.role) && hit(u.name + ' ' + u.email + ' ' + (u.phone || ''))).slice(0, 5) : [];
+  const grp = (t, items) => (items.length ? html`<p class="ck-h">${t}</p>${items}` : '');
+  const out = html`
+    ${grp(T('מעבר מהיר', 'Go to'), pages.filter((x) => hit(x[1])).map(([h, l]) => html`<a class="ck-i" href="${h}" data-action="cmdk-close">${ICON2.arrow}<span>${l}</span></a>`))}
+    ${grp(T('פעולות', 'Actions'), acts.filter((x) => hit(x[0])).map(([l, a, d]) => html`<button class="ck-i" data-action="${a}" data-id="" data-range="${d}">${ICON2.plus}<span>${l}</span></button>`))}
+    ${grp(T('הזמנות', 'Orders'), os.map((o) => html`<button class="ck-i" data-action="order-view" data-id="${o.id}"><b>#${o.num}</b><span>${o.customer.name}</span><small>${m(o.total)} · ${statusLabel(o.status)}</small></button>`))}
+    ${grp(T('מוצרים', 'Products'), ps.map((p) => html`<button class="ck-i" data-action="edit-product" data-id="${p.id}"><span>${L(p.name)}</span><small>${p.quote ? '' : `${p.stock} ${T('במלאי', 'in stock')}`}</small></button>`))}
+    ${grp(T('לקוחות', 'Customers'), us.map((u) => html`<button class="ck-i" data-action="cust-open" data-id="${u.id}"><span>${u.name}</span><small>${u.phone || u.email}</small></button>`))}`;
+  return String(out).trim() ? out : html`<p class="ck-empty">${T('לא נמצאו תוצאות', 'No results')}</p>`;
 }
 
 export function boSearch(q) {
@@ -156,7 +185,7 @@ export function dashboard(metric = 'rev') {
   const catTotal = Object.values(cats).reduce((a, b) => a + b, 0) || 1;
   const metrics = [['rev', T('הכנסות', 'Revenue')], ['profit', T('רווח גולמי', 'Gross profit')], ['n', T('הזמנות', 'Orders')]];
   const recent = orders.slice(0, 7);
-  return shell('admin', html`${greeting()}, ${db.me().name.split(' ')[0]}`, html`
+  return shell('admin', T('לוח בקרה', 'Dashboard'), html`
     ${orders.some((o) => o.demo) ? html`<div class="bo-alert soft">${ICON2.eye}<span>${T('מצב תצוגה — הנתונים מדמים שנת פעילות.', 'Preview mode — data simulates a year of trading.')}</span><button class="link-btn" data-action="clear-demo">${T('ניקוי נתוני דמו', 'Clear demo data')}</button></div>` : ''}
     <section class="kpis" aria-label="${T('מדדים', 'Metrics')}">
       ${[[T('הכנסות החודש', 'Revenue (MTD)'), m(cur.rev), delta(cur.rev, prev.rev), series('rev')],
@@ -222,7 +251,7 @@ export function reportCSV(range) {
 }
 
 // ---------- Products ----------
-export function productsAdmin(cat = '', q = '') {
+export function productsAdmin(cat = '', q = '', pv = 'grid') {
   const all = db.products();
   let list = all;
   if (cat) list = list.filter((p) => p.cat === cat);
@@ -232,14 +261,24 @@ export function productsAdmin(cat = '', q = '') {
   return shell('admin/products', T('מוצרים', 'Products'), html`
     <nav class="bo-tabs" aria-label="${T('קטגוריות', 'Categories')}"><button aria-pressed="${!cat}" data-action="pcat" data-c="">${T('הכל', 'All')} <em>${all.length}</em></button>
       ${CATEGORIES.filter((c) => all.some((p) => p.cat === c.id)).map((c) => html`<button aria-pressed="${cat === c.id}" data-action="pcat" data-c="${c.id}">${L(c)} <em>${all.filter((p) => p.cat === c.id).length}</em></button>`)}</nav>
+    ${pv === 'table' ? html`<section class="panel flush"><div class="tbl-wrap"><table class="tbl ptbl">
+      <thead><tr><th></th><th>${T('מוצר', 'Product')}</th><th>${T('מחיר בסיס ₪', 'Base price ₪')}</th><th>${T('מלאי', 'Stock')}</th><th>${T('מוצג', 'Live')}</th><th></th></tr></thead>
+      <tbody>${list.map((p) => html`<tr class="${p.active === false ? 'off' : ''}">
+        <td><span class="thumb">${media(p)}</span></td>
+        <td><b>${L(p.name)}</b><small class="block">${p.sub ? subName(p.sub) : L(CATEGORIES.find((c) => c.id === p.cat))}${p.sizes.length > 1 ? ` · ${p.sizes.length} ${T('גדלים', 'sizes')}` : ''}</small></td>
+        <td>${p.quote ? html`<small class="muted">${T('הצעת מחיר', 'Quote')}</small>` : html`<input class="cell" type="number" min="0" value="${p.sizes[0].price}" data-input="p-price" data-id="${p.id}" aria-label="${T('מחיר', 'Price')} ${L(p.name)}">`}</td>
+        <td>${p.quote ? '' : html`<input class="cell ${stockCls(p)}" type="number" min="0" value="${p.stock}" data-input="p-stock" data-id="${p.id}" aria-label="${T('מלאי', 'Stock')} ${L(p.name)}">`}</td>
+        <td><label class="switch"><input type="checkbox" data-input="p-active" data-id="${p.id}" ${raw(p.active !== false ? 'checked' : '')}><span></span><span class="sr-only">${T('מוצג', 'Live')}</span></label></td>
+        <td><button class="link-btn" data-action="edit-product" data-id="${p.id}">${T('עריכה מלאה', 'Edit')}</button></td></tr>`)}</tbody></table></div></section>` : html`
     <div class="pgrid">${list.map((p) => html`<article class="pcard ${p.active === false ? 'off' : ''}">
       <button class="pcard-img ${p.fit === 'contain' ? 'contain' : ''}" data-action="edit-product" data-id="${p.id}" aria-label="${T('עריכת', 'Edit')} ${L(p.name)}">${media(p)}</button>
       <div class="pcard-b"><small>${p.sub ? subName(p.sub) : L(CATEGORIES.find((c) => c.id === p.cat))}</small><b>${L(p.name)}</b>
         <div class="pcard-m"><span>${range(p)}</span>${p.quote ? '' : html`<span class="stock ${stockCls(p)}">${p.stock === 0 ? T('אזל', 'Out') : `${p.stock} ${T('במלאי', 'in stock')}`}</span>`}</div></div>
       <div class="pcard-f"><label class="switch"><input type="checkbox" data-input="p-active" data-id="${p.id}" ${raw(p.active !== false ? 'checked' : '')}><span></span>${p.active !== false ? T('מוצג', 'Live') : T('מוסתר', 'Hidden')}</label>
         <button class="link-btn" data-action="edit-product" data-id="${p.id}">${T('עריכה', 'Edit')}</button></div>
-    </article>`)}</div>`,
-    html`<label class="bo-field">${ICON2.search}<span class="sr-only">${T('חיפוש', 'Search')}</span><input id="pq" type="search" value="${q}" placeholder="${T('חיפוש מוצר', 'Search products')}" data-input="pq"></label>
+    </article>`)}</div>`}`,
+    html`<div class="seg" role="group" aria-label="${T('תצוגה', 'View')}"><button aria-pressed="${pv === 'grid'}" data-action="pv" data-v="grid">${T('כרטיסים', 'Cards')}</button><button aria-pressed="${pv === 'table'}" data-action="pv" data-v="table">${T('טבלה לעריכה מהירה', 'Quick-edit table')}</button></div>
+    <label class="bo-field">${ICON2.search}<span class="sr-only">${T('חיפוש', 'Search')}</span><input id="pq" type="search" value="${q}" placeholder="${T('חיפוש מוצר', 'Search products')}" data-input="pq"></label>
     <button class="btn sm" data-action="edit-product" data-id="">${ICON2.plus}<span>${T('מוצר חדש', 'New product')}</span></button>`, `${list.length} ${T('מוצרים', 'products')}`);
 }
 
@@ -369,7 +408,7 @@ export function staffDrawer(id, role = 'orders') {
 
 // ---------- Orders ----------
 export function ordersBoard(state) {
-  const { view = 'list', month = 'all', q = '', status = '' } = state;
+  const { view = 'list', month = 'all', q = '', status = '', sel = new Set() } = state;
   let list = db.orders();
   const months = [...new Set(list.map((o) => monthKey(o.date)))];
   if (month !== 'all') list = list.filter((o) => monthKey(o.date) === month);
@@ -384,18 +423,23 @@ export function ordersBoard(state) {
   const body = view === 'board'
     ? html`<div class="kanban">${cols.map((c) => { const os = list.filter((o) => o.status === c); return html`<section class="col" aria-label="${statusLabel(c)}"><h3>${statusPill(c)}<span>${os.length}</span></h3>${os.slice(0, 30).map(ocard)}</section>`; })}</div>`
     : html`<section class="panel flush"><div class="tbl-wrap"><table class="tbl orders">
-      <thead><tr><th>${T('הזמנה', 'Order')}</th><th>${T('לקוח', 'Customer')}</th><th>${T('פריטים', 'Items')}</th><th>${T('סכום', 'Total')}</th><th>${T('סטטוס', 'Status')}</th><th>${T('פעולה', 'Action')}</th></tr></thead>
-      <tbody>${shown.map((o) => html`<tr data-action="order-view" data-id="${o.id}" class="clickable">
-        <td><b>#${o.num}</b><small class="block">${dt(o.date)}</small></td>
+      <thead><tr><th class="ck"><input type="checkbox" data-input="sel-all" aria-label="${T('בחירת כל ההזמנות המוצגות', 'Select all shown')}" ${raw(shown.length && shown.every((o) => sel.has(o.id)) ? 'checked' : '')}></th><th>${T('הזמנה', 'Order')}</th><th>${T('לקוח', 'Customer')}</th><th>${T('פריטים', 'Items')}</th><th>${T('סכום', 'Total')}</th><th>${T('סטטוס', 'Status')}</th><th>${T('פעולה', 'Action')}</th></tr></thead>
+      <tbody>${shown.map((o) => { const open = ['new', 'processing'].includes(o.status); const late = open && Date.now() - o.date > 864e5; return html`<tr data-action="order-view" data-id="${o.id}" class="clickable ${sel.has(o.id) ? 'sel' : ''}">
+        <td class="ck" data-action="noop"><input type="checkbox" data-input="sel" data-id="${o.id}" aria-label="${T('בחירת הזמנה', 'Select order')} ${o.num}" ${raw(sel.has(o.id) ? 'checked' : '')}></td>
+        <td><b class="num">#${o.num}</b><small class="block">${open ? html`<span class="age ${late ? 'late' : ''}">${ago(o.date)}</span>` : dt(o.date)}</small></td>
         <td><div class="who">${avatar(o.customer.name)}<span><b>${o.customer.name}</b><small>${o.customer.city}</small></span></div></td>
         <td><small>${o.items.slice(0, 2).map((i) => L(i.name)).join(', ')}${o.items.length > 2 ? ` +${o.items.length - 2}` : ''}</small></td>
         <td><b>${m(o.total)}</b><small class="block">${o.payment === 'paid' ? T('שולם', 'Paid') : o.payment === 'refunded' ? T('זוכה', 'Refunded') : T('ממתין לתשלום', 'Awaiting payment')}</small></td>
         <td>${statusPill(o.status)}</td>
-        <td>${next[o.status] ? html`<button class="btn sm ghost" data-action="order-status" data-id="${o.id}" data-s="${next[o.status]}">${nextLabel[o.status]}</button>` : ''}</td></tr>`)}</tbody></table></div>
+        <td>${next[o.status] ? html`<button class="btn sm ghost" data-action="order-status" data-id="${o.id}" data-s="${next[o.status]}">${nextLabel[o.status]}</button>` : ''}</td></tr>`; })}</tbody></table></div>
       <p class="muted pad">${shownAll.length} ${T('הזמנות', 'orders')} · ${m(shownAll.filter((o) => o.status !== 'cancelled').reduce((a, o) => a + o.total, 0))}${shownAll.length > shown.length ? ` · ${T('מוצגות', 'showing')} ${shown.length}` : ''}</p></section>`;
   return shell('orders', T('הזמנות', 'Orders'), html`
     ${view === 'list' ? html`<nav class="bo-tabs" aria-label="${T('סטטוס', 'Status')}"><button aria-pressed="${!status}" data-action="os-tab" data-s="">${T('הכל', 'All')} <em>${list.length}</em></button>${db.STATUSES.map((s) => html`<button aria-pressed="${status === s}" data-action="os-tab" data-s="${s}" class="${s === 'new' && counts[s] ? 'hot' : ''}">${statusLabel(s)} <em>${counts[s]}</em></button>`)}</nav>` : ''}
-    ${body}`,
+    ${body}
+    ${sel.size ? html`<div class="bulk" role="region" aria-label="${T('פעולות על הזמנות שנבחרו', 'Bulk actions')}"><b>${sel.size} ${T('נבחרו', 'selected')}</b>
+      <label class="sr-only" for="bulk-st">${T('העברה לסטטוס', 'Move to status')}</label><select class="mini-sel" id="bulk-st" data-input="bulk-status"><option value="">${T('העברה לסטטוס…', 'Move to status…')}</option>${db.STATUSES.map((s) => html`<option value="${s}">${statusLabel(s)}</option>`)}</select>
+      <button class="btn sm ghost" data-action="bulk-print">${ICON2.print}<span>${T('הדפסת תעודות משלוח', 'Print slips')}</span></button>
+      <button class="link-btn" data-action="sel-clear">${T('ביטול בחירה', 'Clear')}</button></div>` : ''}`,
     html`<div class="seg" role="group" aria-label="${T('תצוגה', 'View')}"><button aria-pressed="${view === 'list'}" data-action="ov" data-v="list">${T('רשימה', 'List')}</button><button aria-pressed="${view === 'board'}" data-action="ov" data-v="board">${T('לוח', 'Board')}</button></div>
     <label class="sr-only" for="om">${T('חודש', 'Month')}</label><select class="mini-sel" id="om" data-input="om"><option value="all">${T('כל התקופה', 'All time')}</option>${months.map((k) => html`<option value="${k}" ${raw(k === month ? 'selected' : '')}>${monthName(k)}</option>`)}</select>
     <label class="bo-field">${ICON2.search}<span class="sr-only">${T('חיפוש', 'Search')}</span><input id="oq" type="search" value="${q}" placeholder="${T('מספר, שם או טלפון', 'No., name or phone')}" data-input="oq"></label>`,
@@ -455,3 +499,10 @@ export function courierView(tab = 'todo') {
 }
 
 export const orderAlertLink = (o) => `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(`הזמנה חדשה #${o.num}\n${o.customer.name} · ${o.customer.phone}\n${o.customer.street}, ${o.customer.city}\nסה"כ: ${o.total}₪`)}`;
+
+export function packingSlips(ids) {
+  const os = db.orders().filter((o) => ids.includes(o.id));
+  return html`${os.map((o) => html`<section class="slip"><header><img src="assets/img/logo-header.png" alt="" width="90" height="100"><div><h2>${T('תעודת משלוח', 'Packing slip')} #${o.num}</h2><p>${dt(o.date)}</p></div></header>
+    <p><b>${o.customer.name}</b> · ${o.customer.phone}<br>${o.customer.street}${o.customer.apt ? ', ' + o.customer.apt : ''}, ${o.customer.city}${o.customer.notes ? html`<br>${T('הערה:', 'Note:')} ${o.customer.notes}` : ''}</p>
+    <table><thead><tr><th>${T('פריט', 'Item')}</th><th>${T('גודל / פרטים', 'Size / details')}</th><th>${T('כמות', 'Qty')}</th></tr></thead><tbody>${o.items.map((i) => html`<tr><td>${L(i.name)}</td><td>${[i.size, i.opt].filter(Boolean).join(' · ')}</td><td>${i.qty}</td></tr>`)}</tbody></table></section>`)}`;
+}
