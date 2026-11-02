@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261102220313';
-import { t, L, getLang } from './i18n.js?v=261102220313';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261102220313';
-import * as db from './db.js?v=261102220313';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261102220352';
+import { t, L, getLang } from './i18n.js?v=261102220352';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261102220352';
+import * as db from './db.js?v=261102220352';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -333,6 +333,7 @@ export function productPage(id) {
   return html`<div class="wrap"><div class="pdp">
     <div class="pdp-gallery">
       <div class="pdp-media ${p.fit === 'contain' ? 'contain' : 'photo'}" data-zoom>${media(p, '', true, gallery[0], true)}</div>
+      ${gallery.length > 1 ? html`<div class="swipe ${p.fit === 'contain' ? 'contain' : ''}" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<img src="${i ? small(g) : g}" alt="${L(p.name)} ${i + 1}" width="800" height="1000" ${raw(i ? 'loading="lazy"' : '')}>`)}</div><div class="swipe-dots" aria-hidden="true">${gallery.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>` : ''}
       ${gallery.length > 1 ? html`<div class="thumbs" role="group" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<button data-action="thumb" data-src="${g}" aria-label="${T('תמונה', 'Image')} ${i + 1}" aria-pressed="${i === 0}"><img src="${small(g)}" alt="" loading="lazy" width="120" height="120"></button>`)}</div>` : ''}
     </div>
     <div>
