@@ -1810,3 +1810,7 @@ h1,h2,h3,.lbl-name,.card-body h3,.ft-body h3,.h-item-t b,.tile b,.qz-opt b,.fd-o
   .h-arrow.prev{right:10px}.h-arrow.next{left:10px}
   .h-slides{touch-action:pan-y}
 }
+/* Oil labels: uniform height, keep the top (hotel/brand name) in view */
+.lbl-arch{aspect-ratio:4/3!important;border-radius:999px 999px 6px 6px}
+.lbl-arch img.m1{position:absolute!important;inset:0;width:100%;height:100%!important;object-fit:cover!important;object-position:50% 0!important}
+.lbl-arch{border-radius:70px 70px 6px 6px!important}
