@@ -1829,3 +1829,15 @@ h1,h2,h3,.lbl-name,.card-body h3,.ft-body h3,.h-item-t b,.tile b,.qz-opt b,.fd-o
 .lbl-arch .in-arch{position:absolute;bottom:10px;inset-inline-end:10px;top:auto;z-index:2}
 .lbl-arch .in-arch,.card.label .card-add{display:none!important}
 @media (max-width:600px){.lbl-arch{border-radius:40px 40px 6px 6px!important}}
+@media (max-width:800px){
+  .ftr-col summary::after{transform:rotate(45deg)!important;margin-top:-4px}
+  .ftr-col[open] summary::after{transform:rotate(-135deg)!important;margin-top:4px}
+  .ftr-col ul{grid-template-columns:1fr!important;gap:0!important;padding:0 0 .8rem!important}
+  .ftr-col ul li a{display:block;padding:.6rem .2rem;font-size:.98rem;color:#d9cfbf;border-radius:8px}
+  .ftr-col ul li a:active{background:rgba(255,255,255,.05)}
+  .ftr-col summary h2{font-size:1.05rem}
+}
+@media (max-width:800px){
+  .ftr-col summary::after{content:"+"!important;width:auto!important;height:auto!important;border:0!important;transform:none!important;margin:0!important;color:var(--gold-2);font-size:1.5rem;font-weight:300;line-height:1}
+  .ftr-col[open] summary::after{content:"−"!important;transform:none!important}
+}
