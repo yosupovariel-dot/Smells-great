@@ -1755,3 +1755,20 @@ h1,h2,h3,.lbl-name,.card-body h3,.ft-body h3,.h-item-t b,.tile b,.qz-opt b,.fd-o
 .lbl-arch{width:100%;aspect-ratio:auto;border-radius:120px 120px 6px 6px;background:#EDE4D6}
 .lbl-arch img.m1{position:relative!important;inset:auto;height:auto;object-fit:contain;display:block}
 .lbl-arch img.m2{object-fit:cover}
+/* Header: logo centred, menu and tools balanced on each side */
+@media (min-width:901px){
+  .hdr .wrap{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:2.5rem}
+  .hdr .nav{justify-self:start;gap:clamp(.9rem,1.5vw,1.6rem);flex-wrap:nowrap}
+  .hdr .brand{justify-self:center;grid-column:2}
+  .hdr .tools{justify-self:end;grid-column:3}
+  .hdr .nav{grid-column:1;grid-row:1}
+  .hdr .menu-btn{display:none}
+}
+@media (min-width:901px) and (max-width:1180px){.hdr .nav a{font-size:.86rem}.hdr .nav{gap:.8rem}.hdr .wrap{gap:1.4rem}}
+.tool-link{display:none;text-decoration:none;font-weight:500;font-size:.95rem;padding:0 .5rem;white-space:nowrap}
+.tool-link:hover{color:var(--gold-dark)}
+@media (min-width:1101px){
+  .tool-link{display:inline-block}
+  .hdr .nav a[href="#/wholesale"],.hdr .nav a[href="#/contact"]{display:none}
+}
+@media (min-width:1101px) and (max-width:1300px){.tool-link{font-size:.88rem;padding:0 .3rem}}

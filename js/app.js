@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261102215511';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261102215511';
-import { CATEGORIES } from './data.js?v=261102215511';
-import * as db from './db.js?v=261102215511';
-import * as S from './views-shop.js?v=261102215511';
-import * as Lg from './views-legal.js?v=261102215511';
-import * as A from './views-admin.js?v=261102215511';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261102215956';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261102215956';
+import { CATEGORIES } from './data.js?v=261102215956';
+import * as db from './db.js?v=261102215956';
+import * as S from './views-shop.js?v=261102215956';
+import * as Lg from './views-legal.js?v=261102215956';
+import * as A from './views-admin.js?v=261102215956';
 
 const app = $('#app');
 const state = { finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -33,6 +33,7 @@ function header() {
     </nav>
     <a class="brand logo" href="#/" aria-label="SAY Boutique — ${t('home')}"><img src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400" fetchpriority="high"></a>
     <div class="tools">
+      <a class="tool-link" href="#/wholesale">${t('wholesale')}</a><a class="tool-link" href="#/contact">${t('contact')}</a>
       <button class="icon-btn lang-btn" data-action="lang" lang="${getLang() === 'he' ? 'en' : 'he'}" aria-label="${t('langLabel')}">${getLang() === 'he' ? 'EN' : 'עב'}</button>
       <button class="icon-btn" data-action="search-open" aria-label="${t('search')}" aria-haspopup="dialog">${raw(ICONS.search)}</button>
       <a class="icon-btn" href="#/account" aria-label="${t('account')}">${raw(ICONS.user)}</a>
