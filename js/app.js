@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261102220643';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261102220643';
-import { CATEGORIES } from './data.js?v=261102220643';
-import * as db from './db.js?v=261102220643';
-import * as S from './views-shop.js?v=261102220643';
-import * as Lg from './views-legal.js?v=261102220643';
-import * as A from './views-admin.js?v=261102220643';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261102221255';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261102221255';
+import { CATEGORIES } from './data.js?v=261102221255';
+import * as db from './db.js?v=261102221255';
+import * as S from './views-shop.js?v=261102221255';
+import * as Lg from './views-legal.js?v=261102221255';
+import * as A from './views-admin.js?v=261102221255';
 
 const app = $('#app');
 const state = { finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -127,24 +127,22 @@ function startSlides() {
 // ---------- Consent ----------
 // ---------- Sign-up promo (glass), 7s after load, only for visitors who aren't signed in ----------
 function maybePromo() {
-  let seen; try { seen = +localStorage.getItem('say_promo') || 0; } catch {}
-  if (seen && Date.now() - seen < 3 * 864e5) return; // shown in the last 3 days
   setTimeout(function show() {
     if (db.me() || /^#\/(account|admin|orders|courier|checkout)/.test(location.hash) || $('#promo')) return;
     if ($('.consent') || document.body.classList.contains('cart-open') || $('#modal') || $('#search-ov')) { setTimeout(show, 2500); return; }
-    try { localStorage.setItem('say_promo', String(Date.now())); } catch {}
     const he = getLang() === 'he';
     const w = document.createElement('div'); w.id = 'promo'; w.className = 'promo-bg';
     render(w, html`<div class="supromo glass-card" role="dialog" aria-modal="true" aria-labelledby="pr-t">
-      <button class="promo-x" data-action="promo-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+      <button class="promo-x" hidden data-action="promo-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
       <img class="promo-logo" src="assets/img/logo-header.png" alt="" width="360" height="400">
       <p class="promo-k">${he ? 'מועדון הלקוחות של SAY' : 'SAY Members Club'}</p>
       <h2 id="pr-t">${he ? '10% הנחה על ההזמנה הראשונה' : '10% off your first order'}</h2>
-      <ul class="promo-list"><li>${he ? 'הצטרפות חינם, בלי התחייבות' : 'Free to join, no commitment'}</li><li>${he ? 'הטבות ומבצעים לחברי מועדון בלבד' : 'Members-only offers'}</li><li>${he ? 'מעקב אחרי ההזמנות שלכם' : 'Track your orders'}</li></ul>
+      <ul class="promo-list"><li>${he ? 'הצטרפות חינם, בלי התחייבות' : 'Free to join, no commitment'}</li><li>${he ? 'הטבות ומבצעים לחברי מועדון בלבד' : 'Members-only offers'}</li><li>${he ? 'הנחה מיוחדת ביום ההולדת' : 'A special birthday discount'}</li><li>${he ? 'מעקב אחרי ההזמנות שלכם' : 'Track your orders'}</li></ul>
       <a class="btn block" href="#/account/register" data-action="promo-join">${he ? 'להצטרפות חינם' : 'Join free'}</a>
       <button class="promo-later" data-action="promo-close">${he ? 'אולי בפעם אחרת' : 'Maybe later'}</button>
     </div>`);
     document.body.append(w); requestAnimationFrame(() => w.classList.add('in'));
+    setTimeout(() => { const x = $('.promo-x', w); if (x) { x.hidden = false; x.classList.add('show'); } }, 3000);
     promoRelease = trapFocus(w.firstElementChild, closePromo);
   }, 7000);
 }
@@ -152,8 +150,7 @@ let promoRelease;
 function closePromo() { const w = $('#promo'); if (!w) return; w.remove(); promoRelease?.(); promoRelease = null; }
 
 function maybeConsent() {
-  let ok; try { ok = localStorage.getItem('say_consent'); } catch {}
-  if (ok || location.hash.match(/^#\/(admin|orders|courier)/)) return;
+  if (db.me() || location.hash.match(/^#\/(admin|orders|courier)/)) return;
   setTimeout(() => {
     if ($('.consent')) return;
     const d = document.createElement('div');

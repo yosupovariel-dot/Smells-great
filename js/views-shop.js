@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261102220643';
-import { t, L, getLang } from './i18n.js?v=261102220643';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261102220643';
-import * as db from './db.js?v=261102220643';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261102221255';
+import { t, L, getLang } from './i18n.js?v=261102221255';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261102221255';
+import * as db from './db.js?v=261102221255';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -43,7 +43,7 @@ function labelCard(p) {
   return html`<article class="card label ${FAMILY_TONE[p.sub] || ''}">
     <a class="lbl" href="#/product/${p.id}">
       <span class="lbl-fam latin">${(FAMILY_EN_SHORT[p.sub] || '').toUpperCase()}</span>
-      <span class="lbl-arch">${media(p, 'm1', false, p.img)}${p.pack ? media(p, 'm2', false, p.pack) : ''}</span>
+      <span class="lbl-arch">${media(p, 'm1', false, p.img)}${p.pack ? media(p, 'm2', false, p.pack) : ''}<span class="card-add in-arch" aria-hidden="true">${plus}</span></span>
       <span class="lbl-name">${L(p.name)}</span>
       <span class="lbl-sub">${subName(p.sub)}</span>
       <span class="lbl-rule" aria-hidden="true"></span>
