@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261102220352';
-import { t, L, getLang } from './i18n.js?v=261102220352';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261102220352';
-import * as db from './db.js?v=261102220352';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261102220458';
+import { t, L, getLang } from './i18n.js?v=261102220458';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261102220458';
+import * as db from './db.js?v=261102220458';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -126,6 +126,8 @@ export function home() {
   const families = Object.keys(banners).map((f) => ({ f, img: banners[f], n: all.filter((p) => p.sub === f).length })).filter((x) => x.n);
   return html`
   <section class="h-hero" aria-labelledby="hero-t">
+    <button class="h-arrow prev" data-action="slide-step" data-d="-1" aria-label="${T('לתמונה הקודמת', 'Previous image')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+    <button class="h-arrow next" data-action="slide-step" data-d="1" aria-label="${T('לתמונה הבאה', 'Next image')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
     <div class="h-slides" role="region" aria-roledescription="carousel" aria-label="${T('מוצרים נבחרים', 'Featured')}">
       ${hero.map((src, i) => html`<figure class="slide ${i ? '' : 'on'}"><img src="${src}" alt="${HERO_SLIDES[i]?.[getLang()] || 'SAY Boutique'}" width="2000" height="968" ${raw(i ? 'fetchpriority="low"' : 'fetchpriority="high"')} decoding="async"></figure>`)}
     </div>

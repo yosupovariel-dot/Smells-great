@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261102220352';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261102220352';
-import { CATEGORIES } from './data.js?v=261102220352';
-import * as db from './db.js?v=261102220352';
-import * as S from './views-shop.js?v=261102220352';
-import * as Lg from './views-legal.js?v=261102220352';
-import * as A from './views-admin.js?v=261102220352';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261102220458';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261102220458';
+import { CATEGORIES } from './data.js?v=261102220458';
+import * as db from './db.js?v=261102220458';
+import * as S from './views-shop.js?v=261102220458';
+import * as Lg from './views-legal.js?v=261102220458';
+import * as A from './views-admin.js?v=261102220458';
 
 const app = $('#app');
 const state = { finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -111,6 +111,13 @@ function showSlide(i) {
   const cap = $('#slide-cap'); const sl = S.HERO_SLIDES?.[slideIdx];
   if (cap && sl) { cap.textContent = sl[getLang()]; cap.href = '#/product/' + sl.pid; }
 }
+// Swipe on the hero image (touch).
+let tx = null;
+document.addEventListener('touchstart', (e) => { if (e.target.closest('.h-slides')) tx = e.touches[0].clientX; }, { passive: true });
+document.addEventListener('touchend', (e) => {
+  if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null;
+  if (Math.abs(dx) < 40) return; showSlide(slideIdx + (dx < 0 ? 1 : -1)); clearInterval(slideTimer);
+}, { passive: true });
 function startSlides() {
   clearInterval(slideTimer); slideIdx = 0;
   if (!$('.slide') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -331,6 +338,7 @@ document.addEventListener('click', async (e) => {
     case 'search-term': { const i = $('#sq'); i.value = el.dataset.q; runSearch(el.dataset.q); i.focus(); break; }
     case 'cart-close': closeCart(); break;
     case 'slide': showSlide(+el.dataset.i); clearInterval(slideTimer); break;
+    case 'slide-step': showSlide(slideIdx + +el.dataset.d); clearInterval(slideTimer); break;
     case 'thumb': { const img = $('.pdp-media img'); if (img) img.src = el.dataset.src; $$('.thumbs button').forEach((b) => b.setAttribute('aria-pressed', b === el)); break; }
     case 'go-cart': closeModal(); openCart(); break;
     case 'quick-add': { const p = db.product(id); db.addToCart(id, p.sizes[0].label, 1); toast(`${t('added')}: ${p.name[getLang()]}`); if (!document.body.classList.contains('cart-open')) openCart(); break; }
