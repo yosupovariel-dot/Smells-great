@@ -2519,3 +2519,10 @@ body.scrolled .hdr .brand.logo img{height:46px!important}
   .mnp-deal-k{grid-row:1/3;font-size:.7rem;font-weight:700;color:#fff;background:#A9874F;border-radius:20px;padding:.15rem .6rem}
   .mnp-deal b{font-size:.9rem}.mnp-deal small{font-size:.74rem;color:var(--muted)}
 }
+
+.sheet fieldset legend small{font-weight:400;color:var(--muted);font-size:.78rem;margin-inline-start:.4rem}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip input{position:absolute;opacity:0}
+.chip span{display:inline-block;padding:.35rem .8rem;border:1px solid var(--line);border-radius:999px;font-size:.85rem;cursor:pointer;background:#fff}
+.chip input:checked+span{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}

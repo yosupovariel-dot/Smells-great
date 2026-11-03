@@ -1,8 +1,8 @@
-import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261103205934';
-import { L, getLang } from './i18n.js?v=261103205934';
-import { CATEGORIES } from './data.js?v=261103205934';
-import * as db from './db.js?v=261103205934';
-import { media, statusLabel, small, subName } from './views-shop.js?v=261103205934';
+import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261103210123';
+import { L, getLang } from './i18n.js?v=261103210123';
+import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261103210123';
+import * as db from './db.js?v=261103210123';
+import { media, statusLabel, small, subName } from './views-shop.js?v=261103210123';
 
 const he = () => getLang() === 'he';
 const T = (h, e) => (he() ? h : e);
@@ -301,6 +301,10 @@ export function productForm(p) {
         <button type="button" class="link-btn" data-action="size-add">+ ${T('הוספת גודל', 'Add size')}</button>
         <template id="srow-t">${row()}</template>
         <div class="row2">${f('stock', T('מלאי (יחידות)', 'Stock (units)'), p.stock ?? 0, 'number', 'min="0"')}<div class="field"><span class="lbl">${T('תצוגה באתר', 'Visibility')}</span><label class="switch big"><input type="checkbox" name="active" ${raw(p.active !== false ? 'checked' : '')}><span></span>${T('המוצר מוצג בחנות', 'Shown in store')}</label></div></div>
+      </section>
+      <section class="dr-sec"><h3>${T('פרופיל ריח (לסינון באתר)', 'Scent profile (shop filter)')}</h3>
+        ${(() => { const sc = scentOf(p); return html`<div class="field"><span class="lbl">${T('עוצמה', 'Strength')}</span><div class="chips">${STRENGTHS.map(([v, h, e]) => html`<label class="chip"><input type="radio" name="strength" value="${v}" ${raw(sc.strength === v ? 'checked' : '')}><span>${T(h, e)}</span></label>`)}</div></div>
+        <div class="field"><span class="lbl">${T('אופי', 'Character')}</span><div class="chips">${NOTES.map(([v, h, e]) => html`<label class="chip"><input type="checkbox" name="notes" value="${v}" ${raw(sc.notes.includes(v) ? 'checked' : '')}><span>${T(h, e)}</span></label>`)}</div></div>`; })()}
       </section>
       <section class="dr-sec"><h3>${T('תמונות', 'Images')}</h3>
         ${gallery.length ? html`<div class="img-pick" role="radiogroup" aria-label="${T('תמונה ראשית', 'Main image')}">${gallery.map((g) => html`<label><input type="radio" name="imgpick" value="${g}" ${raw(g === p.img ? 'checked' : '')}><img src="${small(g)}" alt="" width="120" height="120" loading="lazy"><span>${T('ראשית', 'Main')}</span></label>`)}</div>` : html`<p class="muted">${T('אין עדיין תמונות למוצר.', 'No images yet.')}</p>`}

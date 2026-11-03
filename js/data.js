@@ -42,3 +42,18 @@ export function catIcon(id) {
   const fake = { cat: id, name: { he: '' } };
   return artSVG(fake).replace('<svg ', '<svg aria-hidden="true" ').replace(/role="img" aria-label="[^"]*"/, '');
 }
+
+// ---------- Scent profile (filter by character, not price) ----------
+export const STRENGTHS = [['strong', 'דומיננטי', 'Bold'], ['soft', 'עדין', 'Soft']];
+export const NOTES = [['sweet', 'מתוק', 'Sweet'], ['fresh', 'רענן ונקי', 'Fresh & clean'], ['floral', 'פרחוני', 'Floral'], ['rich', 'עמוק ויוקרתי', 'Rich & luxurious']];
+// Defaults by scent family until the team sets each product in the back office.
+const FAMILY_SCENT = {
+  'מאפים ומתוקים': ['strong', ['sweet']], 'ניקיון ורעננות': ['soft', ['fresh']], 'טבע וספא': ['soft', ['fresh', 'floral']],
+  'בתי מלון ויוקרה': ['strong', ['rich']], 'השראת בשמים יוקרתיים': ['strong', ['rich']], 'חנויות ורשתות מובילות': ['strong', ['rich']], 'ניחוחות קלאסיים': ['soft', ['floral']],
+};
+export function scentOf(p) {
+  const [s0, n0] = FAMILY_SCENT[p.sub] || ['', []];
+  const name = (p.name?.he || '') + ' ' + (p.name?.en || '');
+  const extra = /וניל|קפה|שוקולד|vanilla|coffee|tutti|טוטי/i.test(name) ? ['sweet'] : /ורד|rose|יסמין/i.test(name) ? ['floral'] : /כותנה|cotton|ים|sea|breeze|white tea|תה לבן/i.test(name) ? ['fresh'] : [];
+  return { strength: p.strength || s0, notes: p.notes?.length ? p.notes : [...new Set([...n0, ...extra])] };
+}

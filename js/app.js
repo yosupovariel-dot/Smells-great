@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103205934';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103205934';
-import { CATEGORIES } from './data.js?v=261103205934';
-import * as db from './db.js?v=261103205934';
-import * as S from './views-shop.js?v=261103205934';
-import * as Lg from './views-legal.js?v=261103205934';
-import * as A from './views-admin.js?v=261103205934';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103210123';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103210123';
+import { CATEGORIES } from './data.js?v=261103210123';
+import * as db from './db.js?v=261103210123';
+import * as S from './views-shop.js?v=261103210123';
+import * as Lg from './views-legal.js?v=261103210123';
+import * as A from './views-admin.js?v=261103210123';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -577,7 +577,7 @@ document.addEventListener('submit', async (e) => {
     window.open(`https://wa.me/${PHONE_INTL}`, '_blank', 'noopener');
     f.reset(); err.textContent = ''; toast(t('sent'));
   }
-  if (kind === 'filter') { const d = new FormData(f); state.f = { price: d.get('price') || '', stock: !!d.get('stock') }; closeModal(); rerender(); return; }
+  if (kind === 'filter') { const d = new FormData(f); state.f = { str: ['strong', 'soft'].includes(d.get('str')) ? d.get('str') : '', notes: d.getAll('notes').filter((x) => ['sweet', 'fresh', 'floral', 'rich'].includes(x)), stock: !!d.get('stock') }; closeModal(); rerender(); return; }
   if (kind === 'customer') {
     const d = Object.fromEntries(new FormData(f)); const err = $('#cd-err');
     if (!valid.name(d.name)) { err.textContent = t('required'); return; }
@@ -608,7 +608,7 @@ document.addEventListener('submit', async (e) => {
     if (img && !/^(assets\/products\/[\w\-./]+|https:\/\/[\w\-./%?=&]+)$/.test(img)) { err.textContent = getLang() === 'he' ? 'נתיב התמונה אינו תקין' : 'Image path invalid'; return; }
     const id = f.dataset.id || (clean(d.en || d.he, 40).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'p') + '-' + Date.now().toString(36);
     db.saveProduct({ ...old, id, cat: CATEGORIES.some((c) => c.id === d.cat) ? d.cat : 'oils', name: { he: clean(d.he, 120), en: clean(d.en, 120) }, desc: { he: multi(d.dhe), en: multi(d.den) },
-      sizes, img, gallery: old.gallery || (img ? [img] : []), tag: d.tag === 'new' || d.tag === 'best' ? d.tag : '', active: !!d.active, stock: Math.max(0, parseInt(d.stock) || 0) });
+      sizes, img, gallery: old.gallery || (img ? [img] : []), strength: ['strong', 'soft'].includes(d.strength) ? d.strength : '', notes: fd.getAll('notes').filter((x) => ['sweet', 'fresh', 'floral', 'rich'].includes(x)), tag: d.tag === 'new' || d.tag === 'best' ? d.tag : '', active: !!d.active, stock: Math.max(0, parseInt(d.stock) || 0) });
     closeModal(); toast(getLang() === 'he' ? 'המוצר נשמר' : 'Product saved'); rerender();
   }
 });

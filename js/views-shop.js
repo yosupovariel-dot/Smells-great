@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103205934';
-import { t, L, getLang } from './i18n.js?v=261103205934';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103205934';
-import * as db from './db.js?v=261103205934';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103210123';
+import { t, L, getLang } from './i18n.js?v=261103210123';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103210123';
+import * as db from './db.js?v=261103210123';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -234,9 +234,9 @@ const CAT_LEAD = {
   bundles: ['מכשיר ומילוי במארז אחד, במחיר שמשתלם יותר.', 'A device and refill in one box, for less.'],
 };
 const PRICE_BANDS = [['', T('הכל', 'All')], ['0-100', T('עד 100₪', 'Up to ₪100')], ['100-300', '100–300₪'], ['300-9999', T('מעל 300₪', 'Over ₪300')]];
-const sortBar = (q, sort, n, f = {}) => { const active_ = (f.price ? 1 : 0) + (f.stock ? 1 : 0); return html`<div class="toolbar2">
+const sortBar = (q, sort, n, f = {}, scent = true) => { const active_ = (f.str ? 1 : 0) + (f.notes?.length || 0) + (f.stock ? 1 : 0); return html`<div class="toolbar2">
   <div class="tb-btns">
-    <button class="tb-btn" data-action="filter-open" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg><span>${T('סינון', 'Filter')}</span>${active_ ? html`<em>${active_}</em>` : ''}</button>
+    ${scent ? '' : raw('<!--')}<button class="tb-btn" data-action="filter-open" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg><span>${T('סינון', 'Filter')}</span>${active_ ? html`<em>${active_}</em>` : ''}</button>${scent ? '' : raw('-->')}
     <label class="tb-btn sel"><span class="sr-only">${t('sortBy')}</span><select id="sort" data-input="sort">
       ${[['pop', T('מומלצים', 'Recommended')], ['low', t('sortLow')], ['high', t('sortHigh')], ['name', t('sortName')]].map(([v, l]) => html`<option value="${v}" ${raw(sort === v ? 'selected' : '')}>${l}</option>`)}
     </select><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></label>
@@ -247,7 +247,8 @@ export function filterSheet(f = {}) {
   return html`<div class="modal-bg sheet-bg"><aside class="sheet" role="dialog" aria-modal="true" aria-labelledby="fs-t">
     <header><h2 id="fs-t">${T('סינון', 'Filter')}</h2><button class="icon-x" data-action="modal-close" aria-label="${t('close')}">×</button></header>
     <form data-form="filter">
-      <fieldset><legend>${T('מחיר', 'Price')}</legend><div class="fs-opts">${PRICE_BANDS.map(([v, l]) => html`<label><input type="radio" name="price" value="${v}" ${raw((f.price || '') === v ? 'checked' : '')}><span>${l}</span></label>`)}</div></fieldset>
+      <fieldset><legend>${T('עוצמת הריח', 'Scent strength')}</legend><div class="fs-opts">${[['', 'הכל', 'All'], ...STRENGTHS].map(([v, h, e]) => html`<label><input type="radio" name="str" value="${v}" ${raw((f.str || '') === v ? 'checked' : '')}><span>${T(h, e)}</span></label>`)}</div></fieldset>
+      <fieldset><legend>${T('אופי הריח', 'Scent character')} <small>${T('אפשר לבחור כמה', 'pick any')}</small></legend><div class="fs-opts">${NOTES.map(([v, h, e]) => html`<label><input type="checkbox" name="notes" value="${v}" ${raw(f.notes?.includes(v) ? 'checked' : '')}><span>${T(h, e)}</span></label>`)}</div></fieldset>
       <label class="switch big"><input type="checkbox" name="stock" ${raw(f.stock ? 'checked' : '')}><span></span>${T('במלאי בלבד', 'In stock only')}</label>
       <button class="btn block" type="submit">${T('הצגת תוצאות', 'Show results')}</button>
     </form></aside></div>`;
@@ -260,7 +261,8 @@ const catTabs = (cat) => html`<nav class="cat-pills" aria-label="${t('categories
 
 export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
   let list = active();
-  if (f.price) { const [lo, hi] = f.price.split('-').map(Number); list = list.filter((p) => !p.quote && minPrice(p) >= lo && minPrice(p) <= hi); }
+  if (f.str) list = list.filter((p) => p.cat !== 'oils' || scentOf(p).strength === f.str);
+  if (f.notes?.length) list = list.filter((p) => p.cat !== 'oils' || scentOf(p).notes.some((n) => f.notes.includes(n)));
   if (f.stock) list = list.filter((p) => p.quote || p.stock > 0);
   if (cat) list = list.filter((p) => p.cat === cat);
   if (sub) list = list.filter((p) => p.sub === sub);
@@ -330,7 +332,7 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
         ${subs.map((s2) => html`<a href="#/shop/${cat}/${encodeURIComponent(s2)}" aria-current="${s2 === sub}"><span class="st-img ${cat === 'diffusers' ? 'studio' : ''}"><img src="${small(subImg(cat, s2))}" alt="" width="160" height="160" loading="lazy"></span><b>${subName(s2)}</b></a>`)}
       </nav>` : ''}
       ${soon ? html`<div class="soon-box"><p class="eyebrow latin">Coming soon</p><h2>${T('הקולקציה תעלה בקרוב', 'The collection is coming soon')}</h2><p>${T('אנחנו מכינים עבורכם קולקציה חדשה. רוצים לשמוע ראשונים או להזמין כבר עכשיו?', 'A new collection is on its way. Want to hear first or order now?')}</p><a class="btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לפרטים בוואטסאפ', 'Ask on WhatsApp')}</a></div>` : html`
-      ${sortBar(q, sort, list.length, f)}
+      ${sortBar(q, sort, list.length, f, cat === 'oils' || !!q)}
       ${list.length ? html`<div class="grid shop-grid">${list.map((p) => card(p, { feature: !q && !sub && (p.picks || p.id === 'say-300') }))}</div>` : html`<p class="empty">${t('noResults')}</p>`}`}
     </div></div><div class="block"></div>`;
 }
