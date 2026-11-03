@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103160401';
-import { t, L, getLang } from './i18n.js?v=261103160401';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103160401';
-import * as db from './db.js?v=261103160401';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103160744';
+import { t, L, getLang } from './i18n.js?v=261103160744';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103160744';
+import * as db from './db.js?v=261103160744';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -675,7 +675,7 @@ export function wholesalePage() {
   <section class="wrap ws-sec"><p class="kicker">${T('סטנדים בשטח', 'Stands in action')}</p><h2>${T('ככה זה נראה אצלכם', 'How it looks at your place')}</h2>
     <div class="ws-gallery">${gal.map(([src, cap]) => html`<figure><img src="${src}" alt="${cap}" loading="lazy"><figcaption>${cap}</figcaption></figure>`)}</div></section>
   <section class="wrap ws-sec"><h2>${T('ארבעה צעדים, אפס כאב ראש', 'Four steps, zero hassle')}</h2>
-    <ol class="ws-steps">${steps.map(([h, d], i) => html`<li><span>0${i + 1}</span><b>${h}</b><p>${d}</p></li>`)}</ol></section>
+    <ol class="ws-steps">${steps.map(([h, d], i) => html`<li><span>${i + 1}</span><b>${h}</b><p>${d}</p></li>`)}</ol></section>
   <section class="wrap ws-sec"><h2>${T('למי זה מתאים', 'Who it is for')}</h2>
     <div class="ws-seg">${seg.map(([h, d, img]) => html`<div class="ws-card">${img ? html`<span class="ws-img"><img src="${small(img)}" alt="" loading="lazy" width="320" height="240"></span>` : ''}<b>${h}</b><p>${d}</p></div>`)}</div></section>
   <section class="wrap ws-cta"><h2>${T('איזה ריח יהיה החתימה של העסק שלכם?', 'What will your signature scent be?')}</h2><p>${T('הודעה אחת — ואנחנו לוקחים את זה מכאן.', 'One message — we take it from there.')}</p>
