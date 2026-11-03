@@ -1,8 +1,8 @@
-import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261103213815';
-import { L, getLang } from './i18n.js?v=261103213815';
-import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261103213815';
-import * as db from './db.js?v=261103213815';
-import { media, statusLabel, small, subName } from './views-shop.js?v=261103213815';
+import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261103214038';
+import { L, getLang } from './i18n.js?v=261103214038';
+import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261103214038';
+import * as db from './db.js?v=261103214038';
+import { media, statusLabel, small, subName } from './views-shop.js?v=261103214038';
 
 const he = () => getLang() === 'he';
 const T = (h, e) => (he() ? h : e);
@@ -300,6 +300,7 @@ export function productForm(p) {
         <div id="srows">${p.sizes.map(row)}</div>
         <button type="button" class="link-btn" data-action="size-add">+ ${T('הוספת גודל', 'Add size')}</button>
         <template id="srow-t">${row()}</template>
+        <div class="row2">${f('was', T('מחיר לפני מבצע ₪ (ריק = אין מבצע)', 'Price before sale ₪ (empty = no sale)'), p.was || '', 'number', 'min="0"')}<span></span></div>
         <div class="row2">${f('stock', T('מלאי (יחידות)', 'Stock (units)'), p.stock ?? 0, 'number', 'min="0"')}<div class="field"><span class="lbl">${T('תצוגה באתר', 'Visibility')}</span><label class="switch big"><input type="checkbox" name="active" ${raw(p.active !== false ? 'checked' : '')}><span></span>${T('המוצר מוצג בחנות', 'Shown in store')}</label></div></div>
       </section>
       <section class="dr-sec"><h3>${T('פרופיל ריח (לסינון באתר)', 'Scent profile (shop filter)')}</h3>

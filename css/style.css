@@ -2746,3 +2746,20 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
   .oz-w{flex-basis:46%}
 }
 @media (prefers-reduced-motion:reduce){.oz-media img,.oz-card{animation:none}}
+
+/* Hero offer card: product name, anchor price, one clear action */
+.h-tag{display:none!important}
+.h-offers{position:absolute;z-index:3;bottom:clamp(1.4rem,4vw,3rem);inset-inline-end:clamp(1.4rem,4vw,3.5rem)}
+.h-offer{display:none;flex-direction:column;gap:.3rem;min-width:260px;padding:1.1rem 1.3rem 1rem;background:rgba(251,248,242,.95);backdrop-filter:blur(10px);text-decoration:none;color:var(--ink);box-shadow:0 30px 60px -30px rgba(22,19,15,.6);animation:lineUp .7s cubic-bezier(.2,.7,.1,1) both}
+.h-offer.on{display:flex}
+.h-sale{align-self:flex-start;font-style:normal;font-size:.78rem;font-weight:800;letter-spacing:.04em;background:#B3261E;color:#fff;padding:.2rem .7rem;border-radius:3px;animation:salePulse 2.2s ease-in-out infinite}
+@keyframes salePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.h-offer b{font-size:1.35rem;line-height:1.2}
+.h-price{display:flex;align-items:baseline;gap:.6rem}
+.h-price s{color:#8a8073;font-size:1.05rem}
+.h-price strong{font-size:1.6rem;color:#B3261E}
+.h-price strong:only-child{font-size:1rem;color:var(--ink)}
+.h-offer i{font-style:normal;font-size:.85rem;font-weight:700;color:#7E6236;margin-top:.2rem}
+@media (max-width:1023px){.h-offers{inset-inline:12px auto;bottom:28px}.h-offer{min-width:0;padding:.7rem .9rem;gap:.15rem}.h-offer b{font-size:1rem}.h-price strong{font-size:1.2rem}.h-price s{font-size:.85rem}.h-offer i{font-size:.75rem}}
+@media (prefers-reduced-motion:reduce){.h-sale{animation:none}}
+@media (min-width:1024px){.h-offers{bottom:7.5rem}}
