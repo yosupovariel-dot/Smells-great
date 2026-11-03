@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103182716';
-import { t, L, getLang } from './i18n.js?v=261103182716';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103182716';
-import * as db from './db.js?v=261103182716';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103183010';
+import { t, L, getLang } from './i18n.js?v=261103183010';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103183010';
+import * as db from './db.js?v=261103183010';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -668,11 +668,11 @@ export function wholesalePage() {
   <header class="wsx">
     <div class="wsx-in wrap">
       <div class="wsx-copy">
-        <p class="wsx-k"><span></span>${T('SAY לעסקים', 'SAY for business')}</p>
+        <p class="wsx-k">${T('SAY לעסקים', 'SAY for business')}</p>
         <h1>${T('הרושם הראשון', 'The first impression')}<br><em>${T('מתחיל באוויר.', 'is in the air.')}</em></h1>
         <p class="wsx-lead">${T('לקוחות שוכחים מה אמרתם להם, אבל זוכרים איך הרגישו אצלכם. ריח חתימה הופך כניסה רגילה לחוויה של מלון יוקרה — ואנחנו דואגים לכל השאר.', 'Customers forget what you said, but remember how they felt. A signature scent turns an ordinary entrance into a luxury-hotel moment — we handle the rest.')}</p>
         <div class="wsx-cta">
-          <a class="wsx-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer"><i aria-hidden="true"></i>${T('לקבלת הצעה בוואטסאפ', 'Get a quote on WhatsApp')}</a>
+          <a class="wsx-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לקבלת הצעה בוואטסאפ', 'Get a quote on WhatsApp')}</a>
           <a class="wsx-link" href="#ws-gal">${T('ראו סטנדים בשטח', 'See stands in action')}</a>
         </div>
         <ul class="wsx-facts">
@@ -681,12 +681,7 @@ export function wholesalePage() {
           <li><b>${T('עד 5 ליטר', 'Up to 5 L')}</b><span>${T('מילוי במחיר סיטונאי', 'wholesale refills')}</span></li>
         </ul>
       </div>
-      <div class="wsx-art" aria-hidden="true">
-        <figure class="wsx-arch"><img src="${P}hero-1.webp" alt="" width="900" height="1100"></figure>
-        <figure class="wsx-orb"><img src="${P}say-400-5-sm.webp" alt="" width="300" height="300"></figure>
-        <div class="wsx-seal">${raw(sealSVG('SIGNATURE SCENT · FOR BUSINESS · '))}</div>
-        <p class="wsx-note"><b>${T('ריח חתימה', 'Signature scent')}</b>${T('נבחר יחד איתכם', 'chosen with you')}</p>
-      </div>
+      <figure class="wsx-art"><img src="${P}hero-1.webp" alt="${T('מפיצי SAY בעמדת קבלה', 'SAY diffusers at a reception desk')}" width="1400" height="1000"></figure>
     </div>
   </header>
   <section class="wrap ws-sec" id="ws-gal"><p class="kicker">${T('סטנדים בשטח', 'Stands in action')}</p><h2>${T('ככה זה נראה אצלכם', 'How it looks at your place')}</h2>

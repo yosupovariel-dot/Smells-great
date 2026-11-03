@@ -2407,3 +2407,30 @@ html.a11y-stop .wsx-arch img,html.a11y-stop .wsx-seal svg{animation:none}
 .ftr .muted{font-size:1rem!important;color:#cfc4b3!important}
 .ftr-bottom{font-size:.92rem!important}
 @media (max-width:900px){.fn-col a{font-size:1rem!important}.ftr .brand.logo img{width:160px!important}}
+
+
+/* ===== Wholesale hero v3: quiet editorial (overrides) ===== */
+.wsx{background:#F4EEE4!important;color:var(--ink)!important}
+.wsx::before{display:none!important}
+.wsx-in{grid-template-columns:1fr 1.1fr!important;gap:0!important;padding:0!important;max-width:none!important;width:100%!important;min-height:min(78vh,720px);align-items:stretch!important}
+.wsx-copy{padding:clamp(2.5rem,6vw,6rem) clamp(1.5rem,6vw,6rem);display:flex;flex-direction:column;justify-content:center}
+.wsx-k{font-size:.8rem!important;letter-spacing:.12em!important;color:#7E6236!important;margin-bottom:1.2rem!important}
+.wsx h1{color:var(--ink)!important;font-size:clamp(2.4rem,4.6vw,4.2rem)!important;line-height:1.08!important;animation:none!important}
+.wsx h1 em{background:none!important;color:#7E6236!important;-webkit-text-fill-color:#7E6236}
+.wsx-lead{color:#4a4238!important;animation:none!important;max-width:30rem!important}
+.wsx-cta{animation:none!important}
+.wsx-btn{background:#16130F!important;color:#F4EEE4!important;border-radius:2px!important;box-shadow:none!important;padding:1rem 1.6rem!important;letter-spacing:.02em}
+.wsx-btn:hover{background:#3a332b!important;transform:none!important}
+.wsx-link{color:var(--ink)!important;border-color:#16130F!important}
+.wsx-facts{border-color:#d9ccb5!important;margin-top:2.6rem!important}
+.wsx-facts li+li{border-color:#d9ccb5!important}
+.wsx-facts b{color:var(--ink)!important}.wsx-facts span{color:#6d6457!important}
+.wsx-art{margin:0;position:relative;width:auto!important;justify-self:stretch!important;min-height:100%}
+.wsx-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.wsx-art figcaption{position:absolute;bottom:1rem;inset-inline-start:1.2rem;font-size:.78rem;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+@media (max-width:860px){
+  .wsx-in{grid-template-columns:1fr!important;min-height:0}
+  .wsx-art{order:-1;aspect-ratio:4/3;min-height:0}
+  .wsx-copy{padding:2rem 16px 2.6rem}
+  .wsx h1{font-size:2.4rem!important}
+}
