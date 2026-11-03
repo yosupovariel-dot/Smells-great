@@ -2617,3 +2617,6 @@ body.scrolled .hdr .brand.logo img{height:46px!important}
 @media (max-width:699px){.club-card .promo-logo{display:none!important}}
 .bo-brand img{width:150px!important;height:auto!important}
 .sp-head-t h1{font-size:clamp(2.2rem,4.6vw,4rem)!important;line-height:1.08!important;font-weight:700!important}
+.sp-cats{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))!important;gap:.8rem!important}
+.sp-cat.soon{opacity:.7}
+@media (max-width:700px){.sp-cats{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:0 16px .4rem;scrollbar-width:none}.sp-cat{flex:0 0 31%;scroll-snap-align:start}}
