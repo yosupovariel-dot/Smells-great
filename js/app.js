@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103212726';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103212726';
-import { CATEGORIES } from './data.js?v=261103212726';
-import * as db from './db.js?v=261103212726';
-import * as S from './views-shop.js?v=261103212726';
-import * as Lg from './views-legal.js?v=261103212726';
-import * as A from './views-admin.js?v=261103212726';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103212801';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103212801';
+import { CATEGORIES } from './data.js?v=261103212801';
+import * as db from './db.js?v=261103212801';
+import * as S from './views-shop.js?v=261103212801';
+import * as Lg from './views-legal.js?v=261103212801';
+import * as A from './views-admin.js?v=261103212801';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -184,7 +184,7 @@ function maybePromo() {
         <img class="promo-logo" src="assets/img/logo-wide.webp" alt="SAY Boutique" width="923" height="350">
         <h2 id="pr-t">${he ? 'הכרטיס שלכם למועדון SAY' : 'Your SAY Club card'}</h2>
         <p class="cc-sub">${he ? 'הצטרפו עכשיו (בחינם) וקבלו:' : 'Join now (free) and get:'}</p>
-        <p class="cc-perks"><b>${he ? '10% הנחה מיידית בקנייה הראשונה' : '10% off your first order'}</b><span>|</span>${he ? 'הטבות לחברי מועדון בלבד' : 'Members-only offers'}<span>|</span>${he ? 'הטבה ייחודית ביום ההולדת!' : 'A birthday treat!'}</p>
+        <ul class="cc-perks2"><li><i class="bob" aria-hidden="true">🎁</i><b>${he ? '10% הנחה' : '10% off'}</b>${he ? 'בקנייה הראשונה' : 'first order'}</li><li><i class="bob d2" aria-hidden="true">💎</i><b>${he ? 'הטבות' : 'Perks'}</b>${he ? 'לחברי מועדון בלבד' : 'members only'}</li><li><i class="bob d3" aria-hidden="true">🎂</i><b>${he ? 'יום הולדת' : 'Birthday'}</b>${he ? 'מתנה מיוחדת' : 'a special gift'}</li></ul>
         <form class="cc-form" data-form="club-join" novalidate>
           <label><span>${he ? 'שם מלא' : 'Full name'} *</span><input name="name" autocomplete="name" required maxlength="80"></label>
           <label><span>${he ? 'מספר טלפון' : 'Phone'} *</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="15" dir="ltr"></label>
