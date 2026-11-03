@@ -2490,3 +2490,23 @@ body.scrolled .hdr .brand.logo img{height:46px!important}
 .mnp-logo img{height:54px!important;width:auto}
 .ticker-msg:not(.on){visibility:hidden;transition:opacity .5s,transform .5s,visibility 0s .5s}
 .ticker-msg.on{visibility:visible;transition:opacity .5s .15s,transform .5s .15s,visibility 0s}
+
+/* Club popup on phones: a light bottom sheet, the page stays visible above */
+@media (max-width:699px){
+  #promo.promo-bg{place-items:end center!important;padding:0!important;background:rgba(22,19,15,.18)!important;backdrop-filter:none!important}
+  .supromo.club-card{width:100%!important;max-height:72svh!important;border-radius:22px 22px 0 0!important;padding:6px 6px 0!important;transform:translateY(40px)!important;transition:transform .45s cubic-bezier(.2,.8,.2,1)!important}
+  .promo-bg.in .supromo.club-card{transform:none!important}
+  .club-card::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:#d9ccb5;margin:4px auto 6px}
+  .club-card .cc-body{border-radius:16px 16px 0 0!important;border-bottom:0!important;padding:.9rem 1rem 1rem!important}
+  .club-card .promo-logo,.club-card .cc-sub:first-of-type{display:none!important}
+  .club-card .cc-star{font-size:1rem}
+  .club-card h2{font-size:1.2rem!important;margin:.2rem 0 .3rem!important}
+  .cc-perks{font-size:.78rem!important;margin-bottom:.7rem!important}
+  .cc-form{grid-template-columns:1fr 1fr;column-gap:.5rem;row-gap:.45rem}
+  .cc-form label{font-size:.74rem}
+  .cc-form input:not([type=checkbox]){padding:.5rem .6rem!important;font-size:.9rem}
+  .cc-form>.cc-check,.cc-form>.cc-err,.cc-form>.cc-go{grid-column:1/-1}
+  .cc-check{font-size:.74rem!important}
+  .club-card .cc-go{min-height:46px!important}
+  .club-card .promo-x{top:14px!important;left:12px!important;width:34px;height:34px}
+}

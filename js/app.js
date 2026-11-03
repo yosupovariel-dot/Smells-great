@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103205511';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103205511';
-import { CATEGORIES } from './data.js?v=261103205511';
-import * as db from './db.js?v=261103205511';
-import * as S from './views-shop.js?v=261103205511';
-import * as Lg from './views-legal.js?v=261103205511';
-import * as A from './views-admin.js?v=261103205511';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103205640';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103205640';
+import { CATEGORIES } from './data.js?v=261103205640';
+import * as db from './db.js?v=261103205640';
+import * as S from './views-shop.js?v=261103205640';
+import * as Lg from './views-legal.js?v=261103205640';
+import * as A from './views-admin.js?v=261103205640';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -188,7 +188,7 @@ function maybePromo() {
           <label><span>${he ? 'שם מלא' : 'Full name'} *</span><input name="name" autocomplete="name" required maxlength="80"></label>
           <label><span>${he ? 'מספר טלפון' : 'Phone'} *</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="15" dir="ltr"></label>
           <label><span>${he ? 'דואר אלקטרוני' : 'Email'} *</span><input name="email" type="email" autocomplete="email" required maxlength="120" dir="ltr"></label>
-          <label><span>${he ? 'בחרו סיסמה (8+ תווים, אות ומספר)' : 'Choose a password (8+, letter & digit)'} *</span><input name="password" type="password" autocomplete="new-password" required maxlength="80" dir="ltr"></label>
+          <label><span>${he ? 'סיסמה (8+ תווים)' : 'Choose a password (8+, letter & digit)'} *</span><input name="password" type="password" autocomplete="new-password" required maxlength="80" dir="ltr"></label>
           <label class="cc-check"><input type="checkbox" name="agree" required><span>${he ? 'אני מאשר/ת הצטרפות למועדון וקבלת עדכונים והטבות בוואטסאפ ובמייל.' : 'I agree to join the club and receive updates and offers by WhatsApp and email.'}</span></label>
           <p class="cc-err" role="alert"></p>
           <button class="btn block cc-go" type="submit">${he ? 'הצטרפות למועדון וקבלת קוד קופון' : 'Join & get my coupon'}</button>
