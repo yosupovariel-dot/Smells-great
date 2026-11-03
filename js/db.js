@@ -1,8 +1,8 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261103215543';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261103215543';
+import { SEED_PRODUCTS } from './data.js?v=261103215706';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261103215706';
 
 const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -282,3 +282,20 @@ export function addReview(r) { const l = reviews(); l.push({ id: uid('r_'), ...r
 export function setReview(id, status) { const l = reviews(); const r = l.find((x) => x.id === id); if (r) { r.status = status; write('reviews', l); } }
 export function deleteReview(id) { write('reviews', reviews().filter((x) => x.id !== id)); }
 export function saveReviewAdmin(r) { const l = reviews(); l.push({ id: uid('r_'), ...r, status: 'approved', at: Date.now() }); write('reviews', l); }
+
+// Draft templates for the team to edit with real customer words before approving. Never shown on the site as-is.
+const REVIEW_DRAFTS = [
+  'מהרגע שהמכשיר נכנס הביתה, כל מי שנכנס שואל מה הריח הזה. מרגיש כמו לחזור למלון כל ערב.',
+  'הזמנתי את ערכת ההתנסות כדי לבחור, ובסוף התאהבתי בשלושה ריחות. שירות מהיר ואדיב, ממש כיף.',
+  'שמנו מפיץ בכניסה לחנות — לקוחות נשארים יותר זמן ומחמיאים על האווירה. השקעה ששווה כל שקל.',
+  'הריח עדין אבל מורגש בכל הבית, בלי ריח כבד. המשלוח הגיע מהר והאריזה מושקעת.',
+  'קיבלתי ייעוץ בוואטסאפ איזה מכשיר מתאים לסלון, וזה בדיוק מה שהיה צריך. ממליצה בחום.',
+  'המכשיר שקט לגמרי, מכוונים שעות באפליקציה ושוכחים ממנו. הבית פשוט מריח טוב כל הזמן.',
+];
+export function seedReviewDrafts() {
+  if (read('rvDrafts', false)) return;
+  const l = reviews();
+  REVIEW_DRAFTS.forEach((text, i) => l.push({ id: uid('r_'), name: 'שם הלקוח', city: '', rating: 5, text, status: 'draft', at: Date.now() - i }));
+  write('reviews', l); write('rvDrafts', true);
+}
+export function updateReview(id, patch) { const l = reviews(); const r = l.find((x) => x.id === id); if (r) { Object.assign(r, patch); write('reviews', l); } }

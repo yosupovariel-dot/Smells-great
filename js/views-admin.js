@@ -1,8 +1,8 @@
-import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261103215543';
-import { L, getLang } from './i18n.js?v=261103215543';
-import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261103215543';
-import * as db from './db.js?v=261103215543';
-import { media, statusLabel, small, subName } from './views-shop.js?v=261103215543';
+import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261103215706';
+import { L, getLang } from './i18n.js?v=261103215706';
+import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261103215706';
+import * as db from './db.js?v=261103215706';
+import { media, statusLabel, small, subName } from './views-shop.js?v=261103215706';
 
 const he = () => getLang() === 'he';
 const T = (h, e) => (he() ? h : e);
@@ -539,12 +539,17 @@ export function packingSlips(ids) {
 }
 
 export function reviewsAdmin() {
-  const l = db.reviews().sort((a, b) => (a.status === 'pending' ? -1 : 0) - (b.status === 'pending' ? -1 : 0) || b.at - a.at);
-  const lab = { pending: T('ממתינה לאישור', 'Pending'), approved: T('מפורסמת', 'Published'), hidden: T('מוסתרת', 'Hidden') };
+  db.seedReviewDrafts();
+  const order = { pending: 0, draft: 1, approved: 2, hidden: 3 };
+  const l = db.reviews().sort((a, b) => order[a.status] - order[b.status] || b.at - a.at);
+  const lab = { pending: T('ממתינה לאישור', 'Pending'), approved: T('מפורסמת באתר', 'Published'), hidden: T('מוסתרת', 'Hidden'), draft: T('טיוטה — לעריכה', 'Draft — edit me') };
   return shell('admin/reviews', html`<header class="bo-top"><h1>${T('ביקורות', 'Reviews')}</h1></header>
-    <p class="muted">${T('ביקורות שלקוחות שולחים מהאתר מגיעות לכאן, ומתפרסמות רק אחרי אישור.', 'Reviews customers send arrive here and go live only after approval.')}</p>
-    ${l.length ? html`<div class="panel"><table class="tbl"><thead><tr><th>${T('לקוח', 'Customer')}</th><th>${T('דירוג', 'Rating')}</th><th>${T('ביקורת', 'Review')}</th><th>${T('סטטוס', 'Status')}</th><th></th></tr></thead><tbody>
-      ${l.map((r) => html`<tr><td><b>${r.name}</b><br><small class="muted">${r.city || ''}</small></td><td>${'★'.repeat(r.rating)}</td><td>${r.text}</td><td>${lab[r.status]}</td>
-        <td class="row-acts">${r.status !== 'approved' ? html`<button class="btn sm" data-action="rv-ok" data-id="${r.id}">${T('אישור', 'Approve')}</button>` : html`<button class="btn sm ghost" data-action="rv-hide" data-id="${r.id}">${T('הסתרה', 'Hide')}</button>`}<button class="link-btn danger" data-action="rv-del" data-id="${r.id}">${T('מחיקה', 'Delete')}</button></td></tr>`)}
-    </tbody></table></div>` : html`<p class="empty">${T('עדיין אין ביקורות. שתפו לקוחות מרוצים בקישור לעמוד הביקורות באתר.', 'No reviews yet. Share the reviews page link with happy customers.')}</p>`}`);
+    <p class="rv-intro">${T('טיוטות הן תבניות כתיבה: החליפו בשם ובמילים של לקוח אמיתי (באישורו), שמרו ואשרו. ביקורות מהאתר מגיעות לכאן לאישור.', 'Drafts are writing templates: replace with a real customer\'s name and words (with consent), save and approve.')}</p>
+    <div class="rv-admin">${l.map((r) => html`<form class="panel rv-edit ${r.status}" data-form="rv-edit" data-id="${r.id}">
+      <div class="rv-edit-h"><span class="pill">${lab[r.status]}</span>${'★'.repeat(r.rating)}</div>
+      <div class="row2"><div class="field"><label>${T('שם', 'Name')}</label><input class="input" name="name" value="${r.name}" maxlength="60"></div><div class="field"><label>${T('עיר', 'City')}</label><input class="input" name="city" value="${r.city || ''}" maxlength="40"></div></div>
+      <div class="field"><label>${T('דירוג', 'Rating')}</label><select class="input" name="rating">${[5, 4, 3, 2, 1].map((n) => html`<option value="${n}" ${raw(r.rating === n ? 'selected' : '')}>${n}</option>`)}</select></div>
+      <div class="field"><label>${T('טקסט', 'Text')}</label><textarea class="input" name="text" rows="3" maxlength="600">${r.text}</textarea></div>
+      <div class="row-acts"><button class="btn sm ghost" type="submit">${T('שמירה', 'Save')}</button>${r.status !== 'approved' ? html`<button class="btn sm" type="button" data-action="rv-ok" data-id="${r.id}" ${raw(r.name === 'שם הלקוח' ? 'disabled title="יש להחליף את השם בשם הלקוח"' : '')}>${T('פרסום באתר', 'Publish')}</button>` : html`<button class="btn sm ghost" type="button" data-action="rv-hide" data-id="${r.id}">${T('הסתרה', 'Hide')}</button>`}<button class="link-btn danger" type="button" data-action="rv-del" data-id="${r.id}">${T('מחיקה', 'Delete')}</button></div>
+    </form>`)}</div>`);
 }

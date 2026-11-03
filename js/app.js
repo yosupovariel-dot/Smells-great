@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103215543';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103215543';
-import { CATEGORIES } from './data.js?v=261103215543';
-import * as db from './db.js?v=261103215543';
-import * as S from './views-shop.js?v=261103215543';
-import * as Lg from './views-legal.js?v=261103215543';
-import * as A from './views-admin.js?v=261103215543';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103215706';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103215706';
+import { CATEGORIES } from './data.js?v=261103215706';
+import * as db from './db.js?v=261103215706';
+import * as S from './views-shop.js?v=261103215706';
+import * as Lg from './views-legal.js?v=261103215706';
+import * as A from './views-admin.js?v=261103215706';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -581,6 +581,11 @@ document.addEventListener('submit', async (e) => {
       <p class="cc-sub">${he ? '10% הנחה יופעלו אוטומטית בקופה בהזמנה הראשונה שלכם — אתם כבר מחוברים.' : '10% off applies automatically at checkout on your first order — you are signed in.'}</p>
       <button class="btn block cc-go" data-action="promo-close">${he ? 'לקניות' : 'Start shopping'}</button>`);
     $('.promo-x')?.removeAttribute('hidden'); rerender(); return;
+  }
+  if (kind === 'rv-edit') {
+    const d = Object.fromEntries(new FormData(f));
+    db.updateReview(f.dataset.id, { name: clean(d.name, 60), city: clean(d.city, 40), rating: Math.min(5, Math.max(1, parseInt(d.rating) || 5)), text: clean(d.text, 600) });
+    toast(getLang() === 'he' ? 'נשמר' : 'Saved'); rerender(); return;
   }
   if (kind === 'review') {
     const d = Object.fromEntries(new FormData(f)); const err = $('#rv-err'); const he = getLang() === 'he';

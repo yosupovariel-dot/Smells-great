@@ -2875,3 +2875,5 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
 .hdr .brand.logo{flex:0 0 auto!important;min-width:max-content}
 .hdr .brand.logo img{max-width:none!important;width:auto!important;object-fit:contain;aspect-ratio:923/350}
 @media (min-width:901px) and (max-width:1320px){.hdr .nav{gap:.75rem!important}.hdr .nav a{font-size:.84rem!important}.hdr .brand.logo{margin-inline:1rem!important}.hdr .brand.logo img{height:50px!important}.hdr .tool-link{display:none}}
+.rv-admin{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:1rem;margin-top:1rem}.rv-edit{padding:1rem 1.2rem}.rv-edit.draft{border:1px dashed #A9874F}.rv-edit-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;color:#C9A24A}.rv-edit .row-acts{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.bo .rv-intro{font:400 .95rem/1.6 var(--f-ui,"Assistant"),sans-serif!important;color:var(--muted);margin:0 0 .4rem;max-width:60rem}
