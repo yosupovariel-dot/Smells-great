@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103212801';
-import { t, L, getLang } from './i18n.js?v=261103212801';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103212801';
-import * as db from './db.js?v=261103212801';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103212959';
+import { t, L, getLang } from './i18n.js?v=261103212959';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103212959';
+import * as db from './db.js?v=261103212959';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -729,6 +729,30 @@ export function wholesalePage() {
   <section class="wrap ws-sec"><h2>${T('למי זה מתאים', 'Who it is for')}</h2>
     <div class="ws-seg">${seg.map(([h, d, img]) => html`<div class="ws-card">${img ? html`<span class="ws-img"><img src="${small(img)}" alt="" loading="lazy" width="320" height="240"></span>` : ''}<b>${h}</b><p>${d}</p></div>`)}</div></section>
   <section class="wrap ws-cta"><h2>${T('איזה ריח יהיה החתימה של העסק שלכם?', 'What will your signature scent be?')}</h2><p>${T('הודעה אחת — ואנחנו לוקחים את זה מכאן.', 'One message — we take it from there.')}</p>
+    <a class="btn wa-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">WhatsApp · ${PHONE_DISPLAY}</a></section>
+  </div><div class="block"></div>`;
+}
+
+export function rentalPage() {
+  const P = 'assets/products/';
+  const who = [[T('חנויות', 'Shops'), T('לקוח שנעים לו נשאר יותר זמן — וקונה יותר.', 'Comfortable shoppers stay longer and buy more.')], [T('מסעדות ובתי קפה', 'Restaurants & cafés'), T('אווירה נקייה ומזמינה מהרגע שנכנסים.', 'A clean, inviting feel from the door.')], [T('בניינים ולובאים', 'Buildings & lobbies'), T('כניסה שמריחה כמו מלון — לדיירים ולאורחים.', 'An entrance that smells like a hotel.')], [T('משרדים', 'Offices'), T('צוות רענן ופגישות נעימות יותר.', 'A fresher team and nicer meetings.')]];
+  const inc = [T('מכשיר מקצועי בהתאם לגודל החלל', 'A pro device sized to your space'), T('התקנה על הקיר על ידי טכנאי', 'Wall installation by a technician'), T('מילוי תמציות שוטף — בלי לחשוב על זה', 'Ongoing refills — no need to think about it'), T('תחזוקה והחלפת מכשיר במקרה תקלה', 'Maintenance and replacement if needed'), T('אפשרות להחליף ריח לפי עונה', 'Switch scents by season')];
+  return html`<div class="ws-page">
+  <header class="wsx"><div class="wsx-in wrap">
+    <div class="wsx-copy">
+      <p class="wsx-k">${T('השכרת מפיצי ריח לעסקים', 'Diffuser rental for business')}</p>
+      <h1>${T('ריח של מלון בעסק שלכם.', 'A hotel scent in your business.')}<br><em>${T('בתשלום חודשי, בלי לקנות מכשיר.', 'Monthly, no device to buy.')}</em></h1>
+      <p class="wsx-lead">${T('אנחנו מגיעים, מתקינים מפיץ ריח מקצועי על הקיר, ממלאים תמציות באופן קבוע ומטפלים בהכל. אתם רק נהנים מהתגובות של הלקוחות.', 'We come, install a professional diffuser on the wall, refill regularly and handle everything. You just enjoy the compliments.')}</p>
+      <div class="wsx-cta"><a class="wsx-btn" href="${waLink(T('שלום, אשמח לפרטים על השכרת מפיץ ריח לעסק', 'Hi, I would like details about diffuser rental'))}" target="_blank" rel="noopener noreferrer">${T('לקבלת הצעה בוואטסאפ', 'Get a quote on WhatsApp')}</a></div>
+      <p class="wsx-note2">${T('בלי התחייבות. נגיע, נריח איתכם ונמליץ על הריח המתאים.', 'No commitment. We visit, smell together and recommend.')}</p>
+    </div>
+    <figure class="wsx-art"><img src="${P}say-400-5.webp" alt="${T('מפיץ ריח מקצועי מותקן בעסק', 'Professional diffuser installed in a business')}" width="1200" height="1200"></figure>
+  </div></header>
+  <section class="wrap ws-sec"><h2>${T('למי זה מתאים', 'Who it is for')}</h2>
+    <div class="ws-seg">${who.map(([h, d]) => html`<div class="ws-card"><b>${h}</b><p>${d}</p></div>`)}</div></section>
+  <section class="wrap ws-sec"><h2>${T('מה כלול בהשכרה', 'What is included')}</h2>
+    <ul class="rent-inc">${inc.map((x) => html`<li>${x}</li>`)}</ul></section>
+  <section class="wrap ws-cta"><h2>${T('רוצים לשמוע כמה זה עולה לעסק שלכם?', 'Want a price for your business?')}</h2><p>${T('ספרו לנו מה סוג העסק וגודל החלל — ונחזור עם הצעה.', 'Tell us your business type and size — we will reply with a quote.')}</p>
     <a class="btn wa-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">WhatsApp · ${PHONE_DISPLAY}</a></section>
   </div><div class="block"></div>`;
 }
