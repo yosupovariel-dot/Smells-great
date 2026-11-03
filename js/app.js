@@ -1,13 +1,13 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261102231919';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261102231919';
-import { CATEGORIES } from './data.js?v=261102231919';
-import * as db from './db.js?v=261102231919';
-import * as S from './views-shop.js?v=261102231919';
-import * as Lg from './views-legal.js?v=261102231919';
-import * as A from './views-admin.js?v=261102231919';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103121202';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103121202';
+import { CATEGORIES } from './data.js?v=261103121202';
+import * as db from './db.js?v=261103121202';
+import * as S from './views-shop.js?v=261103121202';
+import * as Lg from './views-legal.js?v=261103121202';
+import * as A from './views-admin.js?v=261103121202';
 
 const app = $('#app');
-const state = { sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
+const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
 const ICONS = {
   search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
   user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>',
@@ -24,7 +24,7 @@ function header() {
   const msgs = ['tick1', 'tick2', 'tick3', 'tick4', 'tick5'];
   return html`<a class="skip" href="#main">${t('skip')}</a>
   <div class="ticker" role="region" aria-label="${getLang() === 'he' ? 'הודעות' : 'Announcements'}"><div class="wrap">
-    <div class="ticker-track" aria-live="off">${msgs.map((k, i) => html`<p class="ticker-msg ${i ? '' : 'on'}" ${raw(i ? 'aria-hidden="true"' : '')}>${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}">${t(k)}</a>` : html`<span>${t(k)}</span>`}</p>`)}</div></div></div>
+    <div class="ticker-track" aria-live="off">${msgs.map((k, i) => html`<p class="ticker-msg ${i ? '' : 'on'}" ${raw(i ? 'aria-hidden="true"' : '')}>${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}">${t(k)}</a>` : k === 'tick1' ? html`<span>${t(k)}</span><a class="tk-more" href="#/terms">${getLang() === 'he' ? 'לפרטים' : 'Details'}</a>` : html`<span>${t(k)}</span>`}</p>`)}</div></div></div>
   <header class="hdr"><div class="wrap">
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
@@ -184,7 +184,7 @@ function route() {
   let v, title = 'SAY Boutique';
   switch (a || '') {
     case '': v = S.home(); title = 'SAY Boutique | Luxury Home Fragrances'; break;
-    case 'shop': v = S.shop(b, state.q, state.sort, parts[2] || ''); title = `${t('shop')} | SAY Boutique`; break;
+    case 'shop': v = S.shop(b, state.q, state.sort, parts[2] || '', state.f); title = `${t('shop')} | SAY Boutique`; break;
     case 'product': v = S.productPage(b); if (v) title = `${(db.product(b).name[getLang()])} | SAY Boutique`; break;
     case 'checkout': v = S.checkout(); break;
     case 'done': v = state.lastOrder ? S.orderDone(state.lastOrder) : S.home(); break;
@@ -340,6 +340,8 @@ document.addEventListener('click', async (e) => {
     case 'menu-close': $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); $('[data-action="menu"]').focus(); break;
     case 'cart-open': openCart(); break;
     case 'search-open': openSearch(); break;
+    case 'filter-open': modal(S.filterSheet(state.f)); break;
+    case 'filter-clear': state.f = {}; rerender(); break;
     case 'cmdk-open': openPalette(); break;
     case 'cmdk-close': closePalette(); break;
     case 'goto-new': closePalette(); state.os = 'new'; state.ov = 'list'; location.hash = '#/orders'; rerender(); break;
@@ -497,6 +499,7 @@ document.addEventListener('submit', async (e) => {
     window.open(`https://wa.me/${PHONE_INTL}`, '_blank', 'noopener');
     f.reset(); err.textContent = ''; toast(t('sent'));
   }
+  if (kind === 'filter') { const d = new FormData(f); state.f = { price: d.get('price') || '', stock: !!d.get('stock') }; closeModal(); rerender(); return; }
   if (kind === 'customer') {
     const d = Object.fromEntries(new FormData(f)); const err = $('#cd-err');
     if (!valid.name(d.name)) { err.textContent = t('required'); return; }

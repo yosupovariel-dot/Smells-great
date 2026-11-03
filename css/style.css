@@ -1951,3 +1951,43 @@ kbd{font-family:var(--f-body);font-size:.7rem;background:#F1ECE3;border:1px soli
 .lbl-name{min-height:2.6em;display:flex;align-items:center;justify-content:center}
 .card .card-tag{top:44px}
 @media (max-width:600px){.card.photo,.card.studio:not(.feature){padding:1rem .8rem 1.1rem}.card.photo .card-media,.card.studio .card-media{border-radius:40px 40px 6px 6px!important}}
+/* Shop toolbar (Clinique-style): two big buttons + count */
+.toolbar2{padding:.6rem 0 1.4rem}
+.tb-btns{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;max-width:520px}
+.tb-btn{position:relative;display:flex;align-items:center;justify-content:center;gap:.6rem;height:54px;border:1.5px solid var(--ink);background:transparent;font:inherit;font-weight:600;font-size:1rem;cursor:pointer;color:var(--ink)}
+.tb-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8}
+.tb-btn em{font-style:normal;background:var(--ink);color:var(--cream);font-size:.72rem;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center}
+.tb-btn:hover{background:var(--ink);color:var(--cream)}.tb-btn:hover em{background:var(--cream);color:var(--ink)}
+.tb-btn.sel select{appearance:none;-webkit-appearance:none;border:0;background:transparent;font:inherit;font-weight:600;color:inherit;width:100%;height:100%;text-align:center;text-align-last:center;cursor:pointer;padding:0 2rem}
+.tb-btn.sel svg{position:absolute;inset-inline-start:.9rem;pointer-events:none}
+.tb-btn.sel:hover select{color:var(--cream)}
+.tb-btn.sel select option{color:var(--ink)}
+.toolbar2 .count{margin:1rem 0 0;color:var(--muted);font-size:.92rem;padding-inline-start:.9rem;border-inline-start:1px solid var(--sand)}
+.toolbar2 .count b{color:var(--ink);font-size:1.05rem}
+/* filter sheet */
+.sheet-bg{place-items:end center!important;justify-items:center!important}
+.sheet{background:var(--cream);width:min(560px,100%);border-radius:24px 24px 0 0;padding:1.2rem 1.4rem calc(1.4rem + env(safe-area-inset-bottom));animation:sheetUp .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes sheetUp{from{transform:translateY(100%)}}
+.sheet header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.sheet h2{margin:0;font-size:1.4rem}
+.sheet fieldset{border:0;padding:0;margin:0 0 1.2rem}
+.sheet legend{font-weight:600;margin-bottom:.6rem}
+.fs-opts{display:flex;flex-wrap:wrap;gap:.5rem}
+.fs-opts label{cursor:pointer}.fs-opts input{position:absolute;opacity:0}
+.fs-opts span{display:block;padding:.6rem 1.1rem;border:1px solid var(--sand);border-radius:30px;background:var(--white)}
+.fs-opts input:checked+span{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.fs-opts input:focus-visible+span{outline:2px solid var(--gold-dark)}
+.sheet .switch{margin-bottom:1.4rem}
+@media (min-width:701px){.sheet-bg{place-items:center!important}.sheet{border-radius:20px}}
+/* badges as soft pills */
+.card .card-tag{background:#DDEBDD;color:#24502f;border-radius:20px;padding:.3rem .8rem;font-size:.74rem;font-weight:600;letter-spacing:0;top:44px}
+.tk-more{color:var(--gold-2);margin-inline-start:.4rem;text-decoration:underline!important}
+/* mobile: get to products faster */
+@media (max-width:700px){
+  .sp-head.cat .sp-arch{display:none}
+  .sp-head{padding-top:1.2rem;padding-bottom:.6rem}
+  .sp-head h1{font-size:2rem;margin:.2rem 0 .6rem}
+  .sp-head .lead{font-size:1rem;line-height:1.8}
+  .tb-btns{max-width:none}
+}
+@media (max-width:700px){.stories .st-img{width:64px;height:64px}.stories a{width:76px}.stories a b{font-size:.72rem}}
