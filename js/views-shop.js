@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103222603';
-import { t, L, getLang } from './i18n.js?v=261103222603';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103222603';
-import * as db from './db.js?v=261103222603';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103223518';
+import { t, L, getLang } from './i18n.js?v=261103223518';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103223518';
+import * as db from './db.js?v=261103223518';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -332,11 +332,11 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
     </div></div><div class="block"></div>`;
   }
   return html`<div class="shop-page">
-    <header class="sp-head cat wrap">
+    ${cat === 'diffusers' && !sub && !q ? dxHead(crumbs) : html`    <header class="sp-head cat wrap">
       <div class="sp-head-t">${crumbs}<p class="kicker latin">${cat ? (CATEGORIES.find((x) => x.id === cat)?.en || '') : 'Search'}</p><h1>${title}</h1>
         ${c && !soon ? html`<p class="lead">${T(...(CAT_LEAD[cat] || [c.descHe, c.descEn]))}</p>` : ''}</div>
       ${heroImg ? html`<figure class="sp-arch ${cat === 'diffusers' && !sub ? 'studio' : ''}"><img src="${heroImg}" alt="" width="900" height="1100" fetchpriority="high"></figure>` : html`<figure class="sp-arch empty"><img src="assets/img/mark.webp" alt="" width="180" height="156"></figure>`}
-    </header>
+    </header>`}
     <div class="wrap">
       ${catTabs(cat)}
       ${subs.length > 1 ? html`<nav class="stories" aria-label="${T('תת־קטגוריות', 'Subcategories')}">
@@ -347,6 +347,25 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
       ${sortBar(q, sort, list.length, f, cat === 'oils' || !!q)}
       ${list.length ? html`<div class="grid shop-grid">${list.map((p) => card(p, { feature: !q && !sub && (p.picks || p.id === 'say-300') }))}</div>` : html`<p class="empty">${t('noResults')}</p>`}`}
     </div></div><div class="block"></div>`;
+}
+
+// Diffusers: a lit "showroom" stage — every device side by side, sized to scale, each labelled with the space it covers.
+function dxHead(crumbs) {
+  const ids = [['say-car', 'רכב וחדר קטן', 'Car & small room', .34], ['say-room-office', 'עד 20 מ"ר', 'Up to 20 m²', .3], ['say-100', 'עד 100 מ"ר', 'Up to 100 m²', .45], ['say-150', 'עד 150 מ"ר', 'Up to 150 m²', .45], ['say-300', 'עד 300 מ"ר', 'Up to 300 m²', .5], ['say-400', 'לובי ואולם', 'Lobby & hall', 1]];
+  const items = ids.map(([id, h, e, k]) => ({ p: db.product(id), h, e, k })).filter((x) => x.p && x.p.active !== false);
+  return html`<header class="dx">
+    <div class="dx-copy wrap">${crumbs}
+      <p class="dx-k">${T('מפיצי ריח · טכנולוגיית אידוי קר', 'Diffusers · cold-air technology')}</p>
+      <h1>${T('שקט. בלי מים. בלי חום.', 'Silent. No water. No heat.')}<br><em>${T('רק ריח של מלון.', 'Just a hotel scent.')}</em></h1>
+      <p class="dx-lead">${T('בחרו לפי גודל החלל — כל המכשירים מסודרים מהקטן לגדול. לחצו על מכשיר לפרטים.', 'Choose by the size of your space — smallest to largest. Tap one for details.')}</p>
+    </div>
+    <div class="dx-cards wrap">${items.map(({ p, h, e, k }, i) => html`<a class="dx-card" href="#/product/${p.id}" style-d="${i}">
+      <span class="dx-n latin">0${i + 1}</span>
+      <span class="dx-pic"><img src="assets/products/cut-${p.id}.webp" alt="${L(p.name)}" width="600" height="600"></span>
+      <b>${L(p.name)}</b><small>${T(h, e)}</small>
+      <span class="dx-cov" aria-hidden="true"><i style-w="${Math.round(20 + k * 80)}"></i></span>
+      <span class="dx-foot">${p.quote ? html`<em>${T('הצעת מחיר', 'Quote')}</em>` : html`<em>${m(minPrice(p))}</em>`}<i aria-hidden="true">${he() ? '←' : '→'}</i></span></a>`)}</div>
+  </header>`;
 }
 
 export function complements(p, n = 4) {
@@ -401,6 +420,7 @@ export function productPage(id) {
       <div class="crumbs"><a href="#/">${t('home')}</a> / <a href="#/shop/${p.cat}">${catName(p.cat)}</a>${p.sub ? html` / <a href="#/shop/${p.cat}/${encodeURIComponent(p.sub)}">${subName(p.sub)}</a>` : ''}</div>
       <p class="eyebrow">${p.sub ? subName(p.sub) : catName(p.cat)}</p>
       <h1>${L(p.name)}</h1>
+      ${BENEFIT[p.id] ? html`<p class="pdp-benefit">${T(...BENEFIT[p.id])}</p>` : ''}
       <p class="price big" id="pdp-price" aria-live="polite">${p.quote ? T('מחיר בהתאמה אישית', 'Price on request') : m(priceOf(p.sizes[0]))}${!p.quote && ws ? html` <s>${m(p.sizes[0].price)}</s> <span class="ws">${t('wsPrice')}</span>` : ''}</p>
       ${p.quote ? html`<p>${he() ? p.desc.he.split('\n')[0] : p.desc.en || p.desc.he.split('\n')[0]}</p>
         <div class="buy-row"><a class="btn gold" href="${waLink(T('שלום, אשמח להצעת מחיר עבור ', 'Hello, I would like a quote for ') + L(p.name))}" target="_blank" rel="noopener noreferrer">${T('לקבלת הצעת מחיר בוואטסאפ', 'Get a quote on WhatsApp')}</a><a class="btn ghost" href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a></div>` : html`

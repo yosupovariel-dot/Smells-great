@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103222603';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103222603';
-import { CATEGORIES } from './data.js?v=261103222603';
-import * as db from './db.js?v=261103222603';
-import * as S from './views-shop.js?v=261103222603';
-import * as Lg from './views-legal.js?v=261103222603';
-import * as A from './views-admin.js?v=261103222603';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103223518';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103223518';
+import { CATEGORIES } from './data.js?v=261103223518';
+import * as db from './db.js?v=261103223518';
+import * as S from './views-shop.js?v=261103223518';
+import * as Lg from './views-legal.js?v=261103223518';
+import * as A from './views-admin.js?v=261103223518';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -281,7 +281,7 @@ function route() {
     sw.addEventListener('scroll', () => { if (sw.scrollWidth > sw.clientWidth + 2) mark(Math.round(Math.abs(sw.scrollLeft) / sw.clientWidth)); }, { passive: true });
     if ('IntersectionObserver' in window) { const io = new IntersectionObserver((es) => es.forEach((x) => { if (x.isIntersecting && sw.scrollWidth <= sw.clientWidth + 2) mark(+x.target.dataset.i); }), { rootMargin: '-45% 0px -45% 0px' }); $$('.pg-slide', sw).forEach((f) => io.observe(f)); }
   }
-  applyA11y(); startTicker(); bars(); startSlides(); startCatRail(); observeReveal(); observeBuy(); watchRails(); markCached();
+  applyA11y(); applyStyleAttrs(); startTicker(); bars(); startSlides(); startCatRail(); observeReveal(); observeBuy(); watchRails(); markCached();
 }
 
 // Fade-in on scroll (skipped when reduced motion / a11y "stop animations" is on).
@@ -342,6 +342,8 @@ document.addEventListener('cart', refreshCart);
 function applyStyleAttrs(root = document) {
   $$('[style-w]', root).forEach((e) => (e.style.width = e.getAttribute('style-w') + '%'));
   $$('[style-a]', root).forEach((e) => e.style.setProperty('--a', e.getAttribute('style-a')));
+  $$('[style-h]', root).forEach((e) => e.style.setProperty('--h', e.getAttribute('style-h') / 100));
+  $$('[style-d]', root).forEach((e) => e.style.setProperty('--d', e.getAttribute('style-d')));
 }
 
 // Images: mark loaded ones (fade-in, hover swaps only when ready) and retry a failed image once.
