@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103214437';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103214437';
-import { CATEGORIES } from './data.js?v=261103214437';
-import * as db from './db.js?v=261103214437';
-import * as S from './views-shop.js?v=261103214437';
-import * as Lg from './views-legal.js?v=261103214437';
-import * as A from './views-admin.js?v=261103214437';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103214500';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103214500';
+import { CATEGORIES } from './data.js?v=261103214500';
+import * as db from './db.js?v=261103214500';
+import * as S from './views-shop.js?v=261103214500';
+import * as Lg from './views-legal.js?v=261103214500';
+import * as A from './views-admin.js?v=261103214500';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -164,6 +164,20 @@ document.addEventListener('touchend', (e) => {
   if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null;
   if (Math.abs(dx) < 40) return; showSlide(slideIdx + (dx < 0 ? 1 : -1)); clearInterval(slideTimer);
 }, { passive: true });
+// Category circles row: gentle auto-scroll on phones, pauses when touched.
+let catTimer, catHold = 0;
+function startCatRail() {
+  clearInterval(catTimer);
+  const r = $('.h-cats2 > div'); if (!r || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  r.addEventListener('touchstart', () => { catHold = Date.now() + 6000; }, { passive: true });
+  catTimer = setInterval(() => {
+    if (!document.body.contains(r)) return clearInterval(catTimer);
+    if (Date.now() < catHold || r.scrollWidth <= r.clientWidth + 4 || document.documentElement.classList.contains('a11y-stop')) return;
+    const dir = document.dir === 'rtl' ? -1 : 1; const step = (r.firstElementChild?.offsetWidth || 90) + 10;
+    if (Math.abs(r.scrollLeft) + r.clientWidth >= r.scrollWidth - 4) r.scrollTo({ left: 0, behavior: 'smooth' });
+    else r.scrollBy({ left: dir * step, behavior: 'smooth' });
+  }, 2200);
+}
 function startSlides() {
   clearInterval(slideTimer); slideIdx = 0;
   if (!$('.slide') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -266,7 +280,7 @@ function route() {
     sw.addEventListener('scroll', () => { if (sw.scrollWidth > sw.clientWidth + 2) mark(Math.round(Math.abs(sw.scrollLeft) / sw.clientWidth)); }, { passive: true });
     if ('IntersectionObserver' in window) { const io = new IntersectionObserver((es) => es.forEach((x) => { if (x.isIntersecting && sw.scrollWidth <= sw.clientWidth + 2) mark(+x.target.dataset.i); }), { rootMargin: '-45% 0px -45% 0px' }); $$('.pg-slide', sw).forEach((f) => io.observe(f)); }
   }
-  applyA11y(); startTicker(); bars(); startSlides(); observeReveal(); observeBuy(); watchRails(); markCached();
+  applyA11y(); startTicker(); bars(); startSlides(); startCatRail(); observeReveal(); observeBuy(); watchRails(); markCached();
 }
 
 // Fade-in on scroll (skipped when reduced motion / a11y "stop animations" is on).
