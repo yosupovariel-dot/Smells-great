@@ -2763,3 +2763,23 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
 @media (max-width:1023px){.h-offers{inset-inline:12px auto;bottom:28px}.h-offer{min-width:0;padding:.7rem .9rem;gap:.15rem}.h-offer b{font-size:1rem}.h-price strong{font-size:1.2rem}.h-price s{font-size:.85rem}.h-offer i{font-size:.75rem}}
 @media (prefers-reduced-motion:reduce){.h-sale{animation:none}}
 @media (min-width:1024px){.h-offers{bottom:7.5rem}}
+/* Hero offer card v2: prominent, elegant */
+.h-offer{background:#16130F!important;color:#F4EEE4!important;backdrop-filter:none!important;padding:1.1rem 1.4rem 1.1rem 1.2rem!important;border:1px solid rgba(226,200,143,.45);box-shadow:0 30px 60px -24px rgba(0,0,0,.65),0 0 0 6px rgba(22,19,15,.08)!important;position:relative;overflow:hidden}
+.h-offer::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(226,200,143,.18) 50%,transparent 70%);background-size:250% 100%;animation:offerShine 4.5s ease-in-out infinite;pointer-events:none}
+@keyframes offerShine{0%{background-position:150% 0}60%,100%{background-position:-50% 0}}
+.h-offer b{color:#fff!important}
+.h-price strong{color:#E2C88F!important}
+.h-price strong:only-child{color:#E2C88F!important;font-size:1.05rem!important}
+.h-price s{color:#a99d8a!important}
+.h-offer i{display:inline-flex;align-self:flex-start;margin-top:.5rem!important;padding:.45rem .9rem;background:#E2C88F;color:#16130F!important;border-radius:999px;font-size:.8rem!important}
+.h-sale{background:#C62828!important;box-shadow:0 0 0 0 rgba(198,40,40,.5)}
+@media (max-width:1023px){
+  .h-offers{inset-inline:12px 12px!important;bottom:34px!important}
+  .h-offer{flex-direction:row!important;flex-wrap:wrap;align-items:center;column-gap:.7rem;padding:.75rem .9rem!important}
+  .h-offer b{flex:1 1 100%;font-size:1rem!important}
+  .h-offer i{margin:0 0 0 auto!important;margin-inline-start:auto!important;padding:.35rem .75rem}
+  .h-dots{bottom:12px!important;inset-inline-start:50%!important;transform:translateX(-50%)}
+  [dir="rtl"] .h-dots{transform:translateX(50%)}
+  .h-media{aspect-ratio:4/3.6!important}
+}
+@media (prefers-reduced-motion:reduce){.h-offer::before{animation:none}}
