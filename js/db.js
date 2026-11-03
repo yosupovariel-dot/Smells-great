@@ -1,8 +1,8 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261103144745';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261103144745';
+import { SEED_PRODUCTS } from './data.js?v=261103145105';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261103145105';
 
 const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -159,8 +159,19 @@ export const notifications = () => read('notify', []);
 export const markNotesRead = () => write('notify', notifications().map((n) => ({ ...n, read: true })));
 
 // ---------- Demo seed (preview only) ----------
+// Keep the simulated year "live": move all demo timestamps forward so the latest demo order is always recent.
+function shiftDemo() {
+  const os = orders(); const demo = os.filter((o) => o.demo); if (!demo.length) return;
+  const anchor = read('seededAt', 0) || Math.max(...demo.map((o) => o.date));
+  const delta = Date.now() - anchor; if (delta < 30 * 60 * 1000) return;
+  for (const o of demo) { o.date += delta; o.history = (o.history || []).map((h) => ({ ...h, at: h.at + delta })); }
+  saveOrders(os.sort((a, b) => b.date - a.date));
+  const us = users(); us.forEach((u) => { if (u.demo) u.createdAt += delta; }); saveUsers(us);
+  write('notify', notifications().map((n) => ({ ...n, at: n.at + delta })));
+  write('seededAt', Date.now());
+}
 export async function seedDemo() {
-  if (read('seeded', false)) return;
+  if (read('seeded', false)) { shiftDemo(); return; }
   // Demo staff for the client preview — simple usernames, password 1234.
   const staff = [
     ['מנהל', 'admin', 'admin'],
@@ -252,7 +263,7 @@ export async function seedDemo() {
   // Stock levels that reflect a year of sales
   const sold = {}; ol.forEach((o) => o.items.forEach((it) => (sold[it.pid] = (sold[it.pid] || 0) + it.qty)));
   write('products', products().map((p) => (p.quote ? p : { ...p, stock: Math.max(0, Math.round((p.cat === 'diffusers' ? 60 : 140) - (sold[p.id] || 0) * .18 + rnd() * 20)) })));
-  write('seeded', true);
+  write('seeded', true); write('seededAt', Date.now());
 }
 export function resetDemo() { for (const k of ['products', 'users', 'orders', 'seeded', 'notify', 'cart', 'lock', 'club']) try { localStorage.removeItem(K(k)); } catch {} }
 // Remove simulated customers/orders but keep staff and the catalog (use before going live).

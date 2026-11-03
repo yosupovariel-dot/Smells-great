@@ -1,13 +1,13 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103144745';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103144745';
-import { CATEGORIES } from './data.js?v=261103144745';
-import * as db from './db.js?v=261103144745';
-import * as S from './views-shop.js?v=261103144745';
-import * as Lg from './views-legal.js?v=261103144745';
-import * as A from './views-admin.js?v=261103144745';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103145105';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103145105';
+import { CATEGORIES } from './data.js?v=261103145105';
+import * as db from './db.js?v=261103145105';
+import * as S from './views-shop.js?v=261103145105';
+import * as Lg from './views-legal.js?v=261103145105';
+import * as A from './views-admin.js?v=261103145105';
 
 const app = $('#app');
-const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'list', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
+const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
 const ICONS = {
   search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
   user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>',
@@ -344,7 +344,7 @@ document.addEventListener('click', async (e) => {
     case 'filter-clear': state.f = {}; rerender(); break;
     case 'cmdk-open': openPalette(); break;
     case 'cmdk-close': closePalette(); break;
-    case 'goto-new': closePalette(); state.os = 'new'; state.ov = 'list'; location.hash = '#/orders'; rerender(); break;
+    case 'goto-new': closePalette(); state.os = 'new'; state.ov = 'queue'; location.hash = '#/orders'; rerender(); break;
     case 'pv': state.pv = el.dataset.v; rerender(); break;
     case 'noop': { const cb = el.querySelector('input'); if (cb && e.target !== cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true })); } break; }
     case 'sel-clear': state.sel.clear(); rerender(); break;

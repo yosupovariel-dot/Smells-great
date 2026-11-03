@@ -1,8 +1,8 @@
-import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261103144745';
-import { L, getLang } from './i18n.js?v=261103144745';
-import { CATEGORIES } from './data.js?v=261103144745';
-import * as db from './db.js?v=261103144745';
-import { media, statusLabel, small, subName } from './views-shop.js?v=261103144745';
+import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261103145105';
+import { L, getLang } from './i18n.js?v=261103145105';
+import { CATEGORIES } from './data.js?v=261103145105';
+import * as db from './db.js?v=261103145105';
+import { media, statusLabel, small, subName } from './views-shop.js?v=261103145105';
 
 const he = () => getLang() === 'he';
 const T = (h, e) => (he() ? h : e);
@@ -408,7 +408,7 @@ export function staffDrawer(id, role = 'orders') {
 
 // ---------- Orders ----------
 export function ordersBoard(state) {
-  const { view = 'list', month = 'all', q = '', status = '', sel = new Set() } = state;
+  const { view = 'queue', month = 'all', q = '', status = '', sel = new Set() } = state;
   let list = db.orders();
   const months = [...new Set(list.map((o) => monthKey(o.date)))];
   if (month !== 'all') list = list.filter((o) => monthKey(o.date) === month);
@@ -420,7 +420,32 @@ export function ordersBoard(state) {
   const nextLabel = { new: T('להכנה', 'Start'), processing: T('מוכן', 'Ready'), ready: T('נשלח', 'Shipped'), shipped: T('נמסר', 'Delivered') };
   const cols = ['new', 'processing', 'ready', 'shipped', 'delivered'];
   const ocard = (o) => html`<button class="ocard" data-action="order-view" data-id="${o.id}"><span class="oc-h"><b>#${o.num}</b><small>${dt(o.date)}</small></span><span class="oc-n">${o.customer.name}</span><span class="oc-f"><small>${o.customer.city} · ${o.items.reduce((a, i) => a + i.qty, 0)} ${T('פריטים', 'items')}</small><b>${m(o.total)}</b></span></button>`;
-  const body = view === 'board'
+  const DAY = 864e5; const t0 = new Date(); t0.setHours(0, 0, 0, 0);
+  const all = db.orders();
+  const late = (o) => ['new', 'processing'].includes(o.status) && Date.now() - o.date > DAY;
+  const doneToday = all.filter((o) => (o.history || []).some((h) => h.at >= +t0 && h.s !== 'new')).length;
+  const openNow = all.filter((o) => ['new', 'processing', 'ready'].includes(o.status)).length;
+  const ticket = (o) => { const n = next[o.status]; const units = o.items.reduce((a, i) => a + i.qty, 0); return html`<article class="ticket ${late(o) ? 'late' : ''}" data-action="order-view" data-id="${o.id}" tabindex="0">
+      <header><span class="t-no">#${o.num}</span><span class="t-age">${ago(o.date)}</span></header>
+      <p class="t-cust"><b>${o.customer.name}</b><span>${o.customer.city}</span></p>
+      <ul class="t-items">${o.items.slice(0, 3).map((i) => html`<li><span class="t-q">×${i.qty}</span><span>${L(i.name)}</span><small>${i.size !== 'יחידה' && i.size !== 'מארז' ? i.size : ''}</small></li>`)}${o.items.length > 3 ? html`<li class="t-more">+${o.items.length - 3} ${T('פריטים נוספים', 'more')}</li>` : ''}</ul>
+      ${o.customer.notes ? html`<p class="t-note">${o.customer.notes}</p>` : ''}
+      <footer><span class="t-sum">${m(o.total)}<small>${units} ${T('יח׳', 'pcs')}${o.payment !== 'paid' ? ' · ' + T('ממתין לתשלום', 'unpaid') : ''}</small></span>
+        ${n ? html`<button class="t-go" data-action="order-status" data-id="${o.id}" data-s="${n}">${nextLabel[o.status]} <span aria-hidden="true">←</span></button>` : ''}</footer>
+    </article>`; };
+  const lanes = [
+    ['late', T('דורש טיפול עכשיו', 'Needs attention now'), T('ממתינות מעל 24 שעות', 'Waiting over 24 hours'), all.filter(late)],
+    ['new', T('חדשות', 'New'), T('לאשר ולהתחיל להכין', 'Confirm and start'), all.filter((o) => o.status === 'new' && !late(o))],
+    ['processing', T('בהכנה', 'Preparing'), T('לארוז ולסמן כמוכן', 'Pack and mark ready'), all.filter((o) => o.status === 'processing' && !late(o))],
+    ['ready', T('מוכנות לשליח', 'Ready for courier'), T('ממתינות לאיסוף', 'Awaiting pickup'), all.filter((o) => o.status === 'ready')],
+  ];
+  const queue = html`<section class="q-hero">
+      <div><p class="q-k">${T('תור העבודה של היום', "Today's queue")}</p><h2>${openNow ? html`<span class="q-n">${openNow}</span> ${T('הזמנות פתוחות', 'open orders')}` : T('הכל טופל. כל הכבוד.', 'All clear. Nice work.')}</h2></div>
+      <div class="q-prog"><span>${T('טופלו היום', 'Handled today')} <b>${doneToday}</b></span><i><b style-w="${Math.round((doneToday / Math.max(1, doneToday + openNow)) * 100)}"></b></i></div>
+    </section>
+    <div class="lanes">${lanes.map(([k, h, sub, os]) => html`<section class="lane l-${k}" aria-labelledby="ln-${k}"><header><h3 id="ln-${k}">${h}<em>${os.length}</em></h3><small>${sub}</small></header>
+      ${os.length ? os.slice(0, 20).map(ticket) : html`<p class="lane-empty">${T('אין כאן כלום כרגע', 'Nothing here right now')}</p>`}${os.length > 20 ? html`<button class="link-btn" data-action="ov" data-v="list">${T('לכל', 'All')} ${os.length} ${T('ברשימה', 'in list')}</button>` : ''}</section>`)}</div>`;
+  const body = view === 'queue' ? queue : view === 'board'
     ? html`<div class="kanban">${cols.map((c) => { const os = list.filter((o) => o.status === c); return html`<section class="col" aria-label="${statusLabel(c)}"><h3>${statusPill(c)}<span>${os.length}</span></h3>${os.slice(0, 30).map(ocard)}</section>`; })}</div>`
     : html`<section class="panel flush"><div class="tbl-wrap"><table class="tbl orders">
       <thead><tr><th class="ck"><input type="checkbox" data-input="sel-all" aria-label="${T('בחירת כל ההזמנות המוצגות', 'Select all shown')}" ${raw(shown.length && shown.every((o) => sel.has(o.id)) ? 'checked' : '')}></th><th>${T('הזמנה', 'Order')}</th><th>${T('לקוח', 'Customer')}</th><th>${T('פריטים', 'Items')}</th><th>${T('סכום', 'Total')}</th><th>${T('סטטוס', 'Status')}</th><th>${T('פעולה', 'Action')}</th></tr></thead>
@@ -440,7 +465,7 @@ export function ordersBoard(state) {
       <label class="sr-only" for="bulk-st">${T('העברה לסטטוס', 'Move to status')}</label><select class="mini-sel" id="bulk-st" data-input="bulk-status"><option value="">${T('העברה לסטטוס…', 'Move to status…')}</option>${db.STATUSES.map((s) => html`<option value="${s}">${statusLabel(s)}</option>`)}</select>
       <button class="btn sm ghost" data-action="bulk-print">${ICON2.print}<span>${T('הדפסת תעודות משלוח', 'Print slips')}</span></button>
       <button class="link-btn" data-action="sel-clear">${T('ביטול בחירה', 'Clear')}</button></div>` : ''}`,
-    html`<div class="seg" role="group" aria-label="${T('תצוגה', 'View')}"><button aria-pressed="${view === 'list'}" data-action="ov" data-v="list">${T('רשימה', 'List')}</button><button aria-pressed="${view === 'board'}" data-action="ov" data-v="board">${T('לוח', 'Board')}</button></div>
+    html`<div class="seg" role="group" aria-label="${T('תצוגה', 'View')}"><button aria-pressed="${view === 'queue'}" data-action="ov" data-v="queue">${T('תור עבודה', 'Work queue')}</button><button aria-pressed="${view === 'list'}" data-action="ov" data-v="list">${T('רשימה', 'List')}</button><button aria-pressed="${view === 'board'}" data-action="ov" data-v="board">${T('לוח', 'Board')}</button></div>
     <label class="sr-only" for="om">${T('חודש', 'Month')}</label><select class="mini-sel" id="om" data-input="om"><option value="all">${T('כל התקופה', 'All time')}</option>${months.map((k) => html`<option value="${k}" ${raw(k === month ? 'selected' : '')}>${monthName(k)}</option>`)}</select>
     <label class="bo-field">${ICON2.search}<span class="sr-only">${T('חיפוש', 'Search')}</span><input id="oq" type="search" value="${q}" placeholder="${T('מספר, שם או טלפון', 'No., name or phone')}" data-input="oq"></label>`,
     T('ניהול, מעקב ומשלוח', 'Manage, track and ship'));
