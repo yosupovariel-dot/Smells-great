@@ -22,7 +22,7 @@ const D = {
     login: 'התחברות', register: 'הצטרפות למועדון', password: 'סיסמה', logout: 'התנתקות', hello: 'שלום', myOrders: 'ההזמנות שלי', noOrders: 'עדיין אין הזמנות',
     loginFail: 'אימייל או סיסמה שגויים', locked: 'יותר מדי ניסיונות. נסו שוב בעוד מספר דקות.', exists: 'כתובת האימייל כבר רשומה באתר. נסו להתחבר.', phoneExists: 'מספר הטלפון כבר רשום באתר. נסו להתחבר.', wsRequest: 'אני בית עסק — בקשה לחשבון סיטונאי', bizName: 'שם העסק / ח.פ.',
     wsPending: 'בקשת הסיטונאי ממתינה לאישור', clubMember: 'חבר/ת מועדון', newsletter: 'אשמח לקבל עדכונים והטבות (ניתן להסיר בכל עת)',
-    consentTitle: 'לפני שממשיכים:', consentText: 'כדי להמשיך להשתמש באתר, נבקש לאשר את ', accept: 'מאשר/ת', essentialOnly: 'חיוניות בלבד',
+    consentTitle: 'לפני שממשיכים:', consentText: 'נבקש לאשר את ', accept: 'מאשר/ת', essentialOnly: 'חיוניות בלבד',
     a11y: 'נגישות', a11yTitle: 'תפריט נגישות', fontUp: 'הגדלת טקסט', fontDown: 'הקטנת טקסט', contrast: 'ניגודיות גבוהה', dark: 'היפוך צבעים', gray: 'גווני אפור', links: 'הדגשת קישורים', readable: 'גופן קריא', stopAnim: 'עצירת אנימציות', bigCursor: 'סמן גדול', reset: 'איפוס', a11yStatement: 'הצהרת נגישות',
     returns: 'מדיניות החזרות וביטולים', accessibility: 'הצהרת נגישות', info: 'מידע', service: 'שירות לקוחות', followUs: 'עקבו אחרינו',
     builtBy: 'נבנה על ידי arielyosupov-webdesign', rights: 'כל הזכויות שמורות', whatsapp: 'שיחה בוואטסאפ', notFound: 'העמוד לא נמצא', backHome: 'חזרה לדף הבית',
