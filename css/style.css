@@ -2390,3 +2390,20 @@ html.a11y-stop .wsx-arch img,html.a11y-stop .wsx-seal svg{animation:none}
   .pdp-info h1{font-size:2.2rem}
 }
 [dir="rtl"] .swipe-dots{direction:rtl}
+
+/* Oil cards: one square frame for all; wide scenes crop to the side with the name (less bed) */
+.lbl-arch.full,.lbl-arch.full.wide{aspect-ratio:1/1!important}
+.lbl-arch.full.wide img.m1{object-position:2% 50%!important}
+.card.label .lbl-name{min-height:1.3em}
+
+/* Footer: larger, clearer text */
+.fn-col h2{font-size:.95rem!important;letter-spacing:.08em}
+.fn-col a{font-size:1.05rem!important;color:#f1ebe0}
+.fn-cats a span{font-size:1rem}
+.fn-cats img{width:46px!important;height:46px!important}
+.fn-soon{font-size:.92rem!important;color:#b9ae9c!important}
+.fn-soon b{font-size:.78rem!important;padding:.1rem .65rem!important}
+.ftr .brand.logo img{width:190px!important;height:auto!important;max-height:none!important}
+.ftr .muted{font-size:1rem!important;color:#cfc4b3!important}
+.ftr-bottom{font-size:.92rem!important}
+@media (max-width:900px){.fn-col a{font-size:1rem!important}.ftr .brand.logo img{width:160px!important}}
