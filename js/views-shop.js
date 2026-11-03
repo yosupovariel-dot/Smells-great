@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103211134';
-import { t, L, getLang } from './i18n.js?v=261103211134';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103211134';
-import * as db from './db.js?v=261103211134';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103211533';
+import { t, L, getLang } from './i18n.js?v=261103211533';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103211533';
+import * as db from './db.js?v=261103211533';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -154,16 +154,33 @@ export function home() {
     </div>
   </section>
 
-  <section class="h-collection" aria-labelledby="col-t"><div class="wrap">
-    <header class="h-head"><h2 id="col-t">${T('מפיצי ריח', 'Diffusers')}</h2><a class="u-link" href="#/shop/diffusers">${T('כל המפיצים', 'All diffusers')} <span aria-hidden="true">${arrow()}</span></a></header>
-    <a class="hc-banner studio reveal" href="#/shop/diffusers"><img src="assets/products/cat-diffusers-all.webp" alt="${T('כל מפיצי הריח של SAY', 'All SAY diffusers')}" width="2400" height="1000" loading="lazy"></a>
-    ${subTiles('diffusers')}
+  <section class="hz" aria-labelledby="col-t"><div class="wrap">
+    <header class="hz-head"><p class="hz-k">${T('מפיצי ריח', 'Diffusers')}</p><h2 id="col-t">${T('כמה גדול החלל שלכם?', 'How big is your space?')}</h2>
+      <p>${T('זה כל מה שצריך לדעת כדי לבחור. שאר העבודה עלינו — המכשיר שקט, בלי מים ובלי חום.', 'That is all you need to know to choose. The device is silent, with no water and no heat.')}</p></header>
+    <div class="hz-scale" aria-hidden="true"><i></i><span>30 ${T('מ"ר', 'm²')}</span><span>150 ${T('מ"ר', 'm²')}</span><span>300+ ${T('מ"ר', 'm²')}</span></div>
+    <div class="hz-grid">${(db.SITE.subs?.['מפיצי ריח'] || []).map((s2, i) => { const items = active().filter((p) => p.sub === s2); if (!items.length) return ''; const priced = items.filter((p) => !p.quote && minPrice(p) > 0); const lo = priced.length ? Math.min(...priced.map(minPrice)) : 0; const hero = items[items.length - 1];
+      return html`<a class="hz-card reveal" href="#/shop/diffusers/${encodeURIComponent(s2)}">
+        <span class="hz-n latin">0${i + 1}</span>
+        <span class="hz-img"><img src="${small(hero.img)}" alt="" loading="lazy" width="560" height="560"></span>
+        <b>${[T('חדר, רכב או משרד', 'A room, car or office'), T('בית או חלל בינוני', 'A home or mid-size space'), T('עסק, לובי או אולם', 'A business, lobby or hall')][i] || subName(s2)}</b>
+        <small>${subName(s2)}</small>
+        <span class="hz-models">${items.map((p) => L(p.name)).join(' · ')}</span>
+        <span class="hz-foot"><em>${lo ? html`${T('החל מ־', 'From ')}${m(lo)}` : T('הצעת מחיר אישית', 'Personal quote')}</em><i aria-hidden="true">${he() ? '←' : '→'}</i></span>
+      </a>`; })}</div>
+    <p class="hz-help">${T('עדיין מתלבטים?', 'Still unsure?')} <a href="${waLink(T('שלום, אשמח להמלצה על מפיץ ריח', 'Hi, I would like a diffuser recommendation'))}" target="_blank" rel="noopener noreferrer">${T('ספרו לנו על החלל ונמליץ בוואטסאפ', 'Tell us about your space on WhatsApp')}</a></p>
   </div></section>
 
-  <section class="h-oils" aria-labelledby="oil-t"><div class="wrap">
-    <header class="h-head"><div><p class="kicker latin">Fragrance oils</p><h2 id="oil-t">${T('תמציות שמן', 'Fragrance oils')}</h2><p class="h-sub">${T('54 ניחוחות בהשראת בתי מלון, בשמים וטבע — מ־10 מ"ל ועד 5 ליטר.', '54 scents inspired by hotels, perfumes and nature — 10 ml to 5 L.')}</p></div><a class="u-link" href="#/shop/oils">${T('לכל התמציות', 'All oils')} <span aria-hidden="true">${arrow()}</span></a></header>
-    <a class="hc-banner reveal" href="#/shop/oils"><img src="${CATEGORIES.find((x) => x.id === 'oils').img}" alt="${T('תמציות השמן של SAY', 'SAY fragrance oils')}" width="1600" height="900" loading="lazy"></a>
-    ${subTiles('oils')}
+  <section class="hw" aria-labelledby="oil-t"><div class="wrap">
+    <div class="hw-in">
+      <div class="hw-copy">
+        <p class="hz-k">${T('תמציות שמן', 'Fragrance oils')}</p>
+        <h2 id="oil-t">${T('בחרו מקום,', 'Choose a place,')}<br>${T('לא בקבוק.', 'not a bottle.')}</h2>
+        <p>${T('כל תמצית נולדה מזיכרון של מקום — לובי של מלון, חנות שאהבתם, ספא שקט. בחרו את העולם שמרגיש לכם נכון, והבית יתחיל להריח כמוהו.', 'Every oil began as a memory of a place — a hotel lobby, a favourite store, a quiet spa. Pick the world that feels right and your home starts to smell like it.')}</p>
+        ${kit ? html`<a class="hw-kit" href="#/product/${kit.id}"><span><b>${T('לא בטוחים איזה עולם?', 'Not sure which world?')}</b>${T('ערכת התנסות: 14 ריחות, מחליטים אחרי שמריחים', 'Discovery kit: 14 scents, decide after you smell')}</span><em>${m(minPrice(kit))}</em></a>` : ''}
+        <a class="u-link" href="#/shop/oils">${T('לכל התמציות', 'All oils')} <span aria-hidden="true">${arrow()}</span></a>
+      </div>
+      <div class="hw-worlds">${(db.SITE.subs?.['תמציות שמן'] || []).filter((s2) => active().filter((p) => p.sub === s2 && !p.picks).length > 2).sort((x, y) => (y === 'בתי מלון ויוקרה') - (x === 'בתי מלון ויוקרה')).slice(0, 5).map((s2, i) => html`<a class="hw-w reveal" href="#/shop/oils/${encodeURIComponent(s2)}"><img src="${i ? small(subImg('oils', s2)) : subImg('oils', s2)}" alt="" loading="lazy" width="600" height="600"><span><b>${subName(s2)}</b><small>${active().filter((p) => p.sub === s2).length} ${T('ריחות', 'scents')}</small></span></a>`)}</div>
+    </div>
   </div></section>
 
   <section class="h-hair" aria-labelledby="hair-t"><div class="wrap h-hair-in">
