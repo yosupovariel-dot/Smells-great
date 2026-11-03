@@ -2649,3 +2649,4 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
 .pg-slide{aspect-ratio:auto!important;display:flex;align-items:center}
 .pg-slide img{height:auto!important;max-height:80vh}
 @media (max-width:860px){.swipe{align-items:center}}
+@media (min-width:901px){.hdr .brand.logo{margin-inline:clamp(1.5rem,3vw,3rem)!important}}
