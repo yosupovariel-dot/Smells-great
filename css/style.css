@@ -2650,3 +2650,56 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
 .pg-slide img{height:auto!important;max-height:80vh}
 @media (max-width:860px){.swipe{align-items:center}}
 @media (min-width:901px){.hdr .brand.logo{margin-inline:clamp(1.5rem,3vw,3rem)!important}}
+
+/* ===== Rental page ===== */
+.rt{background:#F4EEE4}
+.rt h2{font-size:clamp(1.9rem,3.4vw,3rem);line-height:1.1;margin:0 0 1.4rem;font-weight:700}
+.rt-hero{display:grid;grid-template-columns:1.15fr 1fr;min-height:min(84vh,760px)}
+.rt-copy{padding:clamp(2.5rem,6vw,6rem) clamp(1.5rem,6vw,6rem);display:flex;flex-direction:column;justify-content:center}
+.rt-k{font-size:.82rem;letter-spacing:.1em;font-weight:700;color:#7E6236;margin:0 0 1.2rem}
+.rt h1{font-size:clamp(2.3rem,4.6vw,4.3rem);line-height:1.06;margin:0 0 1.4rem;font-weight:700;color:#8a8073}
+.rt h1 em{font-style:normal;color:var(--ink)}
+.rt h1>*,.rt h1{animation:lineUp 1s cubic-bezier(.2,.7,.1,1) both}
+.rt-lead{font-size:1.08rem;line-height:1.75;color:#4a4238;max-width:31rem;margin:0 0 2rem}
+.rt-cta{display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
+.rt-cta span{font-size:.85rem;color:#6d6457}
+.rt-btn{display:inline-block;padding:1.05rem 1.8rem;background:#16130F;color:#F4EEE4;text-decoration:none;font-weight:700;transition:background .3s}
+.rt-btn:hover{background:#3a332b}
+.rt-btn.light{background:#E2C88F;color:#16130F}.rt-btn.light:hover{background:#F0DDB3}
+.rt-art{position:relative;background:#E9E0D2;overflow:hidden}
+.rt-art figure{margin:0;position:absolute;inset:0}
+.rt-art img{width:100%;height:100%;object-fit:cover;animation:oxZoom 24s ease-in-out infinite alternate}
+.rt-tag{position:absolute;bottom:1.6rem;inset-inline-start:1.6rem;margin:0;background:#FBF8F2;padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.15rem;font-size:.82rem;color:#6d6457;box-shadow:0 24px 40px -26px rgba(22,19,15,.6)}
+.rt-tag b{font-size:1.05rem;color:var(--ink)}
+.rt-vs,.rt-who,.rt-steps{padding-top:clamp(3.5rem,7vw,6rem)}
+.rt-cmp{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.rt-cmp>div{padding:1.6rem;border:1px solid #d9ccb5}
+.rt-cmp h3{margin:0 0 1rem;font-size:1.2rem}
+.rt-cmp ul{list-style:none;margin:0;padding:0;display:grid;gap:.7rem}
+.rt-cmp li{position:relative;padding-inline-start:1.6rem;color:#6d6457}
+.rt-cmp li::before{content:"—";position:absolute;inset-inline-start:0;color:#b5a991}
+.rt-cmp .on{background:#16130F;border-color:#16130F;color:#F4EEE4}
+.rt-cmp .on li{color:#e9e1d4}.rt-cmp .on li::before{content:"✓";color:#E2C88F}
+.rt-wgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem}
+.rt-w{position:relative;aspect-ratio:3/4;overflow:hidden;display:block;text-decoration:none;color:#fff}
+.rt-w img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover!important;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.rt-w:hover img{transform:scale(1.06)}
+.rt-w span{position:absolute;inset:auto 0 0 0;padding:3rem 1rem 1rem;background:linear-gradient(transparent,rgba(22,19,15,.85));display:flex;flex-direction:column;font-size:.85rem;color:#e9e1d4}
+.rt-w b{font-size:1.15rem;color:#fff}
+.rt-steps ol{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;border-top:1px solid #16130F}
+.rt-steps li{padding-top:1.4rem}
+.rt-steps span{font-family:"Secular One",sans-serif;font-size:3rem;line-height:1;color:#C9AD7A}
+.rt-steps b{display:block;font-size:1.3rem;margin:.6rem 0 .4rem}
+.rt-steps p{margin:0;color:#6d6457;line-height:1.65}
+.rt-end{margin-top:clamp(3.5rem,7vw,6rem);background:#16130F;color:#F4EEE4;padding:clamp(3rem,7vw,5.5rem) 0;text-align:center}
+.rt-end h2{max-width:36rem;margin:0 auto 1.8rem}
+.rt-end p{margin:1rem 0 0;color:#a99d8a}
+@media (max-width:860px){
+  .rt-hero{grid-template-columns:1fr;min-height:0}
+  .rt-art{order:-1;aspect-ratio:4/3}
+  .rt-copy{padding:2rem 16px 2.4rem}
+  .rt-btn{width:100%;text-align:center}
+  .rt-cmp,.rt-steps ol{grid-template-columns:1fr}
+  .rt-wgrid{grid-template-columns:1fr 1fr}
+  .rt-tag{bottom:1rem;inset-inline-start:1rem;padding:.7rem .9rem}
+}
