@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103205745';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103205745';
-import { CATEGORIES } from './data.js?v=261103205745';
-import * as db from './db.js?v=261103205745';
-import * as S from './views-shop.js?v=261103205745';
-import * as Lg from './views-legal.js?v=261103205745';
-import * as A from './views-admin.js?v=261103205745';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103205934';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103205934';
+import { CATEGORIES } from './data.js?v=261103205934';
+import * as db from './db.js?v=261103205934';
+import * as S from './views-shop.js?v=261103205934';
+import * as Lg from './views-legal.js?v=261103205934';
+import * as A from './views-admin.js?v=261103205934';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -46,7 +46,7 @@ function header() {
 function mobileMenu() {
   const he = getLang() === 'he'; const T2 = (a, b) => (he ? a : b);
   const all = db.products().filter((p) => p.active !== false);
-  const cats = CATEGORIES.map((c) => ({ ...c, n: all.filter((p) => p.cat === c.id).length })).filter((c) => c.n && c.img);
+  const cats = CATEGORIES.map((c) => ({ ...c, n: all.filter((p) => p.cat === c.id).length })).filter((c) => c.img).sort((a, b) => !!b.n - !!a.n);
   const best = all.filter((p) => p.tag === 'best').slice(0, 3);
   const sm = (x) => (x || '').replace(/(?<!-sm)\.webp$/, '-sm.webp');
   const hr = new Date().getHours();
@@ -59,10 +59,11 @@ function mobileMenu() {
     <button class="mnp-search" data-action="search-open" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>${T2('חפשו מלון, בושם או מכשיר…', 'Search a hotel, perfume or device…')}</button>
     <a class="mnp-finder" href="#/finder"><span class="mnp-f-k">${T2('לא בטוחים?', 'Not sure?')}</span><b>${T2('מצאו את הריח שלכם ב־30 שניות', 'Find your scent in 30 seconds')}</b><i aria-hidden="true">${he ? '←' : '→'}</i></a>
     <p class="mnp-h">${T2('קטגוריות', 'Shop by category')}<a href="#/shop">${T2('לכל החנות', 'Shop all')}</a></p>
-    <div class="mnp-cats">${cats.map((c, k) => html`<a class="mnp-cat" href="#/shop/${c.id}" style-d="${k}"><span class="mnp-ci"><img src="${sm(c.img)}" alt="" loading="lazy" width="200" height="200"></span><b>${c[getLang()]}</b><small>${c.n} ${T2('מוצרים', 'items')}</small></a>`)}</div>
+    <div class="mnp-cats">${cats.map((c, k) => html`<a class="mnp-cat" href="#/shop/${c.id}" style-d="${k}"><span class="mnp-ci"><img src="${sm(c.img)}" alt="" loading="lazy" width="200" height="200"></span><b>${c[getLang()]}</b><small>${c.n ? `${c.n} ${T2('מוצרים', 'items')}` : T2('בקרוב', 'Soon')}</small></a>`)}</div>
+    <a class="mnp-deal" href="#/shop/bundles"><span class="mnp-deal-k">${T2('מבצעים', 'Deals')}</span><b>${T2('מארזים במחיר מיוחד', 'Bundles at a special price')}</b><small>${T2('+ 10% לחברי מועדון בהזמנה ראשונה', '+ 10% off a first order for members')}</small></a>
     ${best.length ? html`<p class="mnp-h">${T2('הכי אהובים עכשיו', 'Loved right now')}</p>
     <div class="mnp-best">${best.map((p) => html`<a href="#/product/${p.id}"><span><img src="${sm(p.img)}" alt="" loading="lazy" width="120" height="120"></span><b>${p.name?.[getLang()] || p.name?.he}</b><em>${T2('רב מכר', 'Bestseller')}</em></a>`)}</div>` : ''}
-    <nav class="mnp-links" aria-label="${T2('עוד', 'More')}"><a href="#/wholesale">${T2('לעסקים וסיטונאים', 'For business')}</a><a href="#/about">${t('about')}</a><a href="#/contact">${t('contact')}</a><a href="#/account">${u ? T2('החשבון שלי', 'My account') : T2('התחברות / הצטרפות למועדון', 'Sign in / join the club')}</a></nav>
+    <nav class="mnp-links" aria-label="${T2('עוד', 'More')}"><a href="#/wholesale">${T2('לעסקים וסיטונאים', 'For business')}</a><a href="#/about">${t('about')}</a><a href="#/contact">${t('contact')}</a><a href="#/account" class="mnp-sup">${T2('כניסה לספקים', 'Supplier login')}</a><a href="#/account">${u ? T2('החשבון שלי', 'My account') : T2('התחברות / הצטרפות למועדון', 'Sign in / join the club')}</a></nav>
     <ul class="mnp-trust"><li><b>${T2('משלוח חינם', 'Free shipping')}</b>${T2('מעל 299 ₪', 'over ₪299')}</li><li><b>${T2('14 יום', '14 days')}</b>${T2('להחזרה', 'returns')}</li><li><b>${T2('מחיר יבואן', 'Importer')}</b>${T2('ישר לצרכן', 'prices')}</li></ul>
     <a class="mnp-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer"><span class="mnp-dot" aria-hidden="true"></span><span><b>${T2('צריכים עזרה בבחירה?', 'Need help choosing?')}</b>${T2('כתבו לנו בוואטסאפ, אנחנו עונים מהר', 'WhatsApp us, we reply fast')}</span></a>
   </div>`;
