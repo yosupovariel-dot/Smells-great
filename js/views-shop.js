@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103183010';
-import { t, L, getLang } from './i18n.js?v=261103183010';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103183010';
-import * as db from './db.js?v=261103183010';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103183243';
+import { t, L, getLang } from './i18n.js?v=261103183243';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103183243';
+import * as db from './db.js?v=261103183243';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -291,6 +291,32 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
   const soon = c && !active().some((p) => p.cat === cat);
   const heroImg = sub ? subImg(cat, sub) : c?.img;
   const title = sub ? subName(sub) : cat ? catName(cat) : T('תוצאות חיפוש', 'Search results');
+  if (cat === 'oils' && !sub && !q) {
+    const fams = subs.map((s2) => ({ s2, n: active().filter((p) => p.sub === s2 && !p.picks).length })).filter((x) => x.n > 2).sort((a, b) => (b.s2 === 'בתי מלון ויוקרה') - (a.s2 === 'בתי מלון ויוקרה'));
+    const kit = active().find((p) => p.picks === 14);
+    return html`<div class="shop-page oils-page">
+    <header class="ox">
+      <div class="ox-copy">${crumbs}
+        <p class="ox-k">${T('תמציות שמן למפיצי ריח', 'Fragrance oils for diffusers')}</p>
+        <h1>${T('כל ריח', 'Every scent')}<br><em>${T('הוא מקום.', 'is a place.')}</em></h1>
+        <p class="ox-lead">${T(`${list.length} תמציות בהשראת בתי מלון, בשמים אייקוניים וטבע. בחרו את המקום שאתם רוצים להרגיש בו — ואנחנו נביא אותו הביתה.`, `${list.length} oils inspired by hotels, iconic perfumes and nature. Pick the place you want to feel — we bring it home.`)}</p>
+        <div class="ox-ways">
+          <a href="#/shop/oils/${encodeURIComponent('בתי מלון ויוקרה')}"><b>${T('אני רוצה ריח של מלון', 'I want a hotel scent')}</b><span>${T('הלובי שאתם זוכרים', 'The lobby you remember')}</span></a>
+          <a href="#/shop/oils/${encodeURIComponent('השראת בשמים יוקרתיים')}"><b>${T('אני אוהב/ת בושם מסוים', 'I love a certain perfume')}</b><span>${T('בהשראת בשמים מוכרים', 'Inspired by famous perfumes')}</span></a>
+          ${kit ? html`<a href="#/product/${kit.id}" class="ox-kit"><b>${T('עוד לא בטוחים?', 'Not sure yet?')}</b><span>${T('ערכת 14 ריחות — מנסים ואז מחליטים', '14-scent kit — try, then decide')}</span></a>` : ''}
+        </div>
+      </div>
+      <figure class="ox-art"><img src="${c.img}" alt="" width="1400" height="1100" fetchpriority="high"></figure>
+    </header>
+    <div class="wrap">
+      ${catTabs(cat)}
+      <section class="ox-worlds" aria-labelledby="ox-w"><h2 id="ox-w">${T('עולמות הריח', 'Scent worlds')}</h2>
+        <div class="ox-wgrid">${fams.map(({ s2, n }, i) => html`<a class="ox-w" href="#/shop/oils/${encodeURIComponent(s2)}"><img src="${i ? small(subImg(cat, s2)) : subImg(cat, s2)}" alt="" width="400" height="300" loading="lazy"><span><b>${subName(s2)}</b><small>${n} ${T('ריחות', 'scents')}</small></span></a>`)}</div>
+      </section>
+      ${sortBar(q, sort, list.filter((p) => !p.picks).length, f)}
+      <div class="grid shop-grid ox-grid">${list.filter((p) => !p.picks).map((p) => card(p))}</div>
+    </div></div><div class="block"></div>`;
+  }
   return html`<div class="shop-page">
     <header class="sp-head cat wrap">
       <div class="sp-head-t">${crumbs}<p class="kicker latin">${cat ? (CATEGORIES.find((x) => x.id === cat)?.en || '') : 'Search'}</p><h1>${title}</h1>
@@ -675,6 +701,7 @@ export function wholesalePage() {
           <a class="wsx-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לקבלת הצעה בוואטסאפ', 'Get a quote on WhatsApp')}</a>
           <a class="wsx-link" href="#ws-gal">${T('ראו סטנדים בשטח', 'See stands in action')}</a>
         </div>
+        <p class="wsx-note2">${T('שיחה קצרה, בלי התחייבות. אתם מריחים קודם — מחליטים אחר כך.', 'A short chat, no commitment. You smell first, decide later.')}</p>
         <ul class="wsx-facts">
           <li><b>${T('התקנה', 'Installed')}</b><span>${T('אצלכם בעסק', 'at your place')}</span></li>
           <li><b>${T('דוגמיות', 'Samples')}</b><span>${T('לפני שמחליטים', 'before you decide')}</span></li>
