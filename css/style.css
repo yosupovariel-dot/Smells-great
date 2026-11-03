@@ -2218,3 +2218,16 @@ html.a11y-stop .mnp-cat{animation:none}
   .mnp-best b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 }
 @media (max-width:900px){.mnp-cat:last-child:nth-child(odd){grid-column:span 2}}
+
+/* Club popup: wider and shorter on tablets/desktop */
+@media (min-width:700px){
+  .supromo.club-card{width:min(720px,100%)}
+  .club-card .cc-body{padding:1.5rem 2rem 1.4rem}
+  .club-card .promo-logo{width:54px!important;margin:.2rem auto .4rem}
+  .club-card h2{font-size:1.6rem!important}
+  .cc-perks{margin-bottom:1rem}
+  .cc-form{grid-template-columns:1fr 1fr;column-gap:.9rem;row-gap:.6rem}
+  .cc-form label:nth-of-type(4),.cc-form label:nth-of-type(5){grid-column:span 1}
+  .cc-form .cc-check,.cc-form .cc-err,.cc-form .cc-go{grid-column:1/-1}
+}
+@media (min-width:700px){.cc-form label:nth-of-type(4){order:1;grid-column:1/-1}.cc-form .cc-check,.cc-form .cc-err,.cc-form .cc-go{order:2}}
