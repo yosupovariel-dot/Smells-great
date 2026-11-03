@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103214500';
-import { t, L, getLang } from './i18n.js?v=261103214500';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103214500';
-import * as db from './db.js?v=261103214500';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103214814';
+import { t, L, getLang } from './i18n.js?v=261103214814';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103214814';
+import * as db from './db.js?v=261103214814';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -524,26 +524,37 @@ export function guide() {
   return html`<div class="wrap legal rich"><p class="eyebrow">SAY Boutique</p><h1>${T('מדריך שימוש, מיקום ותחזוקה', 'Use, placement & care guide')}</h1>${richText(g)}</div>`;
 }
 
+const TRUST = () => html`<ul class="trust3"><li><b>${T('14 יום', '14 days')}</b>${T('להחזרה', 'to return')}</li><li><b>${T('3–5 ימים', '3–5 days')}</b>${T('עד הבית', 'delivery')}</li><li><b>${T('וואטסאפ', 'WhatsApp')}</b>${T('תמיכה אישית', 'support')}</li></ul>`;
+const isDirect = (p) => !(p.quote || p.picks || p.options?.length || p.sizes.length > 1);
 export function cartDrawer() {
-  const tt = db.cartTotals();
-  const left = Math.max(0, FREE_SHIP - (tt.subtotal - tt.discount));
-  const ratio = Math.min(1, (tt.subtotal - tt.discount) / FREE_SHIP);
-  const ups = tt.lines.length ? complements(tt.lines[0].p, 6).filter((x) => !x.quote && !tt.lines.some((l) => l.pid === x.id)).slice(0, 2) : [];
-  return html`<header><h2 id="cart-t">${t('cart')}</h2><button class="icon-btn" data-action="cart-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button></header>
+  const tt = db.cartTotals(); const u = db.me();
+  const net = tt.subtotal - tt.discount;
+  const left = Math.max(0, FREE_SHIP - net);
+  const ratio = Math.min(1, net / FREE_SHIP);
+  const count = tt.lines.reduce((a, l) => a + l.qty, 0);
+  const pool = tt.lines.length ? complements(tt.lines[0].p, 8).filter((x) => !x.quote && !tt.lines.some((l) => l.pid === x.id)) : [];
+  // Best add-on: the cheapest one that unlocks free shipping, else the first suggestion.
+  const up = left ? (pool.filter((x) => minPrice(x) >= left).sort((a, b) => minPrice(a) - minPrice(b))[0] || pool[0]) : pool[0];
+  return html`<header class="cd-head"><h2 id="cart-t">${t('cart')} <span>${count ? `(${count})` : ''}</span></h2><button class="icon-btn" data-action="cart-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button></header>
   <div class="drawer-body">
     ${tt.lines.length ? html`
-      <p class="muted">${left ? t('toFree', { x: m(left) }) : t('gotFree')}</p>
-      <div class="progress" aria-hidden="true"><i class="pbar" data-ratio="${ratio}"></i></div>
-      ${tt.lines.map((l, i) => html`<div class="line">
-        <div class="line-media">${media(l.p)}</div>
-        <div><h3>${L(l.p.name)}</h3><small class="muted">${l.size === 'יחידה' || l.size === 'מארז' ? '' : l.size}${l.opt ? html` · ${l.opt.length > 40 ? l.opt.slice(0, 40) + '…' : l.opt}` : ''}</small>
-          <div class="qty"><button data-action="line-qty" data-i="${i}" data-d="-1" aria-label="${t('decrease')}">−</button><input aria-label="${t('qty')}" value="${l.qty}" readonly><button data-action="line-qty" data-i="${i}" data-d="1" aria-label="${t('increase')}">+</button></div></div>
-        <div><b>${m(l.price * l.qty)}</b><br><button class="link-btn" data-action="line-rm" data-i="${i}">${t('remove')}</button></div>
+      <div class="cd-ship ${left ? '' : 'done'}"><p>${left ? html`${T('עוד', 'Add')} <b>${m(left)}</b> ${T('ומשלוח חינם עד הבית', 'for free delivery')}` : html`<b>${T('יש! המשלוח עלינו', 'Free delivery unlocked')}</b>`}</p>
+        <div class="progress" aria-hidden="true"><i class="pbar" data-ratio="${ratio}"></i></div></div>
+      ${tt.lines.map((l, i) => html`<div class="line cd-line">
+        <a class="line-media" href="#/product/${l.p.id}" data-action="cart-close" tabindex="-1">${media(l.p)}</a>
+        <div class="cd-info"><h3>${L(l.p.name)}</h3><small class="muted">${l.size === 'יחידה' || l.size === 'מארז' ? '' : l.size}${l.opt ? html` · ${l.opt.length > 40 ? l.opt.slice(0, 40) + '…' : l.opt}` : ''}</small>
+          <div class="cd-row"><div class="qty"><button data-action="line-qty" data-i="${i}" data-d="-1" aria-label="${t('decrease')}">−</button><input aria-label="${t('qty')}" value="${l.qty}" readonly><button data-action="line-qty" data-i="${i}" data-d="1" aria-label="${t('increase')}">+</button></div><b>${m(l.price * l.qty)}</b></div>
+          <button class="link-btn cd-rm" data-action="line-rm" data-i="${i}">${t('remove')}</button></div>
       </div>`)}
-      ${ups.length ? html`<div class="upsell"><h3>${t('youMayLike')}</h3>${ups.map((x) => html`<div class="mini"><div class="line-media">${media(x)}</div><div><a href="#/product/${x.id}">${L(x.name)}</a><br><small>${m(Math.min(...x.sizes.map((s) => s.price)))}</small></div><a class="btn sm ghost" href="#/product/${x.id}" data-action="cart-close" aria-label="${L(x.name)}">←</a></div>`)}</div>` : ''}
-    ` : html`<p>${t('cartEmpty')}</p><a class="btn ghost" href="#/shop" data-action="cart-close">${t('continueShop')}</a>`}
+      ${up ? html`<div class="cd-up"><p class="cd-up-k">${left && minPrice(up) >= left ? T('מוסיפים את זה — והמשלוח חינם', 'Add this and delivery is free') : T('לקוחות הוסיפו גם', 'Customers also added')}</p>
+        <div class="cd-up-row"><span class="line-media">${media(up)}</span><span><b>${L(up.name)}</b><small>${m(minPrice(up))}</small></span>
+        ${isDirect(up) ? html`<button class="cd-add" data-action="quick-add" data-id="${up.id}">${T('הוספה', 'Add')} +</button>` : html`<a class="cd-add" href="#/product/${up.id}" data-action="cart-close">${T('לבחירה', 'Choose')}</a>`}</div></div>` : ''}
+      ${!u && !tt.discount ? html`<a class="cd-club" href="#/account/register" data-action="cart-close"><span aria-hidden="true">🎁</span><span><b>${T('10% הנחה על ההזמנה הזאת', '10% off this order')}</b>${T('הצטרפו למועדון בחינם — לוקח 20 שניות', 'Join the club free — takes 20 seconds')}</span></a>` : ''}
+    ` : html`<div class="cd-empty"><span aria-hidden="true">🛍️</span><p><b>${T('העגלה עדיין ריקה', 'Your bag is empty')}</b>${T('בואו נמצא לכם ריח שתתאהבו בו.', 'Let us find a scent you will love.')}</p><a class="btn" href="#/finder" data-action="cart-close">${T('מציאת הריח שלי', 'Find my scent')}</a><a class="u-link" href="#/shop" data-action="cart-close">${t('continueShop')}</a></div>`}
   </div>
-  ${tt.lines.length ? html`<footer>${totalsBlock(tt)}<a class="btn block" href="#/checkout" data-action="cart-close">${t('checkout')}</a></footer>` : ''}`;
+  ${tt.lines.length ? html`<footer class="cd-foot">${totalsBlock(tt)}
+    <a class="btn block cd-go" href="#/checkout" data-action="cart-close"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>${T('לתשלום מאובטח', 'Secure checkout')} · ${m(tt.total)}</a>
+    ${TRUST()}<button class="link-btn cd-cont" data-action="cart-close">${t('continueShop')}</button></footer>` : ''}`;
 }
 
 export const totalsBlock = (tt) => html`<div class="totals">
@@ -555,23 +566,31 @@ export const totalsBlock = (tt) => html`<div class="totals">
 export function checkout() {
   const tt = db.cartTotals(); const u = db.me();
   if (!tt.lines.length) return html`<div class="wrap legal"><h1>${t('checkoutTitle')}</h1><p>${t('cartEmpty')}</p><a class="btn" href="#/shop">${t('continueShop')}</a></div>`;
-  const f = (id, label, type = 'text', ac = '', req = true, val = '') => html`<div class="field"><label for="${id}">${label}${req ? ' *' : ''}</label><input class="input" id="${id}" name="${id}" type="${type}" autocomplete="${ac}" ${raw(req ? 'required aria-required="true"' : '')} value="${val}" maxlength="120" aria-describedby="${id}-e"><span class="err" id="${id}-e" aria-live="polite"></span></div>`;
-  return html`<div class="wrap"><h1 class="sr-only">${t('checkoutTitle')}</h1><div class="checkout">
+  const f = (id, label, type = 'text', ac = '', req = true, val = '', ph = '') => html`<div class="field"><label for="${id}">${label}${req ? '' : html` <small>${T('(רשות)', '(optional)')}</small>`}</label><input class="input" id="${id}" name="${id}" type="${type}" autocomplete="${ac}" ${raw(req ? 'required aria-required="true"' : '')} value="${val}" placeholder="${ph}" maxlength="120" aria-describedby="${id}-e"><span class="err" id="${id}-e" aria-live="polite"></span></div>`;
+  const left = Math.max(0, FREE_SHIP - (tt.subtotal - tt.discount));
+  return html`<div class="co-page"><div class="wrap">
+    <ol class="co-steps" aria-label="${T('שלבי ההזמנה', 'Order steps')}"><li class="done">${T('עגלה', 'Bag')}</li><li class="on" aria-current="step">${T('פרטים ומשלוח', 'Details & delivery')}</li><li>${T('אישור', 'Confirmation')}</li></ol>
+    <h1 class="co-h">${T('עוד רגע והריח בדרך אליכם', 'Almost there — your scent is on its way')}</h1>
+    <div class="checkout co">
     <form data-form="checkout" novalidate>
-      <h2>${t('details')}</h2>
-      <div class="row2">${f('name', t('fullName'), 'text', 'name', true, u?.name || '')}${f('phone', t('phone'), 'tel', 'tel', true, u?.phone || '')}</div>
-      ${f('email', t('email'), 'email', 'email', true, u?.email || '')}
-      <div class="row2">${f('city', t('city'), 'text', 'address-level2')}${f('street', t('street'), 'text', 'street-address')}</div>
-      ${f('apt', t('apt'), 'text', 'off', false)}
-      <div class="field"><label for="notes">${t('notesF')}</label><textarea class="input" id="notes" name="notes" rows="2" maxlength="300"></textarea></div>
-      <h2>${t('payment')}</h2><p class="muted">${t('payNote')}</p>
-      <label class="check"><input type="checkbox" name="agree" required aria-describedby="agree-e"><span>${t('agree')}<a href="#/terms" target="_blank">${t('terms')}</a>${t('and')}<a href="#/privacy" target="_blank">${t('privacy')}</a> *</span></label>
-      <span class="err" id="agree-e" aria-live="polite"></span>
-      <button class="btn block gold" type="submit">${t('placeOrder')} · ${m(tt.total)}</button>
-      <p class="secure-note">${t('secure')}</p>
+      ${!u ? html`<p class="co-login">${T('כבר חברי מועדון?', 'Already a member?')} <a href="#/account">${T('התחברו וקבלו 10% הנחה', 'Sign in for 10% off')}</a></p>` : ''}
+      <section class="co-box"><h2><span>1</span>${T('איך ניצור קשר?', 'How do we reach you?')}</h2>
+        <div class="row2">${f('name', t('fullName'), 'text', 'name', true, u?.name || '')}${f('phone', t('phone'), 'tel', 'tel', true, u?.phone || '', '050-0000000')}</div>
+        ${f('email', t('email'), 'email', 'email', true, u?.email || '', T('לשליחת אישור ההזמנה', 'For your order confirmation'))}</section>
+      <section class="co-box"><h2><span>2</span>${T('לאן לשלוח?', 'Where to deliver?')}</h2>
+        <div class="row2">${f('city', t('city'), 'text', 'address-level2')}${f('street', t('street'), 'text', 'street-address')}</div>
+        ${f('apt', t('apt'), 'text', 'off', false)}
+        <details class="co-notes"><summary>${T('הוספת הערה לשליח', 'Add a note for the courier')}</summary><textarea class="input" id="notes" name="notes" rows="2" maxlength="300"></textarea></details>
+        <p class="co-eta">${T('משלוח עד הבית תוך 3–5 ימי עסקים', 'Home delivery in 3–5 business days')}${left ? '' : html` · <b>${T('חינם', 'free')}</b>`}</p></section>
+      <section class="co-box"><h2><span>3</span>${t('payment')}</h2><p class="muted">${t('payNote')}</p>
+        <label class="check"><input type="checkbox" name="agree" required aria-describedby="agree-e"><span>${t('agree')}<a href="#/terms" target="_blank">${t('terms')}</a>${t('and')}<a href="#/privacy" target="_blank">${t('privacy')}</a></span></label>
+        <span class="err" id="agree-e" aria-live="polite"></span>
+        <button class="btn block co-go" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>${t('placeOrder')} · ${m(tt.total)}</button>
+        <p class="secure-note">${t('secure')}</p>${TRUST()}</section>
     </form>
-    <aside class="summary" aria-label="${t('cart')}">${tt.lines.map((l) => html`<div class="mini"><div class="line-media">${media(l.p)}</div><div>${L(l.p.name)}<br><small class="muted">${l.size} × ${l.qty}${l.opt ? html`<br>${l.opt}` : ''}</small></div><b>${m(l.price * l.qty)}</b></div>`)}<hr>${totalsBlock(tt)}</aside>
-  </div></div>`;
+    <aside class="summary co-sum" aria-label="${t('cart')}"><h2>${T('ההזמנה שלכם', 'Your order')}</h2>${tt.lines.map((l) => html`<div class="mini"><div class="line-media">${media(l.p)}<em>${l.qty}</em></div><div>${L(l.p.name)}<br><small class="muted">${l.size === 'יחידה' || l.size === 'מארז' ? '' : l.size}${l.opt ? html` ${l.opt}` : ''}</small></div><b>${m(l.price * l.qty)}</b></div>`)}<hr>${totalsBlock(tt)}
+      <a class="co-help" href="${waLink(T('שלום, יש לי שאלה לגבי ההזמנה', 'Hi, I have a question about my order'))}" target="_blank" rel="noopener noreferrer">${T('שאלה לפני שמזמינים? כתבו לנו בוואטסאפ', 'A question first? WhatsApp us')}</a></aside>
+  </div></div></div>`;
 }
 
 export function checkoutSubmit(form) {
