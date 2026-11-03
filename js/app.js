@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103210825';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103210825';
-import { CATEGORIES } from './data.js?v=261103210825';
-import * as db from './db.js?v=261103210825';
-import * as S from './views-shop.js?v=261103210825';
-import * as Lg from './views-legal.js?v=261103210825';
-import * as A from './views-admin.js?v=261103210825';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103211134';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103211134';
+import { CATEGORIES } from './data.js?v=261103211134';
+import * as db from './db.js?v=261103211134';
+import * as S from './views-shop.js?v=261103211134';
+import * as Lg from './views-legal.js?v=261103211134';
+import * as A from './views-admin.js?v=261103211134';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -212,7 +212,7 @@ function maybeConsent() {
     d.className = 'consent'; d.setAttribute('role', 'region'); d.setAttribute('aria-labelledby', 'cs-t'); d.setAttribute('aria-live', 'polite');
     render(d, html`<button class="consent-x" data-action="consent" data-v="essential" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
       <span class="consent-ic" aria-hidden="true"><img src="assets/img/mark.webp" alt="" width="44" height="38"></span>
-      <p><b id="cs-t">${t('consentTitle')}</b> ${t('consentText')}<a href="#/terms">${t('terms')}</a>${t('and')}<a href="#/privacy">${t('privacy')}</a>.</p>
+      <p><b id="cs-t">${t('consentTitle')}</b> ${t('consentText')}<a href="#/terms">${t('terms')}</a> ${getLang() === 'he' ? 'ואת' : 'and the'} <a href="#/privacy">${t('privacy')}</a>.</p>
       <div class="actions"><button class="btn sm" data-action="consent" data-v="all">${t('accept')}</button></div>`);
     document.body.append(d); requestAnimationFrame(() => document.documentElement.style.setProperty('--cs-h', d.offsetHeight + 'px'));
     d.addEventListener('click', (e) => { const b = e.target.closest('[data-action="consent"]'); if (!b) return; try { localStorage.setItem('say_consent', JSON.stringify({ v: b.dataset.v, at: Date.now() })); } catch {} d.classList.add('out'); setTimeout(() => d.remove(), 350); });

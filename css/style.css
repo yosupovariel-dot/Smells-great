@@ -2544,3 +2544,10 @@ body.scrolled .hdr .brand.logo img{height:46px!important}
 .hc-sub small{font-size:.78rem;color:var(--muted)}
 @media (max-width:700px){.hc-banner{aspect-ratio:16/9;border-radius:14px}.hc-subs{grid-template-columns:repeat(2,1fr);gap:.7rem}}
 @media (max-width:700px){.hc-subs:has(>:nth-child(3):last-child){grid-template-columns:repeat(3,1fr);gap:.5rem}.hc-subs:has(>:nth-child(3):last-child) b{font-size:.8rem}}
+.consent p{font-family:var(--f-ui,"Assistant"),sans-serif!important;font-size:1rem!important;font-weight:500;color:#e9e1d4!important;text-align:center;letter-spacing:0!important;line-height:1.5!important}
+.consent p b{font-weight:700;color:#fff;margin-inline-end:.25rem}
+.consent p a{color:#E2C88F!important;font-weight:600;text-decoration:none!important;border-bottom:1px solid rgba(226,200,143,.5);padding-bottom:1px}
+.consent p a:hover{border-color:#E2C88F}
+.consent .actions .btn{font-size:1rem!important;padding:.55rem 1.8rem!important}
+@media (max-width:760px){.consent p{font-size:.86rem!important}}
+@media (max-width:760px){.consent p{font-size:.8rem!important}}
