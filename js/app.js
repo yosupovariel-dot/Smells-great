@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103145325';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103145325';
-import { CATEGORIES } from './data.js?v=261103145325';
-import * as db from './db.js?v=261103145325';
-import * as S from './views-shop.js?v=261103145325';
-import * as Lg from './views-legal.js?v=261103145325';
-import * as A from './views-admin.js?v=261103145325';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103145428';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103145428';
+import { CATEGORIES } from './data.js?v=261103145428';
+import * as db from './db.js?v=261103145428';
+import * as S from './views-shop.js?v=261103145428';
+import * as Lg from './views-legal.js?v=261103145428';
+import * as A from './views-admin.js?v=261103145428';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -29,7 +29,10 @@ function header() {
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
       <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-      ${navLink('#/', t('home'))}${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/contact', t('contact'))}
+      <a class="mn-logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400" loading="lazy"></a>
+      <div class="mn-cats">${CATEGORIES.filter((c) => c.img).map((c) => html`<a class="mn-cat" href="#/shop/${c.id}"><img src="${c.img.replace('.webp', '-sm.webp')}" alt="" loading="lazy" width="200" height="200"><span>${c[getLang()]}</span></a>`)}</div>
+      <span class="mn-home">${navLink('#/', t('home'))}</span>${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/contact', t('contact'))}
+      <div class="mn-foot"><a class="btn wa-btn" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">WhatsApp</a><a class="btn ghost" href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a></div>
     </nav>
     <a class="brand logo" href="#/" aria-label="SAY Boutique — ${t('home')}"><img src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400" fetchpriority="high"></a>
     <div class="tools">
