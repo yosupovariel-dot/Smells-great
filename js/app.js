@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103155435';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103155435';
-import { CATEGORIES } from './data.js?v=261103155435';
-import * as db from './db.js?v=261103155435';
-import * as S from './views-shop.js?v=261103155435';
-import * as Lg from './views-legal.js?v=261103155435';
-import * as A from './views-admin.js?v=261103155435';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103155836';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103155836';
+import { CATEGORIES } from './data.js?v=261103155836';
+import * as db from './db.js?v=261103155836';
+import * as S from './views-shop.js?v=261103155836';
+import * as Lg from './views-legal.js?v=261103155836';
+import * as A from './views-admin.js?v=261103155836';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -29,10 +29,8 @@ function header() {
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
       <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-      <a class="mn-logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400" loading="lazy"></a>
-      <div class="mn-cats">${CATEGORIES.filter((c) => c.img).map((c) => html`<a class="mn-cat" href="#/shop/${c.id}"><img src="${c.img.replace('.webp', '-sm.webp')}" alt="" loading="lazy" width="200" height="200"><span>${c[getLang()]}</span></a>`)}</div>
-      <span class="mn-home">${navLink('#/', t('home'))}</span>${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/contact', t('contact'))}
-      <div class="mn-foot"><a class="btn wa-btn" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">WhatsApp</a><a class="btn ghost" href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a></div>
+      <span class="mn-desk">${navLink('#/', t('home'))}${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/contact', t('contact'))}</span>
+      ${mobileMenu()}
     </nav>
     <a class="brand logo" href="#/" aria-label="SAY Boutique — ${t('home')}"><img src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400" fetchpriority="high"></a>
     <div class="tools">
@@ -42,6 +40,32 @@ function header() {
       <a class="icon-btn" href="#/account" aria-label="${t('account')}">${raw(ICONS.user)}</a>
       <button class="icon-btn" data-action="cart-open" aria-label="${t('cart')} (${n})" aria-haspopup="dialog">${raw(ICONS.bag)}${n ? html`<span class="badge" aria-hidden="true">${n}</span>` : ''}</button>
     </div></div></header>`;
+}
+
+// Mobile menu: guide, don't list. One clear next step, visual categories, social proof, reassurance.
+function mobileMenu() {
+  const he = getLang() === 'he'; const T2 = (a, b) => (he ? a : b);
+  const all = db.products().filter((p) => p.active !== false);
+  const cats = CATEGORIES.map((c) => ({ ...c, n: all.filter((p) => p.cat === c.id).length })).filter((c) => c.n && c.img);
+  const best = all.filter((p) => p.tag === 'best').slice(0, 3);
+  const sm = (x) => (x || '').replace(/(?<!-sm)\.webp$/, '-sm.webp');
+  const hr = new Date().getHours();
+  const hello = hr < 12 ? T2('בוקר טוב', 'Good morning') : hr < 18 ? T2('צהריים טובים', 'Good afternoon') : T2('ערב טוב', 'Good evening');
+  const u = db.me();
+  return html`<div class="mnp">
+    <div class="mnp-top"><a class="mnp-logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400" loading="lazy"></a></div>
+    <p class="mnp-hello">${hello}${u ? `, ${u.name.split(' ')[0]}` : ''} <span aria-hidden="true">✦</span></p>
+    <h2 class="mnp-q">${T2('איזה ריח בא לכם היום?', 'What will you smell like today?')}</h2>
+    <button class="mnp-search" data-action="search-open" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>${T2('חפשו מלון, בושם או מכשיר…', 'Search a hotel, perfume or device…')}</button>
+    <a class="mnp-finder" href="#/finder"><span class="mnp-f-k">${T2('לא בטוחים?', 'Not sure?')}</span><b>${T2('מצאו את הריח שלכם ב־30 שניות', 'Find your scent in 30 seconds')}</b><i aria-hidden="true">${he ? '←' : '→'}</i></a>
+    <p class="mnp-h">${T2('קטגוריות', 'Shop by category')}<a href="#/shop">${T2('לכל החנות', 'Shop all')}</a></p>
+    <div class="mnp-cats">${cats.map((c, k) => html`<a class="mnp-cat" href="#/shop/${c.id}" style-d="${k}"><span class="mnp-ci"><img src="${sm(c.img)}" alt="" loading="lazy" width="200" height="200"></span><b>${c[getLang()]}</b><small>${c.n} ${T2('מוצרים', 'items')}</small></a>`)}</div>
+    ${best.length ? html`<p class="mnp-h">${T2('הכי אהובים עכשיו', 'Loved right now')}</p>
+    <div class="mnp-best">${best.map((p) => html`<a href="#/product/${p.id}"><span><img src="${sm(p.img)}" alt="" loading="lazy" width="120" height="120"></span><b>${p.name?.[getLang()] || p.name?.he}</b><em>${T2('רב מכר', 'Bestseller')}</em></a>`)}</div>` : ''}
+    <nav class="mnp-links" aria-label="${T2('עוד', 'More')}"><a href="#/wholesale">${T2('לעסקים וסיטונאים', 'For business')}</a><a href="#/about">${t('about')}</a><a href="#/contact">${t('contact')}</a><a href="#/account">${u ? T2('החשבון שלי', 'My account') : T2('התחברות / הצטרפות למועדון', 'Sign in / join the club')}</a></nav>
+    <ul class="mnp-trust"><li><b>${T2('משלוח חינם', 'Free shipping')}</b>${T2('מעל 299 ₪', 'over ₪299')}</li><li><b>${T2('14 יום', '14 days')}</b>${T2('להחזרה', 'returns')}</li><li><b>${T2('מחיר יבואן', 'Importer')}</b>${T2('ישר לצרכן', 'prices')}</li></ul>
+    <a class="mnp-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer"><span class="mnp-dot" aria-hidden="true"></span><span><b>${T2('צריכים עזרה בבחירה?', 'Need help choosing?')}</b>${T2('כתבו לנו בוואטסאפ, אנחנו עונים מהר', 'WhatsApp us, we reply fast')}</span></a>
+  </div>`;
 }
 
 function footer() {
@@ -357,7 +381,7 @@ document.addEventListener('click', async (e) => {
     case 'menu': $('#nav').classList.add('open'); el.setAttribute('aria-expanded', 'true'); trapFocus($('#nav'), () => $('[data-action="menu-close"]').click()); break;
     case 'menu-close': $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); $('[data-action="menu"]').focus(); break;
     case 'cart-open': openCart(); break;
-    case 'search-open': openSearch(); break;
+    case 'search-open': if ($('#nav').classList.contains('open')) { $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); } openSearch(); break;
     case 'filter-open': modal(S.filterSheet(state.f)); break;
     case 'filter-clear': state.f = {}; rerender(); break;
     case 'cmdk-open': openPalette(); break;
