@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103145105';
-import { t, L, getLang } from './i18n.js?v=261103145105';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103145105';
-import * as db from './db.js?v=261103145105';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103145325';
+import { t, L, getLang } from './i18n.js?v=261103145325';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103145325';
+import * as db from './db.js?v=261103145325';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -642,28 +642,40 @@ export function about() {
 
 export function wholesalePage() {
   const banners = db.SITE.site?.subBanners || {};
-  const s300 = db.product('say-300');
+  const P = 'assets/products/';
+  const gal = [
+    [P + 'hero-1.webp', T('עמדת קבלה במלון', 'Hotel reception')], [P + 'say-400-5.webp', T('עמוד ריח ללובי', 'Lobby scent tower')],
+    [P + 'hero-3.webp', T('תצוגה בחנות', 'In-store display')], [P + 'say-300-3.webp', T('מכשיר לחלל גדול', 'Large-space unit')],
+    [P + 'say-100-12.webp', T('פינת המתנה', 'Waiting corner')], [P + 'say-room-office-11.webp', T('משרד וחדר ישיבות', 'Office & boardroom')],
+    [P + 'hero-0.webp', T('ספא וחדר טיפולים', 'Spa & treatment room')], [P + 'say-400-0.webp', T('סטנד עומד בכניסה', 'Entrance stand')],
+  ];
   const seg = [
-    [T('מלונות וצימרים', 'Hotels & B&Bs'), banners['בתי מלון ויוקרה']], [T('חנויות ורשתות', 'Shops & chains'), banners['חנויות ורשתות מובילות']],
-    [T('קליניקות וספא', 'Clinics & spas'), banners['טבע וספא']], [T('משרדים', 'Offices'), banners['ניקיון ורעננות']],
+    [T('מלונות וצימרים', 'Hotels & B&Bs'), T('האורח זוכר את הריח עוד לפני החדר.', 'Guests remember the scent before the room.'), banners['בתי מלון ויוקרה']],
+    [T('חנויות ורשתות', 'Shops & chains'), T('לקוח שנעים לו — נשאר יותר זמן.', 'Comfortable shoppers stay longer.'), banners['חנויות ורשתות מובילות']],
+    [T('קליניקות וספא', 'Clinics & spas'), T('רוגע מתחיל כבר בדלת.', 'Calm starts at the door.'), banners['טבע וספא']],
+    [T('משרדים', 'Offices'), T('צוות רענן, פגישות נעימות.', 'Fresh team, pleasant meetings.'), banners['ניקיון ורעננות']],
+  ];
+  const steps = [
+    [T('מדברים', 'We talk'), T('הודעה קצרה בוואטסאפ: איזה עסק, כמה מטרים, איזו אווירה.', 'A quick WhatsApp: business type, size, vibe.')],
+    [T('מריחים', 'You sniff'), T('שולחים לכם דוגמיות — בוחרים את הריח שיהיה החתימה שלכם.', 'We send samples — pick your signature scent.')],
+    [T('מתקינים', 'We install'), T('מגיעים, מתקינים את הסטנד ומכוונים עוצמה ושעות.', 'We arrive, install and tune intensity and hours.')],
+    [T('נהנים', 'You enjoy'), T('ממלאים תמציות במחיר סיטונאי — ואנחנו זמינים תמיד.', 'Refills at wholesale prices — we are always here.')],
   ];
   return html`<div class="ws-page">
   <header class="ws-hero wrap">
-    <div><p class="kicker latin">For business</p><h1>${T('מחירי סיטונאות והתקנת סטנדים לעסקים', 'Wholesale prices & stand installation')}</h1>
-      <p class="lead">${T('מלון, חנות, קליניקה או משרד? כתבו לנו בוואטסאפ ונחזור אליכם עם הצעת מחיר סיטונאית — למכשירים, לתמציות בכמויות ולהתקנת סטנד ריח בעסק.', 'Hotel, shop, clinic or office? Message us on WhatsApp for a wholesale quote — devices, bulk oils and in-store scent stands.')}</p>
-      <div class="hero-cta"><a class="btn wa-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לבירור מחירי סיטונאות בוואטסאפ', 'Ask about wholesale on WhatsApp')}</a></div></div>
-    ${s300 ? html`<figure class="sp-arch studio"><img src="${s300.img}" alt="SAY 300" width="900" height="1100"></figure>` : ''}
+    <div><p class="kicker latin">For business</p><h1>${T('העסק שלכם יכול להריח כמו לובי של מלון', 'Your business can smell like a hotel lobby')}</h1>
+      <p class="lead">${T('לקוחות שוכחים מה אמרתם להם — אבל לא איך הרגישו אצלכם. ריח הוא הדרך הכי שקטה ליצור את התחושה הזאת. אנחנו מתקינים סטנדים מעוצבים, מתאימים ריח חתימה, ונותנים מחירי סיטונאות על מכשירים ותמציות.', 'Customers forget what you said, never how you made them feel. We install designed scent stands, match a signature scent and offer wholesale prices.')}</p>
+      <div class="hero-cta"><a class="btn wa-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('בואו נדבר בוואטסאפ', 'Chat on WhatsApp')}</a></div>
+      <ul class="ws-facts"><li><b>${T('התקנה', 'Install')}</b>${T('אצלכם בעסק', 'on site')}</li><li><b>${T('דוגמיות', 'Samples')}</b>${T('לפני שמחליטים', 'before deciding')}</li><li><b>${T('מילוי', 'Refills')}</b>${T('עד 5 ליטר', 'up to 5 L')}</li></ul></div>
+    <div class="ws-mosaic">${gal.slice(0, 3).map(([src, cap]) => html`<figure><img src="${src}" alt="${cap}" loading="lazy"><figcaption>${cap}</figcaption></figure>`)}</div>
   </header>
-  <section class="wrap ws-sec ws-two">
-    <div><h2>${T('במה אפשר לעזור', 'What we offer')}</h2><ul class="ws-list">
-      <li><b>${T('מחירי סיטונאות', 'Wholesale pricing')}</b>${T('מחירים מיוחדים לעסקים על מכשירים ותמציות.', 'Special business prices on devices and oils.')}</li>
-      <li><b>${T('התקנת סטנדים', 'Stand installation')}</b>${T('סטנד ריח מעוצב בעסק שלכם — אנחנו מגיעים, מתקינים ומכוונים.', 'A designed scent stand in your business — we install and set it up.')}</li>
-      <li><b>${T('תמציות בכמויות', 'Bulk oils')}</b>${T('בקבוקים של 500 מ"ל, ליטר ו־5 ליטר לשימוש שוטף.', '500 ml, 1 L and 5 L bottles.')}</li>
-      <li><b>${T('ליווי אישי', 'Personal support')}</b>${T('בחירת ריח, מיקום המכשיר והגדרת זמני עבודה.', 'Scent choice, placement and scheduling.')}</li></ul></div>
-    <div><h2>${T('למי זה מתאים', 'Who it is for')}</h2>
-      <div class="ws-seg two">${seg.map(([h, img]) => html`<div class="ws-card">${img ? html`<span class="ws-img"><img src="${small(img)}" alt="" loading="lazy" width="320" height="240"></span>` : ''}<b>${h}</b></div>`)}</div></div>
-  </section>
-  <section class="wrap ws-cta"><h2>${T('רוצים הצעת מחיר?', 'Want a quote?')}</h2><p>${T('שלחו לנו הודעה — נענה בהקדם.', 'Send us a message — we will reply soon.')}</p>
+  <section class="wrap ws-sec"><p class="kicker">${T('סטנדים בשטח', 'Stands in action')}</p><h2>${T('ככה זה נראה אצלכם', 'How it looks at your place')}</h2>
+    <div class="ws-gallery">${gal.map(([src, cap]) => html`<figure><img src="${src}" alt="${cap}" loading="lazy"><figcaption>${cap}</figcaption></figure>`)}</div></section>
+  <section class="wrap ws-sec"><h2>${T('ארבעה צעדים, אפס כאב ראש', 'Four steps, zero hassle')}</h2>
+    <ol class="ws-steps">${steps.map(([h, d], i) => html`<li><span>0${i + 1}</span><b>${h}</b><p>${d}</p></li>`)}</ol></section>
+  <section class="wrap ws-sec"><h2>${T('למי זה מתאים', 'Who it is for')}</h2>
+    <div class="ws-seg">${seg.map(([h, d, img]) => html`<div class="ws-card">${img ? html`<span class="ws-img"><img src="${small(img)}" alt="" loading="lazy" width="320" height="240"></span>` : ''}<b>${h}</b><p>${d}</p></div>`)}</div></section>
+  <section class="wrap ws-cta"><h2>${T('איזה ריח יהיה החתימה של העסק שלכם?', 'What will your signature scent be?')}</h2><p>${T('הודעה אחת — ואנחנו לוקחים את זה מכאן.', 'One message — we take it from there.')}</p>
     <a class="btn wa-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">WhatsApp · ${PHONE_DISPLAY}</a></section>
   </div><div class="block"></div>`;
 }
