@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103183243';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103183243';
-import { CATEGORIES } from './data.js?v=261103183243';
-import * as db from './db.js?v=261103183243';
-import * as S from './views-shop.js?v=261103183243';
-import * as Lg from './views-legal.js?v=261103183243';
-import * as A from './views-admin.js?v=261103183243';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103183847';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103183847';
+import { CATEGORIES } from './data.js?v=261103183847';
+import * as db from './db.js?v=261103183847';
+import * as S from './views-shop.js?v=261103183847';
+import * as Lg from './views-legal.js?v=261103183847';
+import * as A from './views-admin.js?v=261103183847';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -187,7 +187,6 @@ function maybePromo() {
           <label><span>${he ? 'שם מלא' : 'Full name'} *</span><input name="name" autocomplete="name" required maxlength="80"></label>
           <label><span>${he ? 'מספר טלפון' : 'Phone'} *</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="15" dir="ltr"></label>
           <label><span>${he ? 'דואר אלקטרוני' : 'Email'} *</span><input name="email" type="email" autocomplete="email" required maxlength="120" dir="ltr"></label>
-          <label><span>${he ? 'כתובת מלאה למשלוחים' : 'Full shipping address'} *</span><input name="address" autocomplete="street-address" required maxlength="160"></label>
           <label><span>${he ? 'בחרו סיסמה (8+ תווים, אות ומספר)' : 'Choose a password (8+, letter & digit)'} *</span><input name="password" type="password" autocomplete="new-password" required maxlength="80" dir="ltr"></label>
           <label class="cc-check"><input type="checkbox" name="agree" required><span>${he ? 'אני מאשר/ת הצטרפות למועדון וקבלת עדכונים והטבות בוואטסאפ ובמייל.' : 'I agree to join the club and receive updates and offers by WhatsApp and email.'}</span></label>
           <p class="cc-err" role="alert"></p>
@@ -212,7 +211,7 @@ function maybeConsent() {
     render(d, html`<button class="consent-x" data-action="consent" data-v="essential" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
       <span class="consent-ic" aria-hidden="true"><img src="assets/img/mark.webp" alt="" width="44" height="38"></span>
       <p><b id="cs-t">${t('consentTitle')}</b> ${t('consentText')}<a href="#/terms">${t('terms')}</a>${t('and')}<a href="#/privacy">${t('privacy')}</a>.</p>
-      <div class="actions"><button class="btn sm" data-action="consent" data-v="all">${t('accept')}</button><button class="consent-ess" data-action="consent" data-v="essential">${t('essentialOnly')}</button></div>`);
+      <div class="actions"><button class="btn sm" data-action="consent" data-v="all">${t('accept')}</button></div>`);
     document.body.append(d); requestAnimationFrame(() => document.documentElement.style.setProperty('--cs-h', d.offsetHeight + 'px'));
     d.addEventListener('click', (e) => { const b = e.target.closest('[data-action="consent"]'); if (!b) return; try { localStorage.setItem('say_consent', JSON.stringify({ v: b.dataset.v, at: Date.now() })); } catch {} d.classList.add('out'); setTimeout(() => d.remove(), 350); });
   }, 5000);
@@ -548,8 +547,8 @@ document.addEventListener('submit', async (e) => {
   }
   if (kind === 'club-join') {
     const he = getLang() === 'he'; const err = $('.cc-err', f); const v = (n) => clean(f.elements[n].value, 160);
-    const d = { name: v('name'), phone: v('phone'), email: v('email'), address: v('address'), password: f.elements.password.value };
-    const bad = !valid.name(d.name) ? (he ? 'נא למלא שם מלא' : 'Please enter your name') : !valid.phone(d.phone) ? (he ? 'מספר טלפון לא תקין' : 'Invalid phone') : !valid.email(d.email) ? (he ? 'כתובת אימייל לא תקינה' : 'Invalid email') : d.address.length < 5 ? (he ? 'נא למלא כתובת מלאה' : 'Please enter a full address') : !valid.password(d.password) ? (he ? 'סיסמה: לפחות 8 תווים, אות ומספר' : 'Password: 8+ chars, a letter and a digit') : !f.elements.agree.checked ? (he ? 'יש לאשר את ההצטרפות' : 'Please confirm') : '';
+    const d = { name: v('name'), phone: v('phone'), email: v('email'), password: f.elements.password.value };
+    const bad = !valid.name(d.name) ? (he ? 'נא למלא שם מלא' : 'Please enter your name') : !valid.phone(d.phone) ? (he ? 'מספר טלפון לא תקין' : 'Invalid phone') : !valid.email(d.email) ? (he ? 'כתובת אימייל לא תקינה' : 'Invalid email') : !valid.password(d.password) ? (he ? 'סיסמה: לפחות 8 תווים, אות ומספר' : 'Password: 8+ chars, a letter and a digit') : !f.elements.agree.checked ? (he ? 'יש לאשר את ההצטרפות' : 'Please confirm') : '';
     if (bad) { err.textContent = bad; return; }
     btn.disabled = true;
     try { await db.register({ ...d, newsletter: true }); db.joinClub(d.email.toLowerCase()); }

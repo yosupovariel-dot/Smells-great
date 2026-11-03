@@ -2482,3 +2482,5 @@ html.a11y-stop .wsx-arch img,html.a11y-stop .wsx-seal svg{animation:none}
 }
 .ox-w img,.ox-art img{object-fit:cover!important;background:none!important}
 @media (min-width:861px){.ox-w:first-child{grid-row:auto!important;aspect-ratio:auto!important}.ox-w:first-child b{font-size:1.3rem}}
+@media (min-width:700px){.cc-form label:nth-of-type(4){order:0!important;grid-column:auto!important}}
+@media (min-width:700px){.cc-form>.cc-check,.cc-form>.cc-err,.cc-form>.cc-go{grid-column:1/-1!important}}
