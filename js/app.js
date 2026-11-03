@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103183847';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103183847';
-import { CATEGORIES } from './data.js?v=261103183847';
-import * as db from './db.js?v=261103183847';
-import * as S from './views-shop.js?v=261103183847';
-import * as Lg from './views-legal.js?v=261103183847';
-import * as A from './views-admin.js?v=261103183847';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103201950';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103201950';
+import { CATEGORIES } from './data.js?v=261103201950';
+import * as db from './db.js?v=261103201950';
+import * as S from './views-shop.js?v=261103201950';
+import * as Lg from './views-legal.js?v=261103201950';
+import * as A from './views-admin.js?v=261103201950';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -32,7 +32,7 @@ function header() {
       <span class="mn-desk">${navLink('#/', t('home'))}${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/contact', t('contact'))}</span>
       ${mobileMenu()}
     </nav>
-    <a class="brand logo" href="#/" aria-label="SAY Boutique — ${t('home')}"><img src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400" fetchpriority="high"></a>
+    <a class="brand logo" href="#/" aria-label="SAY Boutique — ${t('home')}"><img src="assets/img/logo-wide.webp" alt="SAY Boutique — Luxury Home Fragrances" width="923" height="350" fetchpriority="high"></a>
     <div class="tools">
       <a class="tool-link" href="#/wholesale">${t('wholesale')}</a><a class="tool-link" href="#/contact">${t('contact')}</a>
       <button class="icon-btn lang-btn" data-action="lang" lang="${getLang() === 'he' ? 'en' : 'he'}" aria-label="${t('langLabel')}">${getLang() === 'he' ? 'EN' : 'עב'}</button>
@@ -53,7 +53,7 @@ function mobileMenu() {
   const hello = hr < 12 ? T2('בוקר טוב', 'Good morning') : hr < 18 ? T2('צהריים טובים', 'Good afternoon') : T2('ערב טוב', 'Good evening');
   const u = db.me();
   return html`<div class="mnp">
-    <div class="mnp-top"><a class="mnp-logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400" loading="lazy"></a></div>
+    <div class="mnp-top"><a class="mnp-logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-wide.webp" alt="SAY Boutique" width="923" height="350" loading="lazy"></a></div>
     <p class="mnp-hello">${hello}${u ? `, ${u.name.split(' ')[0]}` : ''} <span aria-hidden="true">✦</span></p>
     <h2 class="mnp-q">${T2('איזה ריח בא לכם היום?', 'What will you smell like today?')}</h2>
     <button class="mnp-search" data-action="search-open" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>${T2('חפשו מלון, בושם או מכשיר…', 'Search a hotel, perfume or device…')}</button>
