@@ -1,8 +1,8 @@
-import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261103211533';
-import { L, getLang } from './i18n.js?v=261103211533';
-import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261103211533';
-import * as db from './db.js?v=261103211533';
-import { media, statusLabel, small, subName } from './views-shop.js?v=261103211533';
+import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261103212412';
+import { L, getLang } from './i18n.js?v=261103212412';
+import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261103212412';
+import * as db from './db.js?v=261103212412';
+import { media, statusLabel, small, subName } from './views-shop.js?v=261103212412';
 
 const he = () => getLang() === 'he';
 const T = (h, e) => (he() ? h : e);
@@ -65,7 +65,7 @@ function shell(active, title, body, tools = '', sub = '') {
   const today = new Date().toLocaleDateString(he() ? 'he-IL' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
   return html`<div class="bo">
     <nav class="bo-side" aria-label="${T('ניווט ניהול', 'Admin navigation')}">
-      <a class="bo-brand" href="#/admin"><img src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400"><small>Back office</small></a>
+      <a class="bo-brand" href="#/admin"><img src="assets/img/logo-wide.webp" alt="SAY Boutique" width="923" height="350"><small>Back office</small></a>
       ${links.map(([g, l]) => html`<p class="bo-group">${g}</p>${l.map(([k, href, ic, label]) => html`<a href="${href}" aria-current="${active === k ? 'page' : 'false'}">${ICON[ic]}<span>${label}</span>${k === 'orders' && unread ? html`<em class="bo-count" aria-label="${unread} ${T('חדשות', 'new')}">${unread}</em>` : ''}</a>`)}`)}
       <span class="spacer"></span>
       <div class="bo-me">${avatar(u.name)}<span><b>${u.name}</b><small>${roleName(u.role)}</small></span><button data-action="logout" aria-label="${T('יציאה', 'Sign out')}" title="${T('יציאה', 'Sign out')}">${ICON.out}</button></div>

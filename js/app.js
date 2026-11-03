@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103211533';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103211533';
-import { CATEGORIES } from './data.js?v=261103211533';
-import * as db from './db.js?v=261103211533';
-import * as S from './views-shop.js?v=261103211533';
-import * as Lg from './views-legal.js?v=261103211533';
-import * as A from './views-admin.js?v=261103211533';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103212412';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103212412';
+import { CATEGORIES } from './data.js?v=261103212412';
+import * as db from './db.js?v=261103212412';
+import * as S from './views-shop.js?v=261103212412';
+import * as Lg from './views-legal.js?v=261103212412';
+import * as A from './views-admin.js?v=261103212412';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -88,7 +88,7 @@ function footer() {
   const y = new Date().getFullYear();
   return html`<footer class="ftr"><div class="wrap">
     <div class="ftr-grid">
-      <div><a class="brand logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-full-light.png" alt="SAY Boutique — Luxury Home Fragrances" width="360" height="478" loading="lazy"></a><p class="muted">${t('tick2')}</p>
+      <div><a class="brand logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-wide-light.webp" alt="SAY Boutique — Luxury Home Fragrances" width="923" height="350" loading="lazy"></a><p class="muted">${t('tick2')}</p>
         <p class="ftr-contact"><a class="fc-btn" href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a><a class="fc-btn wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
       ${footNav()}
     </div>
@@ -181,7 +181,7 @@ function maybePromo() {
       <button class="promo-x" hidden data-action="promo-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
       <div class="cc-body">
         <span class="cc-star" aria-hidden="true">✦</span>
-        <img class="promo-logo" src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400">
+        <img class="promo-logo" src="assets/img/logo-wide.webp" alt="SAY Boutique" width="923" height="350">
         <h2 id="pr-t">${he ? 'הכרטיס שלכם למועדון SAY' : 'Your SAY Club card'}</h2>
         <p class="cc-sub">${he ? 'הצטרפו עכשיו (בחינם) וקבלו:' : 'Join now (free) and get:'}</p>
         <p class="cc-perks"><b>${he ? '10% הנחה מיידית בקנייה הראשונה' : '10% off your first order'}</b><span>|</span>${he ? 'הטבות לחברי מועדון בלבד' : 'Members-only offers'}<span>|</span>${he ? 'הטבה ייחודית ביום ההולדת!' : 'A birthday treat!'}</p>
