@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103212652';
-import { t, L, getLang } from './i18n.js?v=261103212652';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103212652';
-import * as db from './db.js?v=261103212652';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103212726';
+import { t, L, getLang } from './i18n.js?v=261103212726';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103212726';
+import * as db from './db.js?v=261103212726';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -309,7 +309,7 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
     <header class="ox">
       <div class="ox-copy">${crumbs}
         <p class="ox-k">${T('תמציות שמן למפיצי ריח', 'Fragrance oils for diffusers')}</p>
-        <h1>${T('כל ריח', 'Every scent')}<br><em>${T('הוא מקום.', 'is a place.')}</em></h1>
+        <h1>${T('נושמים פנימה.', 'Breathe in.')}<br><em>${T('ומרגישים במלון.', 'You are at the hotel.')}</em></h1>
         <p class="ox-lead">${T(`${list.length} תמציות בהשראת בתי מלון, בשמים אייקוניים וטבע. בחרו את המקום שאתם רוצים להרגיש בו — ואנחנו נביא אותו הביתה.`, `${list.length} oils inspired by hotels, iconic perfumes and nature. Pick the place you want to feel — we bring it home.`)}</p>
         <div class="ox-ways">
           <a href="#/shop/oils/${encodeURIComponent('בתי מלון ויוקרה')}"><b>${T('אני רוצה ריח של מלון', 'I want a hotel scent')}</b><span>${T('הלובי שאתם זוכרים', 'The lobby you remember')}</span></a>
@@ -317,7 +317,7 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
           ${kit ? html`<a href="#/product/${kit.id}" class="ox-kit"><b>${T('עוד לא בטוחים?', 'Not sure yet?')}</b><span>${T('ערכת 14 ריחות — מנסים ואז מחליטים', '14-scent kit — try, then decide')}</span></a>` : ''}
         </div>
       </div>
-      <figure class="ox-art"><img src="${c.img}" alt="" width="1400" height="1100" fetchpriority="high"></figure>
+      <figure class="ox-art"><span class="mist" aria-hidden="true"><i></i><i></i><i></i></span><img src="${c.img}" alt="" width="1400" height="1100" fetchpriority="high"></figure>
     </header>
     <div class="wrap">
       ${catTabs(cat)}

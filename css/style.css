@@ -2620,3 +2620,16 @@ body.scrolled .hdr .brand.logo img{height:46px!important}
 .sp-cats{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))!important;gap:.8rem!important}
 .sp-cat.soon{opacity:.7}
 @media (max-width:700px){.sp-cats{display:flex!important;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:0 16px .4rem;scrollbar-width:none}.sp-cat{flex:0 0 31%;scroll-snap-align:start}}
+/* Oils hero motion: slow zoom + rising scent mist + headline reveal */
+.ox-art img{animation:oxZoom 22s ease-in-out infinite alternate}
+@keyframes oxZoom{from{transform:scale(1)}to{transform:scale(1.09) translateY(-1.5%)}}
+.mist{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.mist i{position:absolute;bottom:-30%;width:45%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(255,250,240,.55),transparent 65%);filter:blur(18px);animation:mistUp 11s ease-in infinite}
+.mist i:nth-child(1){inset-inline-start:15%}
+.mist i:nth-child(2){inset-inline-start:45%;animation-delay:3.6s;width:38%}
+.mist i:nth-child(3){inset-inline-start:30%;animation-delay:7.2s;width:52%}
+@keyframes mistUp{0%{transform:translateY(0) scale(.6);opacity:0}25%{opacity:.9}100%{transform:translateY(-150%) scale(1.3);opacity:0}}
+.ox h1,.ox-lead,.ox-ways a{animation:lineUp 1s cubic-bezier(.2,.7,.1,1) both}
+.ox-lead{animation-delay:.15s}.ox-ways a:nth-child(1){animation-delay:.3s}.ox-ways a:nth-child(2){animation-delay:.4s}.ox-ways a:nth-child(3){animation-delay:.5s}
+@media (prefers-reduced-motion:reduce){.ox-art img,.mist i,.ox h1,.ox-lead,.ox-ways a{animation:none!important}}
+html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
