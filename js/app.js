@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103182436';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103182436';
-import { CATEGORIES } from './data.js?v=261103182436';
-import * as db from './db.js?v=261103182436';
-import * as S from './views-shop.js?v=261103182436';
-import * as Lg from './views-legal.js?v=261103182436';
-import * as A from './views-admin.js?v=261103182436';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103182629';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103182629';
+import { CATEGORIES } from './data.js?v=261103182629';
+import * as db from './db.js?v=261103182629';
+import * as S from './views-shop.js?v=261103182629';
+import * as Lg from './views-legal.js?v=261103182629';
+import * as A from './views-admin.js?v=261103182629';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -258,7 +258,11 @@ function route() {
   render(app, html`${header()}<main id="main" tabindex="-1">${v}</main>${footer()}`);
   document.title = title;
   if (matchMedia('(max-width:800px)').matches) $$('.ftr-col').forEach((d) => d.removeAttribute('open'));
-  const sw = $('.swipe'); if (sw) sw.addEventListener('scroll', () => { const i = Math.round(Math.abs(sw.scrollLeft) / sw.clientWidth); $$('.swipe-dots i').forEach((d, k) => d.classList.toggle('on', k === i)); }, { passive: true });
+  const sw = $('.swipe'); if (sw) {
+    const mark = (i) => { $$('.swipe-dots i').forEach((d, k) => d.classList.toggle('on', k === i)); $$('.pg-rail button').forEach((b, k) => b.setAttribute('aria-pressed', k === i)); const n = $('#pg-n'); if (n) n.textContent = i + 1; };
+    sw.addEventListener('scroll', () => { if (sw.scrollWidth > sw.clientWidth + 2) mark(Math.round(Math.abs(sw.scrollLeft) / sw.clientWidth)); }, { passive: true });
+    if ('IntersectionObserver' in window) { const io = new IntersectionObserver((es) => es.forEach((x) => { if (x.isIntersecting && sw.scrollWidth <= sw.clientWidth + 2) mark(+x.target.dataset.i); }), { rootMargin: '-45% 0px -45% 0px' }); $$('.pg-slide', sw).forEach((f) => io.observe(f)); }
+  }
   applyA11y(); startTicker(); bars(); startSlides(); observeReveal(); observeBuy(); watchRails(); markCached();
 }
 
@@ -431,7 +435,7 @@ document.addEventListener('click', async (e) => {
     case 'cart-close': closeCart(); break;
     case 'slide': showSlide(+el.dataset.i); clearInterval(slideTimer); break;
     case 'slide-step': showSlide(slideIdx + +el.dataset.d); clearInterval(slideTimer); break;
-    case 'thumb': { const img = $('.pdp-media img'); if (img) img.src = el.dataset.src; $$('.thumbs button').forEach((b) => b.setAttribute('aria-pressed', b === el)); break; }
+    case 'thumb': { const f = $$('.pg-slide')[+el.dataset.i]; const sw = $('.swipe'); if (!f || !sw) break; if (sw.scrollWidth > sw.clientWidth + 2) sw.scrollTo({ left: f.offsetLeft - sw.offsetLeft, behavior: 'smooth' }); else window.scrollTo({ top: f.getBoundingClientRect().top + scrollY - 110, behavior: 'smooth' }); break; }
     case 'go-cart': closeModal(); openCart(); break;
     case 'quick-add': { const p = db.product(id); db.addToCart(id, p.sizes[0].label, 1); toast(`${t('added')}: ${p.name[getLang()]}`); if (!document.body.classList.contains('cart-open')) openCart(); break; }
     case 'qty': { const i = $('#qty'); i.value = Math.max(1, Math.min(99, (parseInt(i.value) || 1) + +el.dataset.d)); break; }
@@ -495,7 +499,11 @@ document.addEventListener('change', (e) => {
   const map = { sort: 'sort', range: 'range', pcat: 'pcat', ur: 'ur', om: 'om', os: 'os' };
   if (map[k]) { state[map[k]] = k === 'range' ? +el.value : el.value; rerender(); }
   if (k === 'size') { const pr = $('#pdp-price'); if (pr) pr.firstChild.textContent = new Intl.NumberFormat(getLang() === 'he' ? 'he-IL' : 'en-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 }).format(+el.dataset.price); }
-  if (k === 'opt' && el.dataset.img) { const img = $('.pdp-media img'); if (img) img.src = el.dataset.img; }
+  if (k === 'opt' && el.dataset.img) {
+    const want = el.dataset.img.replace(/-sm\.webp$/, '.webp'); const slides = $$('.pg-slide'); let i = slides.findIndex((f) => f.querySelector('img').getAttribute('src').replace(/-sm\.webp$/, '.webp') === want);
+    if (i < 0 && slides[0]) { slides[0].querySelector('img').src = el.dataset.img; i = 0; }
+    $$('.pg-rail button')[i]?.click();
+  }
   if (k === 'pick' || k === 'surprise') {
     const box = $('.pick-groups'); const max = +box.dataset.max; const sur = $('[data-input="surprise"]').checked;
     const picked = $$('[data-input="pick"]:checked');

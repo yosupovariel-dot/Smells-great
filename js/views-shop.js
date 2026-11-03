@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103182436';
-import { t, L, getLang } from './i18n.js?v=261103182436';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103182436';
-import * as db from './db.js?v=261103182436';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103182629';
+import { t, L, getLang } from './i18n.js?v=261103182629';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103182629';
+import * as db from './db.js?v=261103182629';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -353,11 +353,11 @@ export function productPage(id) {
   const groups = [...new Set(pickList.map((x) => x.sub))];
   return html`<div class="wrap"><div class="pdp">
     <div class="pdp-gallery">
-      <div class="pdp-media ${p.fit === 'contain' ? 'contain' : 'photo'}" data-zoom>${media(p, '', true, gallery[0], true)}</div>
-      ${gallery.length > 1 ? html`<div class="swipe ${p.fit === 'contain' ? 'contain' : ''}" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<img src="${i ? small(g) : g}" alt="${L(p.name)} ${i + 1}" width="800" height="1000" ${raw(i ? 'loading="lazy"' : '')}>`)}</div><div class="swipe-dots" aria-hidden="true">${gallery.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>` : ''}
-      ${gallery.length > 1 ? html`<div class="thumbs" role="group" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<button data-action="thumb" data-src="${g}" aria-label="${T('תמונה', 'Image')} ${i + 1}" aria-pressed="${i === 0}"><img src="${small(g)}" alt="" loading="lazy" width="120" height="120"></button>`)}</div>` : ''}
+      ${gallery.length > 1 ? html`<div class="pg-rail" role="group" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<button data-action="thumb" data-i="${i}" aria-label="${T('תמונה', 'Image')} ${i + 1}" aria-pressed="${i === 0}"><img src="${small(g)}" alt="" loading="lazy" width="120" height="120"></button>`)}</div>` : ''}
+      <div class="swipe ${p.fit === 'contain' ? 'contain' : ''}" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<figure class="pg-slide" data-i="${i}"><img src="${g}" alt="${L(p.name)} ${i + 1}" width="1000" height="1250" ${raw(i ? 'loading="lazy"' : 'fetchpriority="high"')} decoding="async"></figure>`)}</div>
+      ${gallery.length > 1 ? html`<div class="pg-count" dir="ltr" aria-hidden="true"><b id="pg-n">1</b> / ${gallery.length}</div><div class="swipe-dots" aria-hidden="true">${gallery.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>` : ''}
     </div>
-    <div>
+    <div class="pdp-info">
       <div class="crumbs"><a href="#/">${t('home')}</a> / <a href="#/shop/${p.cat}">${catName(p.cat)}</a>${p.sub ? html` / <a href="#/shop/${p.cat}/${encodeURIComponent(p.sub)}">${subName(p.sub)}</a>` : ''}</div>
       <p class="eyebrow">${p.sub ? subName(p.sub) : catName(p.cat)}</p>
       <h1>${L(p.name)}</h1>
