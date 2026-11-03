@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103221726';
-import { t, L, getLang } from './i18n.js?v=261103221726';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103221726';
-import * as db from './db.js?v=261103221726';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103222603';
+import { t, L, getLang } from './i18n.js?v=261103222603';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103222603';
+import * as db from './db.js?v=261103222603';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -302,7 +302,7 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
 
   const subs = (db.SITE.subs?.[c?.he] || []).filter((s2) => active().some((p) => p.sub === s2));
   const soon = c && !active().some((p) => p.cat === cat);
-  const heroImg = sub ? subImg(cat, sub) : c?.img;
+  const heroImg = sub ? subImg(cat, sub) : cat === 'diffusers' ? 'assets/products/cat-diffusers-grid.webp' : c?.img;
   const title = sub ? subName(sub) : cat ? catName(cat) : T('תוצאות חיפוש', 'Search results');
   if (cat === 'oils' && !sub && !q) {
     const worlds = subs.map((s2) => ({ s2, n: active().filter((p) => p.sub === s2 && !p.picks).length })).filter((x) => x.n).sort((x, y) => (y.s2 === 'בתי מלון ויוקרה') - (x.s2 === 'בתי מלון ויוקרה'));
