@@ -1,8 +1,8 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261103150023';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261103150023';
+import { SEED_PRODUCTS } from './data.js?v=261103155435';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261103155435';
 
 const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -47,13 +47,13 @@ export const users = () => read('users', []);
 const saveUsers = (l) => write('users', l);
 export const publicUser = (u) => u && (({ salt, hash, ...rest }) => rest)(u);
 
-export async function register({ name, email, phone, password, wholesale, biz, newsletter }) {
+export async function register({ name, email, phone, password, wholesale, biz, newsletter, address }) {
   const l = users(); email = email.toLowerCase().trim();
   if (l.some((u) => u.email === email)) throw new Error('exists');
   const ph = (x) => String(x || '').replace(/\D/g, '').replace(/^972/, '0');
   if (phone && l.some((u) => u.phone && ph(u.phone) === ph(phone))) throw new Error('phoneExists');
   const { salt, hash } = await hashPw(password);
-  const u = { id: uid('u_'), name, email, phone, role: 'customer', wsRequest: !!wholesale, biz: biz || '', newsletter: !!newsletter, club: true, blocked: false, firstOrderDiscount: true, createdAt: Date.now(), salt, hash };
+  const u = { id: uid('u_'), name, email, phone, role: 'customer', wsRequest: !!wholesale, biz: biz || '', newsletter: !!newsletter, address: address || '', club: true, blocked: false, firstOrderDiscount: true, createdAt: Date.now(), salt, hash };
   l.push(u); saveUsers(l); setSession(u.id); return publicUser(u);
 }
 

@@ -2118,3 +2118,35 @@ img[src*="/oil-"]{object-fit:contain!important;background:#f4ede2}
 
 .card-mark{display:block;width:34px;height:auto;margin:0 auto .35rem;mix-blend-mode:multiply}
 .card>.card-mark{margin-top:.9rem}
+
+
+/* ===== Club card popup (cream + gold) ===== */
+.supromo.club-card{width:min(440px,100%);max-height:calc(100svh - 24px);overflow-y:auto;background:#F7F1E6!important;backdrop-filter:none!important;border-radius:6px!important;border:0!important;padding:10px!important;box-shadow:0 40px 90px -30px rgba(0,0,0,.7)!important;text-align:center}
+.club-card .cc-body{border:1px solid #C9AD7A;border-radius:3px;padding:1.6rem 1.4rem 1.3rem}
+.club-card .cc-star{display:block;color:#A9874F;font-size:1.2rem;line-height:1}
+.club-card .promo-logo{width:74px!important;height:auto;margin:.3rem auto .6rem;display:block}
+.club-card h2{font-size:1.45rem!important;margin:0 0 .5rem!important;font-weight:700}
+.cc-sub{margin:0 0 .3rem;font-size:.95rem}
+.cc-perks{margin:0 0 1.1rem;font-size:.86rem;line-height:1.6;color:var(--ink-2)}
+.cc-perks span{color:#C9AD7A;margin:0 .35rem}
+.cc-form{display:grid;gap:.55rem;text-align:start}
+.cc-form label{display:grid;gap:.2rem;font-size:.8rem;font-weight:600}
+.cc-form input:not([type=checkbox]){width:100%;border:1px solid #d9ccb5;background:#fff;border-radius:4px;padding:.6rem .7rem;font:inherit;font-size:.95rem}
+.cc-form input:focus{outline:2px solid #C9AD7A;outline-offset:0;border-color:#C9AD7A}
+.cc-form input[dir=ltr]{text-align:right}
+.cc-check{display:flex!important;gap:.5rem;align-items:flex-start;font-weight:400!important;font-size:.8rem!important;line-height:1.45}
+.cc-check input{margin-top:.2rem;accent-color:#16130F;width:16px;height:16px;flex:0 0 auto}
+.cc-err{color:#a33a2c;font-size:.82rem;margin:0;min-height:1em}
+.club-card .cc-go{background:#16130F;color:#fff;border-radius:4px!important;min-height:50px;font-weight:700}
+.cc-code{font-family:"IBM Plex Mono",monospace;font-size:2rem;letter-spacing:.15em;margin:.3rem auto 1rem;padding:.5rem 1rem;border:1.5px dashed #A9874F;display:inline-block;background:#fff}
+.club-card .promo-x{top:18px!important;inset-inline-end:auto!important;left:18px!important}
+@media (max-width:480px){.club-card .cc-body{padding:1.2rem 1rem 1rem}.club-card h2{font-size:1.25rem!important}.cc-form{gap:.45rem}}
+
+/* Oil label frame follows the photo's own shape: full image, no bands, no crop */
+.lbl-arch.full{aspect-ratio:1/1!important;width:100%!important;border-radius:12px!important;box-shadow:0 14px 30px -22px rgba(22,19,15,.6)!important;background:#EDE4D6!important}
+.lbl-arch.full.wide{aspect-ratio:1.83/1!important}
+.lbl-arch.full img.bgfill{display:none!important}
+.lbl-arch.full img.m1{object-fit:cover!important;transition:transform 1s cubic-bezier(.2,.7,.2,1)!important}
+.card.label:hover .lbl-arch.full img.m1{transform:scale(1.03)!important}
+.card.label .lbl{justify-content:flex-start}
+.card-mark{width:30px!important;border-radius:50%;-webkit-mask-image:radial-gradient(circle,#000 56%,transparent 72%);mask-image:radial-gradient(circle,#000 56%,transparent 72%)}

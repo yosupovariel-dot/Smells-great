@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103150023';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103150023';
-import { CATEGORIES } from './data.js?v=261103150023';
-import * as db from './db.js?v=261103150023';
-import * as S from './views-shop.js?v=261103150023';
-import * as Lg from './views-legal.js?v=261103150023';
-import * as A from './views-admin.js?v=261103150023';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103155435';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103155435';
+import { CATEGORIES } from './data.js?v=261103155435';
+import * as db from './db.js?v=261103155435';
+import * as S from './views-shop.js?v=261103155435';
+import * as Lg from './views-legal.js?v=261103155435';
+import * as A from './views-admin.js?v=261103155435';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -138,14 +138,25 @@ function maybePromo() {
     if ($('.consent') || document.body.classList.contains('cart-open') || $('#modal') || $('#search-ov')) { setTimeout(show, 2500); return; }
     const he = getLang() === 'he';
     const w = document.createElement('div'); w.id = 'promo'; w.className = 'promo-bg';
-    render(w, html`<div class="supromo glass-card" role="dialog" aria-modal="true" aria-labelledby="pr-t">
+    render(w, html`<div class="supromo club-card" role="dialog" aria-modal="true" aria-labelledby="pr-t">
       <button class="promo-x" hidden data-action="promo-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-      <img class="promo-logo" src="assets/img/logo-header.png" alt="" width="360" height="400">
-      <p class="promo-k">${he ? 'מועדון הלקוחות של SAY' : 'SAY Members Club'}</p>
-      <h2 id="pr-t">${he ? '10% הנחה על ההזמנה הראשונה' : '10% off your first order'}</h2>
-      <ul class="promo-list"><li>${he ? 'הצטרפות חינם, בלי התחייבות' : 'Free to join, no commitment'}</li><li>${he ? 'הטבות ומבצעים לחברי מועדון בלבד' : 'Members-only offers'}</li><li>${he ? 'הנחה מיוחדת ביום ההולדת' : 'A special birthday discount'}</li><li>${he ? 'מעקב אחרי ההזמנות שלכם' : 'Track your orders'}</li></ul>
-      <a class="btn block" href="#/account/register" data-action="promo-join">${he ? 'להצטרפות חינם' : 'Join free'}</a>
-      <button class="promo-later" data-action="promo-close">${he ? 'אולי בפעם אחרת' : 'Maybe later'}</button>
+      <div class="cc-body">
+        <span class="cc-star" aria-hidden="true">✦</span>
+        <img class="promo-logo" src="assets/img/logo-header.png" alt="SAY Boutique" width="360" height="400">
+        <h2 id="pr-t">${he ? 'הכרטיס שלכם למועדון SAY' : 'Your SAY Club card'}</h2>
+        <p class="cc-sub">${he ? 'הצטרפו עכשיו (בחינם) וקבלו:' : 'Join now (free) and get:'}</p>
+        <p class="cc-perks"><b>${he ? '10% הנחה מיידית בקנייה הראשונה' : '10% off your first order'}</b><span>|</span>${he ? 'הטבות לחברי מועדון בלבד' : 'Members-only offers'}<span>|</span>${he ? 'הטבה ייחודית ביום ההולדת!' : 'A birthday treat!'}</p>
+        <form class="cc-form" data-form="club-join" novalidate>
+          <label><span>${he ? 'שם מלא' : 'Full name'} *</span><input name="name" autocomplete="name" required maxlength="80"></label>
+          <label><span>${he ? 'מספר טלפון' : 'Phone'} *</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="15" dir="ltr"></label>
+          <label><span>${he ? 'דואר אלקטרוני' : 'Email'} *</span><input name="email" type="email" autocomplete="email" required maxlength="120" dir="ltr"></label>
+          <label><span>${he ? 'כתובת מלאה למשלוחים' : 'Full shipping address'} *</span><input name="address" autocomplete="street-address" required maxlength="160"></label>
+          <label><span>${he ? 'בחרו סיסמה (8+ תווים, אות ומספר)' : 'Choose a password (8+, letter & digit)'} *</span><input name="password" type="password" autocomplete="new-password" required maxlength="80" dir="ltr"></label>
+          <label class="cc-check"><input type="checkbox" name="agree" required><span>${he ? 'אני מאשר/ת הצטרפות למועדון וקבלת עדכונים והטבות בוואטסאפ ובמייל.' : 'I agree to join the club and receive updates and offers by WhatsApp and email.'}</span></label>
+          <p class="cc-err" role="alert"></p>
+          <button class="btn block cc-go" type="submit">🛍️ ${he ? 'הצטרפות למועדון וקבלת קוד קופון' : 'Join & get my coupon'}</button>
+        </form>
+      </div>
     </div>`);
     document.body.append(w); requestAnimationFrame(() => w.classList.add('in'));
     setTimeout(() => { const x = $('.promo-x', w); if (x) { x.hidden = false; x.classList.add('show'); } }, 3000);
@@ -275,14 +286,15 @@ function applyStyleAttrs(root = document) {
 }
 
 // Images: mark loaded ones (fade-in, hover swaps only when ready) and retry a failed image once.
-document.addEventListener('load', (e) => { if (e.target.tagName === 'IMG') e.target.classList.add('ld'); }, true);
+const fitArch = (i) => { const a = i.closest('.lbl-arch'); if (a && i.classList.contains('m1') && i.naturalWidth) a.classList.toggle('wide', i.naturalWidth / i.naturalHeight > 1.3); };
+document.addEventListener('load', (e) => { if (e.target.tagName === 'IMG') { e.target.classList.add('ld'); fitArch(e.target); } }, true);
 document.addEventListener('error', (e) => {
   const i = e.target; if (i.tagName !== 'IMG' || i.dataset.retry) return;
   i.dataset.retry = '1'; const src = i.getAttribute('src'); i.removeAttribute('srcset');
   setTimeout(() => { i.src = src + (src.includes('?') ? '&' : '?') + 'r=' + Date.now(); }, 400);
 }, true);
 // Images already in cache fire 'load' before listeners see them.
-const markCached = () => $$('img').forEach((i) => { if (i.complete && i.naturalWidth) i.classList.add('ld'); });
+const markCached = () => $$('img').forEach((i) => { if (i.complete && i.naturalWidth) { i.classList.add('ld'); fitArch(i); } });
 // Horizontal rails: native lazy-loading ignores sideways scrolling, so load a rail's images once it nears the viewport.
 const railObs = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { en.target.querySelectorAll('img[loading="lazy"]').forEach((im) => (im.loading = 'eager')); railObs.unobserve(en.target); } }), { rootMargin: '300px' }) : null;
 const watchRails = () => railObs && $$('.rail').forEach((r) => railObs.observe(r));
@@ -488,6 +500,20 @@ document.addEventListener('submit', async (e) => {
     const email = clean(f.email.value, 120);
     if (!valid.email(email)) { f.email.setAttribute('aria-invalid', 'true'); toast(t('badEmail')); f.email.focus(); return; }
     db.joinClub(email); f.reset(); toast(t('joined')); $('#club-msg') && ($('#club-msg').textContent = t('joined'));
+  }
+  if (kind === 'club-join') {
+    const he = getLang() === 'he'; const err = $('.cc-err', f); const v = (n) => clean(f.elements[n].value, 160);
+    const d = { name: v('name'), phone: v('phone'), email: v('email'), address: v('address'), password: f.elements.password.value };
+    const bad = !valid.name(d.name) ? (he ? 'נא למלא שם מלא' : 'Please enter your name') : !valid.phone(d.phone) ? (he ? 'מספר טלפון לא תקין' : 'Invalid phone') : !valid.email(d.email) ? (he ? 'כתובת אימייל לא תקינה' : 'Invalid email') : d.address.length < 5 ? (he ? 'נא למלא כתובת מלאה' : 'Please enter a full address') : !valid.password(d.password) ? (he ? 'סיסמה: לפחות 8 תווים, אות ומספר' : 'Password: 8+ chars, a letter and a digit') : !f.elements.agree.checked ? (he ? 'יש לאשר את ההצטרפות' : 'Please confirm') : '';
+    if (bad) { err.textContent = bad; return; }
+    btn.disabled = true;
+    try { await db.register({ ...d, newsletter: true }); db.joinClub(d.email.toLowerCase()); }
+    catch (x) { err.textContent = ['exists', 'phoneExists'].includes(x.message) ? t(x.message) : t('required'); btn.disabled = false; return; }
+    render($('.cc-body'), html`<span class="cc-star" aria-hidden="true">✦</span><h2 id="pr-t">${he ? 'ברוכים הבאים למועדון!' : 'Welcome to the club!'}</h2>
+      <p class="cc-sub">${he ? 'קוד הקופון שלכם:' : 'Your coupon code:'}</p><p class="cc-code">SAY10</p>
+      <p class="cc-sub">${he ? '10% הנחה יופעלו אוטומטית בקופה בהזמנה הראשונה שלכם — אתם כבר מחוברים.' : '10% off applies automatically at checkout on your first order — you are signed in.'}</p>
+      <button class="btn block cc-go" data-action="promo-close">${he ? 'לקניות' : 'Start shopping'}</button>`);
+    $('.promo-x')?.removeAttribute('hidden'); rerender(); return;
   }
   if (kind === 'checkout') {
     btn.disabled = true;
