@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103210123';
-import { t, L, getLang } from './i18n.js?v=261103210123';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103210123';
-import * as db from './db.js?v=261103210123';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103210825';
+import { t, L, getLang } from './i18n.js?v=261103210825';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103210825';
+import * as db from './db.js?v=261103210825';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -120,6 +120,8 @@ function sealSVG(text) {
   return raw(`<svg viewBox="0 0 200 200" direction="ltr" aria-hidden="true">${ch.map((c, i) => `<text x="100" y="24" text-anchor="middle" transform="rotate(${(i * 360 / n).toFixed(2)} 100 100)">${c === ' ' ? '&#160;' : c}</text>`).join('')}</svg>`);
 }
 
+const subTiles = (cat) => { const c = CATEGORIES.find((x) => x.id === cat); const subs = (db.SITE.subs?.[c.he] || []).filter((s2) => active().some((p) => p.sub === s2));
+  return html`<div class="hc-subs">${subs.map((s2) => html`<a class="hc-sub ${cat === 'diffusers' ? 'studio' : ''}" href="#/shop/${cat}/${encodeURIComponent(s2)}"><span class="hc-sub-img"><img src="${small(subImg(cat, s2))}" alt="" loading="lazy" width="400" height="300"></span><b>${subName(s2)}</b><small>${active().filter((p) => p.sub === s2).length} ${T('מוצרים', 'items')}</small></a>`)}</div>`; };
 export function home() {
   const all = active();
   const hero = (db.SITE.site?.hero || []).slice(0, 4);
@@ -154,17 +156,14 @@ export function home() {
 
   <section class="h-collection" aria-labelledby="col-t"><div class="wrap">
     <header class="h-head"><h2 id="col-t">${T('מפיצי ריח', 'Diffusers')}</h2><a class="u-link" href="#/shop/diffusers">${T('כל המפיצים', 'All diffusers')} <span aria-hidden="true">${arrow()}</span></a></header>
-    <div class="h-col-grid">
-      ${(() => { const f = db.product('say-300'); return f ? html`<a class="h-feature reveal" href="#/product/say-300"><span class="h-feature-arch">${media(f, '', false, f.img, true)}</span>
-        <span class="h-feature-t"><b>SAY 300</b><small>${T('לחללים של עד 300 מ"ר · Wi-Fi ובלוטות׳', 'Up to 300 m² · Wi-Fi & Bluetooth')}</small>${priceTag(f)}</span></a>` : ''; })()}
-      <div class="h-col-list reveal">${diff.filter((p) => p.id !== 'say-300').slice(0, 4).map((p) => html`<a class="h-item" href="#/product/${p.id}">
-        <span class="h-item-img">${media(p, '', false, p.pack || p.img)}</span><span class="h-item-t"><b>${L(p.name)}</b><small>${subName(p.sub)}</small></span><span class="h-item-p">${m(minPrice(p))}</span></a>`)}</div>
-    </div>
+    <a class="hc-banner studio reveal" href="#/shop/diffusers"><img src="assets/products/cat-diffusers-all.webp" alt="${T('כל מפיצי הריח של SAY', 'All SAY diffusers')}" width="2400" height="1000" loading="lazy"></a>
+    ${subTiles('diffusers')}
   </div></section>
 
   <section class="h-oils" aria-labelledby="oil-t"><div class="wrap">
     <header class="h-head"><div><p class="kicker latin">Fragrance oils</p><h2 id="oil-t">${T('תמציות שמן', 'Fragrance oils')}</h2><p class="h-sub">${T('54 ניחוחות בהשראת בתי מלון, בשמים וטבע — מ־10 מ"ל ועד 5 ליטר.', '54 scents inspired by hotels, perfumes and nature — 10 ml to 5 L.')}</p></div><a class="u-link" href="#/shop/oils">${T('לכל התמציות', 'All oils')} <span aria-hidden="true">${arrow()}</span></a></header>
-    <div class="rail">${['oil-king-david', 'oil-hilton', 'oil-tom-ford', 'oil-white-tea', 'oil-pure-vanilla', 'oil-sea-breeze', 'oil-royal-amber', 'oil-coco-chanel'].map((id) => db.product(id)).filter(Boolean).map((p) => card(p))}</div>
+    <a class="hc-banner reveal" href="#/shop/oils"><img src="${CATEGORIES.find((x) => x.id === 'oils').img}" alt="${T('תמציות השמן של SAY', 'SAY fragrance oils')}" width="1600" height="900" loading="lazy"></a>
+    ${subTiles('oils')}
   </div></section>
 
   <section class="h-hair" aria-labelledby="hair-t"><div class="wrap h-hair-in">
@@ -174,14 +173,7 @@ export function home() {
     <div class="h-hair-grid">${[1, 2, 3, 4].map((i) => html`<span class="hh hh${i}"><img src="assets/products/hair-${i}-sm.webp" alt="" loading="lazy" width="560" height="560"></span>`)}</div>
   </div></section>
 
-  ${families.length ? html`<section class="h-library" aria-labelledby="lib-t"><div class="wrap">
-    <header class="h-head"><h2 id="lib-t">${T('תמציות שמן לפי סוג', 'Fragrance oils by type')}</h2><a class="u-link" href="#/shop/oils">${T('כל התמציות', 'All oils')} <span aria-hidden="true">${arrow()}</span></a></header>
-    <div class="h-lib">
-      <ol class="h-lib-list">${families.map((x, i) => html`<li><a href="#/shop/oils/${encodeURIComponent(x.f)}" data-fam-img="${x.img}" class="${i ? '' : 'on'}">
-        <span class="latin idx">${FAMILY_EN[x.f] || ''}</span><b>${subName(x.f)}</b><small>${x.n} ${T('ניחוחות', 'scents')}</small></a></li>`)}</ol>
-      <figure class="h-lib-view" aria-hidden="true"><img id="fam-preview" src="${families[0].img}" alt="" loading="lazy" width="1600" height="700"></figure>
-    </div>
-  </div></section>` : ''}
+
 
   <section class="h-how" aria-labelledby="how-t"><div class="wrap">
     <header class="h-head"><h2 id="how-t">${T('איך זה עובד', 'How it works')}</h2></header>
