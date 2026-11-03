@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103214238';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103214238';
-import { CATEGORIES } from './data.js?v=261103214238';
-import * as db from './db.js?v=261103214238';
-import * as S from './views-shop.js?v=261103214238';
-import * as Lg from './views-legal.js?v=261103214238';
-import * as A from './views-admin.js?v=261103214238';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103214437';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103214437';
+import { CATEGORIES } from './data.js?v=261103214437';
+import * as db from './db.js?v=261103214437';
+import * as S from './views-shop.js?v=261103214437';
+import * as Lg from './views-legal.js?v=261103214437';
+import * as A from './views-admin.js?v=261103214437';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -59,7 +59,7 @@ function mobileMenu() {
     <button class="mnp-search" data-action="search-open" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>${T2('חפשו מלון, בושם או מכשיר…', 'Search a hotel, perfume or device…')}</button>
     <a class="mnp-finder" href="#/finder"><span class="mnp-f-k">${T2('לא בטוחים?', 'Not sure?')}</span><b>${T2('מצאו את הריח שלכם ב־30 שניות', 'Find your scent in 30 seconds')}</b><i aria-hidden="true">${he ? '←' : '→'}</i></a>
     <p class="mnp-h">${T2('קטגוריות', 'Shop by category')}<a href="#/shop">${T2('לכל החנות', 'Shop all')}</a></p>
-    <div class="mnp-cats">${cats.map((c, k) => html`<a class="mnp-cat" href="#/shop/${c.id}" style-d="${k}"><span class="mnp-ci"><img src="${sm(c.img)}" alt="" loading="lazy" width="200" height="200"></span><b>${c[getLang()]}</b><small>${c.n ? `${c.n} ${T2('מוצרים', 'items')}` : T2('בקרוב', 'Soon')}</small></a>`)}</div>
+    <div class="mnp-cats">${cats.map((c, k) => html`<a class="mnp-cat" href="#/shop/${c.id}" style-d="${k}"><span class="mnp-ci"><img src="${sm(c.id === 'diffusers' ? 'assets/products/say-150-3.webp' : c.img)}" alt="" loading="lazy" width="200" height="200"></span><b>${c[getLang()]}</b><small>${c.n ? `${c.n} ${T2('מוצרים', 'items')}` : T2('בקרוב', 'Soon')}</small></a>`)}</div>
     <a class="mnp-deal" href="#/shop/bundles"><span class="mnp-deal-k">${T2('מבצעים', 'Deals')}</span><b>${T2('מארזים במחיר מיוחד', 'Bundles at a special price')}</b><small>${T2('+ 10% לחברי מועדון בהזמנה ראשונה', '+ 10% off a first order for members')}</small></a>
     ${best.length ? html`<p class="mnp-h">${T2('הכי אהובים עכשיו', 'Loved right now')}</p>
     <div class="mnp-best">${best.map((p) => html`<a href="#/product/${p.id}"><span><img src="${sm(p.img)}" alt="" loading="lazy" width="120" height="120"></span><b>${p.name?.[getLang()] || p.name?.he}</b><em>${T2('רב מכר', 'Bestseller')}</em></a>`)}</div>` : ''}
