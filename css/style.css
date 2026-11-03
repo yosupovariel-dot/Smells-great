@@ -2871,3 +2871,7 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
 .rv-rate input:focus-visible+label{outline:2px solid #A9874F;outline-offset:2px}
 .rv-thanks{font-size:1.1rem;text-align:center;padding:1rem 0;margin:0}
 [dir="rtl"] .rv-rate{flex-direction:row-reverse}
+/* logo must never squeeze */
+.hdr .brand.logo{flex:0 0 auto!important;min-width:max-content}
+.hdr .brand.logo img{max-width:none!important;width:auto!important;object-fit:contain;aspect-ratio:923/350}
+@media (min-width:901px) and (max-width:1320px){.hdr .nav{gap:.75rem!important}.hdr .nav a{font-size:.84rem!important}.hdr .brand.logo{margin-inline:1rem!important}.hdr .brand.logo img{height:50px!important}.hdr .tool-link{display:none}}
