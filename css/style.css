@@ -2616,3 +2616,4 @@ body.scrolled .hdr .brand.logo img{height:46px!important}
 .club-card .promo-logo{height:auto!important;width:170px!important}
 @media (max-width:699px){.club-card .promo-logo{display:none!important}}
 .bo-brand img{width:150px!important;height:auto!important}
+.sp-head-t h1{font-size:clamp(2.2rem,4.6vw,4rem)!important;line-height:1.08!important;font-weight:700!important}
