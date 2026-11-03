@@ -2260,3 +2260,4 @@ html.a11y-stop .mnp-cat{animation:none}
 @media (min-width:700px){.club-card .promo-logo{height:84px!important}}
 .fn-cats li:last-child:nth-child(odd){grid-column:1/-1}
 @media (max-width:900px){.ftr .fn{border-top:0;padding-top:0}}
+@media (max-width:1023px){.h-media{margin:0!important;border-radius:0!important;width:100%}}
