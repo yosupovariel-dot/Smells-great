@@ -1991,3 +1991,10 @@ kbd{font-family:var(--f-body);font-size:.7rem;background:#F1ECE3;border:1px soli
   .tb-btns{max-width:none}
 }
 @media (max-width:700px){.stories .st-img{width:64px;height:64px}.stories a{width:76px}.stories a b{font-size:.72rem}}
+/* Oil label image: always the WHOLE picture (hotel/brand name fully visible), equal card heights */
+.lbl-arch.full{aspect-ratio:4/3!important;border-radius:14px!important;overflow:hidden;position:relative}
+.lbl-arch.full img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important}
+.lbl-arch.full img.bgfill{object-fit:cover!important;filter:blur(14px) brightness(.95);transform:scale(1.15);opacity:1!important}
+.lbl-arch.full img.m1{object-fit:contain!important;object-position:center!important;z-index:1;opacity:1}
+.card.label:hover .lbl-arch.full img.m1{opacity:1!important;transform:none!important}
+@media (max-width:600px){.lbl-arch.full{border-radius:12px!important}}
