@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103205323';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103205323';
-import { CATEGORIES } from './data.js?v=261103205323';
-import * as db from './db.js?v=261103205323';
-import * as S from './views-shop.js?v=261103205323';
-import * as Lg from './views-legal.js?v=261103205323';
-import * as A from './views-admin.js?v=261103205323';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103205511';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103205511';
+import { CATEGORIES } from './data.js?v=261103205511';
+import * as db from './db.js?v=261103205511';
+import * as S from './views-shop.js?v=261103205511';
+import * as Lg from './views-legal.js?v=261103205511';
+import * as A from './views-admin.js?v=261103205511';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -123,8 +123,9 @@ function a11yPanel() {
 let tickTimer, tickIdx = 0, tickPaused = false;
 function stepTicker(d) {
   const ms = $$('.ticker-msg'); if (!ms.length) return;
-  ms[tickIdx].classList.remove('on'); ms[tickIdx].setAttribute('aria-hidden', 'true');
-  tickIdx = (tickIdx + d + ms.length) % ms.length; ms[tickIdx].classList.add('on'); ms[tickIdx].removeAttribute('aria-hidden');
+  const cur = Math.max(0, ms.findIndex((m) => m.classList.contains('on')));
+  tickIdx = (cur + d + ms.length) % ms.length;
+  ms.forEach((m, k) => { m.classList.toggle('on', k === tickIdx); if (k === tickIdx) m.removeAttribute('aria-hidden'); else m.setAttribute('aria-hidden', 'true'); });
 }
 function startTicker() {
   clearInterval(tickTimer);

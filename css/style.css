@@ -2488,3 +2488,5 @@ html.a11y-stop .wsx-arch img,html.a11y-stop .wsx-seal svg{animation:none}
 body.scrolled .hdr .brand.logo img{height:46px!important}
 @media (max-width:900px){.hdr .brand.logo img{height:44px!important}body.scrolled .hdr .brand.logo img{height:40px!important}}
 .mnp-logo img{height:54px!important;width:auto}
+.ticker-msg:not(.on){visibility:hidden;transition:opacity .5s,transform .5s,visibility 0s .5s}
+.ticker-msg.on{visibility:visible;transition:opacity .5s .15s,transform .5s .15s,visibility 0s}
