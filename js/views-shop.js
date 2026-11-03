@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103160744';
-import { t, L, getLang } from './i18n.js?v=261103160744';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103160744';
-import * as db from './db.js?v=261103160744';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103160944';
+import { t, L, getLang } from './i18n.js?v=261103160944';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103160944';
+import * as db from './db.js?v=261103160944';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -665,14 +665,31 @@ export function wholesalePage() {
     [T('נהנים', 'You enjoy'), T('ממלאים תמציות במחיר סיטונאי — ואנחנו זמינים תמיד.', 'Refills at wholesale prices — we are always here.')],
   ];
   return html`<div class="ws-page">
-  <header class="ws-hero wrap">
-    <div><p class="kicker latin">For business</p><h1>${T('העסק שלכם יכול להריח כמו לובי של מלון', 'Your business can smell like a hotel lobby')}</h1>
-      <p class="lead">${T('לקוחות שוכחים מה אמרתם להם — אבל לא איך הרגישו אצלכם. ריח הוא הדרך הכי שקטה ליצור את התחושה הזאת. אנחנו מתקינים סטנדים מעוצבים, מתאימים ריח חתימה, ונותנים מחירי סיטונאות על מכשירים ותמציות.', 'Customers forget what you said, never how you made them feel. We install designed scent stands, match a signature scent and offer wholesale prices.')}</p>
-      <div class="hero-cta"><a class="btn wa-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('בואו נדבר בוואטסאפ', 'Chat on WhatsApp')}</a></div>
-      <ul class="ws-facts"><li><b>${T('התקנה', 'Install')}</b>${T('אצלכם בעסק', 'on site')}</li><li><b>${T('דוגמיות', 'Samples')}</b>${T('לפני שמחליטים', 'before deciding')}</li><li><b>${T('מילוי', 'Refills')}</b>${T('עד 5 ליטר', 'up to 5 L')}</li></ul></div>
-    <div class="ws-mosaic">${gal.slice(0, 3).map(([src, cap]) => html`<figure><img src="${src}" alt="${cap}" loading="lazy"><figcaption>${cap}</figcaption></figure>`)}</div>
+  <header class="wsx">
+    <div class="wsx-in wrap">
+      <div class="wsx-copy">
+        <p class="wsx-k"><span></span>${T('SAY לעסקים', 'SAY for business')}</p>
+        <h1>${T('הרושם הראשון', 'The first impression')}<br><em>${T('מתחיל באוויר.', 'is in the air.')}</em></h1>
+        <p class="wsx-lead">${T('לקוחות שוכחים מה אמרתם להם, אבל זוכרים איך הרגישו אצלכם. ריח חתימה הופך כניסה רגילה לחוויה של מלון יוקרה — ואנחנו דואגים לכל השאר.', 'Customers forget what you said, but remember how they felt. A signature scent turns an ordinary entrance into a luxury-hotel moment — we handle the rest.')}</p>
+        <div class="wsx-cta">
+          <a class="wsx-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer"><i aria-hidden="true"></i>${T('לקבלת הצעה בוואטסאפ', 'Get a quote on WhatsApp')}</a>
+          <a class="wsx-link" href="#ws-gal">${T('ראו סטנדים בשטח', 'See stands in action')}</a>
+        </div>
+        <ul class="wsx-facts">
+          <li><b>${T('התקנה', 'Installed')}</b><span>${T('אצלכם בעסק', 'at your place')}</span></li>
+          <li><b>${T('דוגמיות', 'Samples')}</b><span>${T('לפני שמחליטים', 'before you decide')}</span></li>
+          <li><b>${T('עד 5 ליטר', 'Up to 5 L')}</b><span>${T('מילוי במחיר סיטונאי', 'wholesale refills')}</span></li>
+        </ul>
+      </div>
+      <div class="wsx-art" aria-hidden="true">
+        <figure class="wsx-arch"><img src="${P}hero-1.webp" alt="" width="900" height="1100"></figure>
+        <figure class="wsx-orb"><img src="${P}say-400-5-sm.webp" alt="" width="300" height="300"></figure>
+        <div class="wsx-seal">${raw(sealSVG('SIGNATURE SCENT · FOR BUSINESS · '))}</div>
+        <p class="wsx-note"><b>${T('ריח חתימה', 'Signature scent')}</b>${T('נבחר יחד איתכם', 'chosen with you')}</p>
+      </div>
+    </div>
   </header>
-  <section class="wrap ws-sec"><p class="kicker">${T('סטנדים בשטח', 'Stands in action')}</p><h2>${T('ככה זה נראה אצלכם', 'How it looks at your place')}</h2>
+  <section class="wrap ws-sec" id="ws-gal"><p class="kicker">${T('סטנדים בשטח', 'Stands in action')}</p><h2>${T('ככה זה נראה אצלכם', 'How it looks at your place')}</h2>
     <div class="ws-gallery">${gal.map(([src, cap]) => html`<figure><img src="${src}" alt="${cap}" loading="lazy"><figcaption>${cap}</figcaption></figure>`)}</div></section>
   <section class="wrap ws-sec"><h2>${T('ארבעה צעדים, אפס כאב ראש', 'Four steps, zero hassle')}</h2>
     <ol class="ws-steps">${steps.map(([h, d], i) => html`<li><span>${i + 1}</span><b>${h}</b><p>${d}</p></li>`)}</ol></section>
