@@ -1,8 +1,8 @@
-import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261103214814';
-import { L, getLang } from './i18n.js?v=261103214814';
-import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261103214814';
-import * as db from './db.js?v=261103214814';
-import { media, statusLabel, small, subName } from './views-shop.js?v=261103214814';
+import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261103215004';
+import { L, getLang } from './i18n.js?v=261103215004';
+import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261103215004';
+import * as db from './db.js?v=261103215004';
+import { media, statusLabel, small, subName } from './views-shop.js?v=261103215004';
 
 const he = () => getLang() === 'he';
 const T = (h, e) => (he() ? h : e);
@@ -57,6 +57,7 @@ function shell(active, title, body, tools = '', sub = '') {
     [T('קטלוג ולקוחות', 'Catalog & people'), [
       ['admin/products', '#/admin/products', 'prod', T('מוצרים', 'Products'), ['admin', 'products']],
       ['admin/users', '#/admin/users', 'users', T('לקוחות', 'Customers'), ['admin']],
+      ['admin/reviews', '#/admin/reviews', 'users', T('ביקורות', 'Reviews'), ['admin']],
       ['admin/team', '#/admin/team', 'team', T('צוות והרשאות', 'Team & roles'), ['admin']],
       ['admin/reports', '#/admin/reports', 'rep', T('דוחות', 'Reports'), ['admin']],
     ]],
@@ -535,4 +536,15 @@ export function packingSlips(ids) {
   return html`${os.map((o) => html`<section class="slip"><header><img src="assets/img/logo-header.png" alt="" width="90" height="100"><div><h2>${T('תעודת משלוח', 'Packing slip')} #${o.num}</h2><p>${dt(o.date)}</p></div></header>
     <p><b>${o.customer.name}</b> · ${o.customer.phone}<br>${o.customer.street}${o.customer.apt ? ', ' + o.customer.apt : ''}, ${o.customer.city}${o.customer.notes ? html`<br>${T('הערה:', 'Note:')} ${o.customer.notes}` : ''}</p>
     <table><thead><tr><th>${T('פריט', 'Item')}</th><th>${T('גודל / פרטים', 'Size / details')}</th><th>${T('כמות', 'Qty')}</th></tr></thead><tbody>${o.items.map((i) => html`<tr><td>${L(i.name)}</td><td>${[i.size, i.opt].filter(Boolean).join(' · ')}</td><td>${i.qty}</td></tr>`)}</tbody></table></section>`)}`;
+}
+
+export function reviewsAdmin() {
+  const l = db.reviews().sort((a, b) => (a.status === 'pending' ? -1 : 0) - (b.status === 'pending' ? -1 : 0) || b.at - a.at);
+  const lab = { pending: T('ממתינה לאישור', 'Pending'), approved: T('מפורסמת', 'Published'), hidden: T('מוסתרת', 'Hidden') };
+  return shell('admin/reviews', html`<header class="bo-top"><h1>${T('ביקורות', 'Reviews')}</h1></header>
+    <p class="muted">${T('ביקורות שלקוחות שולחים מהאתר מגיעות לכאן, ומתפרסמות רק אחרי אישור.', 'Reviews customers send arrive here and go live only after approval.')}</p>
+    ${l.length ? html`<div class="panel"><table class="tbl"><thead><tr><th>${T('לקוח', 'Customer')}</th><th>${T('דירוג', 'Rating')}</th><th>${T('ביקורת', 'Review')}</th><th>${T('סטטוס', 'Status')}</th><th></th></tr></thead><tbody>
+      ${l.map((r) => html`<tr><td><b>${r.name}</b><br><small class="muted">${r.city || ''}</small></td><td>${'★'.repeat(r.rating)}</td><td>${r.text}</td><td>${lab[r.status]}</td>
+        <td class="row-acts">${r.status !== 'approved' ? html`<button class="btn sm" data-action="rv-ok" data-id="${r.id}">${T('אישור', 'Approve')}</button>` : html`<button class="btn sm ghost" data-action="rv-hide" data-id="${r.id}">${T('הסתרה', 'Hide')}</button>`}<button class="link-btn danger" data-action="rv-del" data-id="${r.id}">${T('מחיקה', 'Delete')}</button></td></tr>`)}
+    </tbody></table></div>` : html`<p class="empty">${T('עדיין אין ביקורות. שתפו לקוחות מרוצים בקישור לעמוד הביקורות באתר.', 'No reviews yet. Share the reviews page link with happy customers.')}</p>`}`);
 }

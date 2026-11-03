@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103214814';
-import { t, L, getLang } from './i18n.js?v=261103214814';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103214814';
-import * as db from './db.js?v=261103214814';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103215004';
+import { t, L, getLang } from './i18n.js?v=261103215004';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103215004';
+import * as db from './db.js?v=261103215004';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -759,23 +759,23 @@ export function rentalPage() {
   const P = 'assets/products/';
   const wa = waLink(T('שלום, אשמח לפרטים על השכרת מפיץ ריח לעסק', 'Hi, I would like details about diffuser rental'));
   const who = [['חנויות', 'Shops', 'לקוח שנעים לו — נשאר יותר.', 'Comfortable shoppers stay longer.', P + 'hero-3.webp'], ['מסעדות ובתי קפה', 'Restaurants & cafés', 'אווירה נקייה מהרגע שנכנסים.', 'A clean feel from the door.', P + 'sub-bakery-sweets.webp'], ['בניינים ולובאים', 'Buildings & lobbies', 'כניסה שמריחה כמו מלון.', 'An entrance that smells like a hotel.', P + 'sub-hotels-luxury.webp'], ['משרדים', 'Offices', 'צוות רענן, פגישות נעימות.', 'Fresh team, nicer meetings.', P + 'say-room-office-11.webp']];
-  const steps = [['נפגשים ומריחים', 'We visit and sniff', 'מגיעים לעסק, מודדים את החלל ומביאים דוגמיות.', 'We measure your space and bring samples.'], ['מתקינים', 'We install', 'טכנאי מתקין את המכשיר על הקיר ומכוון עוצמה ושעות.', 'A technician mounts and tunes the device.'], ['אנחנו דואגים', 'We take care', 'מילויים, תחזוקה והחלפת ריח — אתם לא צריכים לזכור כלום.', 'Refills, upkeep, scent changes — nothing to remember.']];
+  const steps = [['נפגשים ומריחים', 'We visit and sniff', 'מגיעים לעסק, מודדים את החלל ומביאים דוגמיות.', 'We measure your space and bring samples.'], ['מתקינים', 'We install', 'טכנאי מתקין את המכשיר על הקיר ומכוון עוצמה ושעות.', 'A technician mounts and tunes the device.'], ['מגיעים כל חודש', 'We come monthly', 'ביקור קבוע עם ריח חדש ומפתיע, מילוי ותחזוקה מלאה — בלי שתצטרכו לזכור כלום.', 'A regular visit with a new scent, refill and full maintenance.']];
   return html`<div class="rt">
   <header class="rt-hero">
     <div class="rt-copy">
-      <p class="rt-k">${T('השכרת מפיצי ריח לעסקים', 'Diffuser rental for business')}</p>
+      <p class="rt-k">${T('מסלול שירות חודשי לעסקים', 'Monthly scent service for business')}</p>
       <h1>${T('לקוחות לא זוכרים', 'Customers forget')}<br>${T('מה הם קנו.', 'what they bought.')}<br><em>${T('הם זוכרים איך הרגיש.', 'They remember how it felt.')}</em></h1>
-      <p class="rt-lead">${T('אנחנו נותנים לעסק שלכם ריח חתימה — מתקינים, ממלאים ומתחזקים. אתם משלמים פעם בחודש, ונהנים מהמחמאות.', 'We give your business a signature scent — installed, refilled and maintained. One monthly fee, all the compliments.')}</p>
+      <p class="rt-lead">${T('חבילה חודשית שמותאמת לעסק שלכם: אנחנו מגיעים פעם בחודש עם ריח חדש ומפתיע, המכשיר עלינו — כולל תחזוקה מלאה. אתם רק נהנים מהמחמאות.', 'A monthly package tailored to your business: we visit once a month with a new scent, the device is on us — full maintenance included. You just enjoy the compliments.')}</p>
       <div class="rt-cta"><a class="rt-btn" href="${wa}" target="_blank" rel="noopener noreferrer">${T('לתיאום ביקור והרחה', 'Book a scent visit')}</a><span>${T('בלי התחייבות · בלי לקנות מכשיר', 'No commitment · no device to buy')}</span></div>
     </div>
     <div class="rt-art"><figure><img src="${P}say-400-5.webp" alt="" width="1200" height="1200"></figure>
-      <p class="rt-tag"><b>${T('תשלום חודשי אחד', 'One monthly fee')}</b>${T('מכשיר · התקנה · מילויים · תחזוקה', 'Device · install · refills · upkeep')}</p></div>
+      <p class="rt-tag"><b>${T('ביקור אחת לחודש', 'A visit every month')}</b>${T('ריח חדש · מכשיר · תחזוקה מלאה', 'New scent · device · full maintenance')}</p></div>
   </header>
 
-  <section class="rt-vs wrap"><h2>${T('לקנות או להשכיר?', 'Buy or rent?')}</h2>
+  <section class="rt-vs wrap"><h2>${T('לקנות לבד או מסלול חודשי?', 'Buy alone or a monthly plan?')}</h2>
     <div class="rt-cmp">
       <div><h3>${T('קונים לבד', 'Buying alone')}</h3><ul><li>${T('הוצאה גדולה מראש', 'A big upfront cost')}</li><li>${T('צריך לזכור למלא', 'You must remember refills')}</li><li>${T('תקלה? מסתדרים לבד', 'A fault? You sort it out')}</li></ul></div>
-      <div class="on"><h3>${T('משכירים מ־SAY', 'Renting from SAY')}</h3><ul><li>${T('תשלום חודשי קבוע וידוע', 'A fixed, known monthly fee')}</li><li>${T('מילויים מגיעים אליכם', 'Refills come to you')}</li><li>${T('תקלה? מחליפים מכשיר', 'A fault? We swap the device')}</li></ul></div>
+      <div class="on"><h3>${T('מסלול השירות של SAY', 'The SAY service plan')}</h3><ul><li>${T('תשלום חודשי קבוע וידוע', 'A fixed, known monthly fee')}</li><li>${T('ביקור חודשי עם ריח חדש', 'A monthly visit with a new scent')}</li><li>${T('תקלה? מחליפים מכשיר', 'A fault? We swap the device')}</li></ul></div>
     </div></section>
 
   <section class="rt-who wrap"><h2>${T('איפה זה עובד הכי טוב', 'Where it works best')}</h2>
@@ -787,4 +787,27 @@ export function rentalPage() {
   <section class="rt-end"><div class="wrap"><h2>${T('איזה ריח יקבל את הלקוחות שלכם מחר בבוקר?', 'Which scent will greet your customers tomorrow?')}</h2>
     <a class="rt-btn light" href="${wa}" target="_blank" rel="noopener noreferrer">${T('בואו נדבר בוואטסאפ', 'Chat on WhatsApp')}</a><p>${PHONE_DISPLAY}</p></div></section>
   </div>`;
+}
+
+const stars = (n) => html`<span class="stars" aria-label="${n} ${T('מתוך 5', 'of 5')}">${[1, 2, 3, 4, 5].map((i) => html`<i class="${i <= n ? 'on' : ''}">★</i>`)}</span>`;
+export function reviewsPage() {
+  const list = db.approvedReviews();
+  const avg = list.length ? (list.reduce((a, r) => a + r.rating, 0) / list.length) : 0;
+  return html`<div class="rv">
+  <header class="rv-hero wrap"><p class="rt-k">${T('לקוחות ממליצים', 'Customer reviews')}</p>
+    <h1>${T('הבית שלהם כבר מריח כמו מלון.', 'Their homes already smell like a hotel.')}</h1>
+    ${list.length ? html`<p class="rv-avg">${stars(Math.round(avg))}<b>${avg.toFixed(1)}</b> ${T(`מתוך ${list.length} ביקורות`, `from ${list.length} reviews`)}</p>` : html`<p class="rv-sub">${T('כאן יופיעו החוויות של הלקוחות שלנו. קניתם אצלנו? נשמח לשמוע איך הריח מרגיש אצלכם.', 'Customer experiences will appear here. Bought from us? We would love to hear how it feels at home.')}</p>`}
+  </header>
+  <div class="wrap">
+    ${list.length ? html`<div class="rv-grid">${list.map((r) => html`<figure class="rv-card">${stars(r.rating)}<blockquote>${r.text}</blockquote><figcaption><span class="rv-av" aria-hidden="true">${(r.name || '?').trim()[0]}</span><b>${r.name}</b>${r.city ? html`<small>${r.city}</small>` : ''}</figcaption></figure>`)}</div>` : ''}
+    <section class="rv-form-box"><h2>${T('ספרו לנו על החוויה שלכם', 'Tell us about your experience')}</h2>
+      <form data-form="review" novalidate class="rv-form">
+        <fieldset class="rv-rate"><legend>${T('איך היה?', 'How was it?')}</legend>${[5, 4, 3, 2, 1].map((n) => html`<input type="radio" id="rv${n}" name="rating" value="${n}"><label for="rv${n}" title="${n}">★</label>`)}</fieldset>
+        <div class="row2"><div class="field"><label for="rv-name">${T('שם', 'Name')}</label><input class="input" id="rv-name" name="name" maxlength="60" autocomplete="name"></div>
+        <div class="field"><label for="rv-city">${T('עיר', 'City')} <small>${T('(רשות)', '(optional)')}</small></label><input class="input" id="rv-city" name="city" maxlength="40"></div></div>
+        <div class="field"><label for="rv-text">${T('מה הכי אהבתם?', 'What did you love most?')}</label><textarea class="input" id="rv-text" name="text" rows="4" maxlength="600"></textarea></div>
+        <p class="err" id="rv-err" role="alert"></p>
+        <button class="btn" type="submit">${T('שליחת ביקורת', 'Send review')}</button>
+      </form></section>
+  </div></div><div class="block"></div>`;
 }

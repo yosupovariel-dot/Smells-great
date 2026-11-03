@@ -2846,3 +2846,28 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
 [dir="rtl"] .cd-ship .pbar{transform-origin:right}
 .cd-foot .totals{font-size:.92rem}
 @media (max-width:600px){.cd-foot{padding-top:.7rem!important}.cd-foot .totals>div:not(.grand){font-size:.82rem}}
+
+/* ===== Reviews ===== */
+.rv{background:#F4EEE4;padding-bottom:3rem}
+.rv-hero{text-align:center;padding:clamp(2.5rem,6vw,5rem) 16px 2rem;max-width:44rem}
+.rv-hero h1{font-size:clamp(2rem,4vw,3.4rem);line-height:1.1;margin:0 0 1rem}
+.rv-sub{color:#4a4238;font-size:1.05rem;line-height:1.7;margin:0}
+.rv-avg{display:flex;justify-content:center;align-items:center;gap:.5rem;margin:0;color:#4a4238}
+.rv-avg b{font-size:1.4rem;color:var(--ink)}
+.stars i{font-style:normal;color:#d9ccb5;font-size:1.1rem}.stars i.on{color:#C9A24A}
+.rv-grid{columns:3 280px;column-gap:1rem}
+.rv-card{break-inside:avoid;margin:0 0 1rem;background:#FBF8F2;border:1px solid #e6dccb;border-radius:16px;padding:1.3rem 1.4rem}
+.rv-card blockquote{margin:.6rem 0 1rem;font-size:1.02rem;line-height:1.7;color:#2b2620}
+.rv-card figcaption{display:flex;align-items:center;gap:.6rem}
+.rv-card figcaption small{color:var(--muted);margin-inline-start:auto}
+.rv-av{width:34px;height:34px;border-radius:50%;background:#16130F;color:#E2C88F;display:grid;place-items:center;font-weight:700}
+.rv-form-box{max-width:640px;margin:2.5rem auto 0;background:#fff;border-radius:18px;padding:clamp(1.3rem,3vw,2rem)}
+.rv-form-box h2{margin:0 0 1rem;font-size:1.4rem}
+.rv-rate{border:0;padding:0;margin:0 0 1rem;display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:.2rem}
+.rv-rate legend{width:100%;font-weight:600;margin-bottom:.3rem}
+.rv-rate input{position:absolute;opacity:0}
+.rv-rate label{font-size:2rem;color:#d9ccb5;cursor:pointer;transition:color .15s,transform .15s}
+.rv-rate label:hover,.rv-rate label:hover~label,.rv-rate input:checked~label{color:#C9A24A}
+.rv-rate input:focus-visible+label{outline:2px solid #A9874F;outline-offset:2px}
+.rv-thanks{font-size:1.1rem;text-align:center;padding:1rem 0;margin:0}
+[dir="rtl"] .rv-rate{flex-direction:row-reverse}

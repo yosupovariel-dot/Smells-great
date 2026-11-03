@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103214814';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103214814';
-import { CATEGORIES } from './data.js?v=261103214814';
-import * as db from './db.js?v=261103214814';
-import * as S from './views-shop.js?v=261103214814';
-import * as Lg from './views-legal.js?v=261103214814';
-import * as A from './views-admin.js?v=261103214814';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103215004';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103215004';
+import { CATEGORIES } from './data.js?v=261103215004';
+import * as db from './db.js?v=261103215004';
+import * as S from './views-shop.js?v=261103215004';
+import * as Lg from './views-legal.js?v=261103215004';
+import * as A from './views-admin.js?v=261103215004';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -29,7 +29,7 @@ function header() {
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
       <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-      <span class="mn-desk">${navLink('#/', t('home'))}${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/rental', getLang() === 'he' ? 'השכרה' : 'Rental')}${navLink('#/contact', t('contact'))}</span>
+      <span class="mn-desk">${navLink('#/', t('home'))}${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/rental', getLang() === 'he' ? 'שירות לעסקים' : 'Business service')}${navLink('#/reviews', getLang() === 'he' ? 'ביקורות' : 'Reviews')}${navLink('#/contact', t('contact'))}</span>
       ${mobileMenu()}
     </nav>
     <a class="brand logo" href="#/" aria-label="SAY Boutique — ${t('home')}"><img src="assets/img/logo-wide.webp" alt="SAY Boutique — Luxury Home Fragrances" width="923" height="350" fetchpriority="high"></a>
@@ -63,7 +63,7 @@ function mobileMenu() {
     <a class="mnp-deal" href="#/shop/bundles"><span class="mnp-deal-k">${T2('מבצעים', 'Deals')}</span><b>${T2('מארזים במחיר מיוחד', 'Bundles at a special price')}</b><small>${T2('+ 10% לחברי מועדון בהזמנה ראשונה', '+ 10% off a first order for members')}</small></a>
     ${best.length ? html`<p class="mnp-h">${T2('הכי אהובים עכשיו', 'Loved right now')}</p>
     <div class="mnp-best">${best.map((p) => html`<a href="#/product/${p.id}"><span><img src="${sm(p.img)}" alt="" loading="lazy" width="120" height="120"></span><b>${p.name?.[getLang()] || p.name?.he}</b><em>${T2('רב מכר', 'Bestseller')}</em></a>`)}</div>` : ''}
-    <nav class="mnp-links" aria-label="${T2('עוד', 'More')}"><a href="#/rental">${T2('השכרת מפיצי ריח לעסקים', 'Diffuser rental')}</a><a href="#/wholesale">${T2('לעסקים וסיטונאים', 'For business')}</a><a href="#/about">${t('about')}</a><a href="#/contact">${t('contact')}</a><a href="#/account" class="mnp-sup">${T2('כניסה לספקים', 'Supplier login')}</a><a href="#/account">${u ? T2('החשבון שלי', 'My account') : T2('התחברות / הצטרפות למועדון', 'Sign in / join the club')}</a></nav>
+    <nav class="mnp-links" aria-label="${T2('עוד', 'More')}"><a href="#/rental">${T2('מסלול שירות חודשי לעסקים', 'Monthly service for business')}</a><a href="#/wholesale">${T2('לעסקים וסיטונאים', 'For business')}</a><a href="#/reviews">${T2('לקוחות ממליצים', 'Reviews')}</a><a href="#/about">${t('about')}</a><a href="#/contact">${t('contact')}</a><a href="#/account" class="mnp-sup">${T2('כניסה לספקים', 'Supplier login')}</a><a href="#/account">${u ? T2('החשבון שלי', 'My account') : T2('התחברות / הצטרפות למועדון', 'Sign in / join the club')}</a></nav>
     <ul class="mnp-trust"><li><b>${T2('משלוח חינם', 'Free shipping')}</b>${T2('מעל 299 ₪', 'over ₪299')}</li><li><b>${T2('14 יום', '14 days')}</b>${T2('להחזרה', 'returns')}</li><li><b>${T2('מחיר יבואן', 'Importer')}</b>${T2('ישר לצרכן', 'prices')}</li></ul>
     <a class="mnp-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer"><span class="mnp-dot" aria-hidden="true"></span><span><b>${T2('צריכים עזרה בבחירה?', 'Need help choosing?')}</b>${T2('כתבו לנו בוואטסאפ, אנחנו עונים מהר', 'WhatsApp us, we reply fast')}</span></a>
   </div>`;
@@ -245,7 +245,7 @@ function route() {
     if (!db.can(STAFF[a])) { state.authTab = 'login'; location.hash = '#/account'; return; }
     let v;
     if (a === 'admin' && db.me().role === 'products' && b !== 'products') { location.hash = '#/admin/products'; return; }
-    if (a === 'admin') v = b === 'products' ? A.productsAdmin(state.pcat, state.pq, state.pv) : b === 'reports' ? A.reports(state.range) : b === 'users' ? A.usersAdmin(state.uq, state.ur) : b === 'team' ? A.teamAdmin() : A.dashboard(state.metric);
+    if (a === 'admin') v = b === 'products' ? A.productsAdmin(state.pcat, state.pq, state.pv) : b === 'reports' ? A.reports(state.range) : b === 'users' ? A.usersAdmin(state.uq, state.ur) : b === 'team' ? A.teamAdmin() : b === 'reviews' ? A.reviewsAdmin() : A.dashboard(state.metric);
     if (a === 'orders') v = A.ordersBoard({ view: state.ov, month: state.om, q: state.oq, status: state.os, sel: state.sel });
     if (a === 'courier') v = A.courierView(state.ctab);
     $('.consent')?.remove(); closePromo();
@@ -263,6 +263,7 @@ function route() {
     case 'about': v = S.about(); break;
     case 'wholesale': v = S.wholesalePage(); break;
     case 'rental': v = S.rentalPage(); break;
+    case 'reviews': v = S.reviewsPage(); break;
     case 'guide': v = S.guide(); break;
     case 'staff': location.hash = '#/account'; return;
     case 'finder': v = S.finder(state.finder); title = (getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder') + ' | SAY Boutique'; break;
@@ -418,6 +419,9 @@ document.addEventListener('click', async (e) => {
     case 'search-open': if ($('#nav').classList.contains('open')) { $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); } openSearch(); break;
     case 'filter-open': modal(S.filterSheet(state.f)); break;
     case 'filter-clear': state.f = {}; rerender(); break;
+    case 'rv-ok': db.setReview(id, 'approved'); rerender(); break;
+    case 'rv-hide': db.setReview(id, 'hidden'); rerender(); break;
+    case 'rv-del': if (confirm(getLang() === 'he' ? 'למחוק את הביקורת?' : 'Delete review?')) { db.deleteReview(id); rerender(); } break;
     case 'mood': { const k = el.dataset.k; const cur = state.f.notes || []; state.f = { ...state.f, notes: cur.includes(k) ? cur.filter((x) => x !== k) : [k] }; rerender(); setTimeout(() => $('#oz-all')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60); break; }
     case 'cmdk-open': openPalette(); break;
     case 'cmdk-close': closePalette(); break;
@@ -577,6 +581,12 @@ document.addEventListener('submit', async (e) => {
       <p class="cc-sub">${he ? '10% הנחה יופעלו אוטומטית בקופה בהזמנה הראשונה שלכם — אתם כבר מחוברים.' : '10% off applies automatically at checkout on your first order — you are signed in.'}</p>
       <button class="btn block cc-go" data-action="promo-close">${he ? 'לקניות' : 'Start shopping'}</button>`);
     $('.promo-x')?.removeAttribute('hidden'); rerender(); return;
+  }
+  if (kind === 'review') {
+    const d = Object.fromEntries(new FormData(f)); const err = $('#rv-err'); const he = getLang() === 'he';
+    const r = { name: clean(d.name, 60), city: clean(d.city, 40), rating: Math.min(5, Math.max(1, parseInt(d.rating) || 0)), text: clean(d.text, 600) };
+    if (!valid.name(r.name) || !d.rating || r.text.length < 10) { err.textContent = he ? 'נא למלא שם, דירוג וכמה מילים על החוויה' : 'Please add your name, a rating and a few words'; return; }
+    db.addReview(r); f.innerHTML = `<p class="rv-thanks">${he ? 'תודה רבה! הביקורת תתפרסם אחרי אישור קצר.' : 'Thank you! Your review will appear after a quick check.'}</p>`; return;
   }
   if (kind === 'checkout') {
     btn.disabled = true;

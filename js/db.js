@@ -1,8 +1,8 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261103214814';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261103214814';
+import { SEED_PRODUCTS } from './data.js?v=261103215004';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261103215004';
 
 const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -274,3 +274,11 @@ export function clearDemoData() {
   write('notify', []); write('club', []); write('seeded', true);
 }
 export { monthKey };
+
+// ---------- Reviews (customers submit, staff approve) ----------
+export const reviews = () => read('reviews', []);
+export const approvedReviews = () => reviews().filter((r) => r.status === 'approved').sort((a, b) => b.at - a.at);
+export function addReview(r) { const l = reviews(); l.push({ id: uid('r_'), ...r, status: 'pending', at: Date.now() }); write('reviews', l); }
+export function setReview(id, status) { const l = reviews(); const r = l.find((x) => x.id === id); if (r) { r.status = status; write('reviews', l); } }
+export function deleteReview(id) { write('reviews', reviews().filter((x) => x.id !== id)); }
+export function saveReviewAdmin(r) { const l = reviews(); l.push({ id: uid('r_'), ...r, status: 'approved', at: Date.now() }); write('reviews', l); }
