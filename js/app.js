@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103145428';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103145428';
-import { CATEGORIES } from './data.js?v=261103145428';
-import * as db from './db.js?v=261103145428';
-import * as S from './views-shop.js?v=261103145428';
-import * as Lg from './views-legal.js?v=261103145428';
-import * as A from './views-admin.js?v=261103145428';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103150023';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103150023';
+import { CATEGORIES } from './data.js?v=261103150023';
+import * as db from './db.js?v=261103150023';
+import * as S from './views-shop.js?v=261103150023';
+import * as Lg from './views-legal.js?v=261103150023';
+import * as A from './views-admin.js?v=261103150023';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -110,11 +110,14 @@ function showSlide(i) {
   ss.forEach((s, k) => s.classList.toggle('on', k === slideIdx));
   $$('.dots button').forEach((b, k) => b.setAttribute('aria-current', k === slideIdx));
   const n = $('#slide-n'); if (n) n.textContent = String(slideIdx + 1).padStart(2, '0');
-  $$('.h-progress i').forEach((b, k) => b.classList.toggle('on', k === slideIdx));
+  $$('.h-progress i, .h-dots i').forEach((b, k) => b.classList.toggle('on', k === slideIdx));
   const cap = $('#slide-cap'); const sl = S.HERO_SLIDES?.[slideIdx];
   if (cap && sl) { cap.textContent = sl[getLang()]; cap.href = '#/product/' + sl.pid; }
 }
-// Swipe on the hero image (touch).
+// Swipe on the hero image (touch + mouse drag).
+let mx = null;
+document.addEventListener('mousedown', (e) => { if (e.target.closest('.h-slides')) { mx = e.clientX; e.preventDefault(); } });
+document.addEventListener('mouseup', (e) => { if (mx === null) return; const dx = e.clientX - mx; mx = null; if (Math.abs(dx) < 40) return; showSlide(slideIdx + (dx < 0 ? 1 : -1)); clearInterval(slideTimer); });
 let tx = null;
 document.addEventListener('touchstart', (e) => { if (e.target.closest('.h-slides')) tx = e.touches[0].clientX; }, { passive: true });
 document.addEventListener('touchend', (e) => {
@@ -518,7 +521,7 @@ document.addEventListener('submit', async (e) => {
     try {
       if (id) { db.updateUser(id, { name: clean(d.name, 80), email: clean(d.email, 120), phone: clean(d.phone, 20), ...(d.role ? { role: d.role } : {}) }); if (d.password) await db.setPassword(id, d.password); }
       else await db.addStaff({ name: clean(d.name, 80), email: clean(d.email, 120), phone: clean(d.phone, 20), role: d.role, password: d.password });
-    } catch (x) { err.textContent = x.message === 'exists' ? t('exists') : t('required'); return; }
+    } catch (x) { err.textContent = ['exists', 'phoneExists'].includes(x.message) ? t(x.message) : t('required'); return; }
     closeModal(); toast(getLang() === 'he' ? 'המשתמש נשמר' : 'User saved'); rerender();
   }
   if (kind === 'product') {

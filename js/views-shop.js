@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103145428';
-import { t, L, getLang } from './i18n.js?v=261103145428';
-import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103145428';
-import * as db from './db.js?v=261103145428';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103150023';
+import { t, L, getLang } from './i18n.js?v=261103150023';
+import { CATEGORIES, COMPLEMENTS, artSVG } from './data.js?v=261103150023';
+import * as db from './db.js?v=261103150023';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -42,6 +42,7 @@ const plus = raw('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M
 function labelCard(p) {
   return html`<article class="card label ${FAMILY_TONE[p.sub] || ''}">
     <a class="lbl" href="#/product/${p.id}">
+      <img class="card-mark" src="assets/img/mark.webp" alt="" width="34" height="30" loading="lazy">
       <span class="lbl-fam latin">${(FAMILY_EN_SHORT[p.sub] || '').toUpperCase()}</span>
       <span class="lbl-arch full">${media(p, 'bgfill', false, p.img)}${media(p, 'm1', false, p.img)}<span class="card-add in-arch" aria-hidden="true">${plus}</span></span>
       <span class="lbl-name">${L(p.name)}</span>
@@ -85,6 +86,7 @@ export function card(p, opts = {}) {
   const direct = !(p.quote || p.picks || p.options?.length || p.sizes.length > 1);
   const fam = p.picks ? 'DISCOVERY KIT' : ({ diffusers: 'DIFFUSERS', bundles: 'BUNDLE', oils: 'FRAGRANCE OIL' })[p.cat] || '';
   return html`<article class="card ${studio ? 'studio' : 'photo'}">
+    <img class="card-mark" src="assets/img/mark.webp" alt="" width="34" height="30" loading="lazy">
     <span class="lbl-fam latin card-fam">${fam}</span>
     <a class="card-media" href="#/product/${p.id}" tabindex="-1" aria-hidden="true">
       ${media(p, 'm1', false, main)}${alt ? media(p, 'm2', false, alt) : ''}
@@ -128,11 +130,6 @@ export function home() {
   const families = Object.keys(banners).map((f) => ({ f, img: banners[f], n: all.filter((p) => p.sub === f).length })).filter((x) => x.n);
   return html`
   <section class="h-hero" aria-labelledby="hero-t">
-    <button class="h-arrow prev" data-action="slide-step" data-d="-1" aria-label="${T('לתמונה הקודמת', 'Previous image')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-    <button class="h-arrow next" data-action="slide-step" data-d="1" aria-label="${T('לתמונה הבאה', 'Next image')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
-    <div class="h-slides" role="region" aria-roledescription="carousel" aria-label="${T('מוצרים נבחרים', 'Featured')}">
-      ${hero.map((src, i) => html`<figure class="slide ${i ? '' : 'on'}"><img src="${src}" alt="${HERO_SLIDES[i]?.[getLang()] || 'SAY Boutique'}" width="2000" height="968" ${raw(i ? 'fetchpriority="low"' : 'fetchpriority="high"')} decoding="async"></figure>`)}
-    </div>
     <div class="h-hero-copy">
       <p class="kicker latin">Luxury Home Fragrances</p>
       <h1 id="hero-t"><span>${t('heroTitle1')}</span> <em>${t('heroTitle2')}</em></h1>
@@ -142,11 +139,17 @@ export function home() {
       ${hero.length ? html`<div class="h-count latin" aria-hidden="true"><b id="slide-n">01</b><span class="h-progress">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</span><span>0${hero.length}</span></div>
       <div class="sr-only">${hero.map((_, i) => html`<button data-action="slide" data-i="${i}" aria-label="${T('שקופית', 'Slide')} ${i + 1}" aria-current="${i === 0}"></button>`)}</div>` : ''}
     </div>
+    <div class="h-media">
+    <div class="h-slides" role="region" aria-roledescription="carousel" aria-label="${T('מוצרים נבחרים', 'Featured')}">
+      ${hero.map((src, i) => html`<figure class="slide ${i ? '' : 'on'}"><img src="${src}" alt="${HERO_SLIDES[i]?.[getLang()] || 'SAY Boutique'}" width="2000" height="968" ${raw(i ? 'fetchpriority="low"' : 'fetchpriority="high"')} decoding="async"></figure>`)}
+    </div>
     ${hero.length ? html`<a class="h-tag" id="slide-cap" href="#/product/${HERO_SLIDES[0].pid}">${HERO_SLIDES[0][getLang()]}</a>` : ''}
     <a class="seal" href="#/about" aria-label="${t('about')}">
       ${sealSVG('SAY BOUTIQUE · LUXURY HOME FRAGRANCES · ')}
       <img src="assets/img/mark.webp" alt="" width="90" height="78">
     </a>
+    ${hero.length ? html`<div class="h-dots" aria-hidden="true">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>` : ''}
+    </div>
   </section>
 
   <section class="h-collection" aria-labelledby="col-t"><div class="wrap">
