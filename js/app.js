@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103221413';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103221413';
-import { CATEGORIES } from './data.js?v=261103221413';
-import * as db from './db.js?v=261103221413';
-import * as S from './views-shop.js?v=261103221413';
-import * as Lg from './views-legal.js?v=261103221413';
-import * as A from './views-admin.js?v=261103221413';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103221448';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103221448';
+import { CATEGORIES } from './data.js?v=261103221448';
+import * as db from './db.js?v=261103221448';
+import * as S from './views-shop.js?v=261103221448';
+import * as Lg from './views-legal.js?v=261103221448';
+import * as A from './views-admin.js?v=261103221448';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -29,7 +29,7 @@ function header() {
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
       <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-      <span class="mn-desk">${navLink('#/', t('home'))}${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/rental', getLang() === 'he' ? 'שירות לעסקים' : 'Business service')}${navLink('#/reviews', getLang() === 'he' ? 'ביקורות' : 'Reviews')}${navLink('#/contact', t('contact'))}</span>
+      <span class="mn-desk">${navLink('#/', t('home'))}${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}${navLink('#/rental', getLang() === 'he' ? 'השכרה' : 'Rental')}${navLink('#/reviews', getLang() === 'he' ? 'ביקורות' : 'Reviews')}${navLink('#/contact', t('contact'))}</span>
       ${mobileMenu()}
     </nav>
     <a class="brand logo" href="#/" aria-label="SAY Boutique — ${t('home')}"><img src="assets/img/logo-wide.webp" alt="SAY Boutique — Luxury Home Fragrances" width="923" height="350" fetchpriority="high"></a>
