@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103213648';
-import { t, L, getLang } from './i18n.js?v=261103213648';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103213648';
-import * as db from './db.js?v=261103213648';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261103213815';
+import { t, L, getLang } from './i18n.js?v=261103213815';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261103213815';
+import * as db from './db.js?v=261103213815';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -303,29 +303,30 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
   const heroImg = sub ? subImg(cat, sub) : c?.img;
   const title = sub ? subName(sub) : cat ? catName(cat) : T('תוצאות חיפוש', 'Search results');
   if (cat === 'oils' && !sub && !q) {
-    const fams = subs.map((s2) => ({ s2, n: active().filter((p) => p.sub === s2 && !p.picks).length })).filter((x) => x.n > 2).sort((a, b) => (b.s2 === 'בתי מלון ויוקרה') - (a.s2 === 'בתי מלון ויוקרה'));
+    const worlds = subs.map((s2) => ({ s2, n: active().filter((p) => p.sub === s2 && !p.picks).length })).filter((x) => x.n).sort((x, y) => (y.s2 === 'בתי מלון ויוקרה') - (x.s2 === 'בתי מלון ויוקרה'));
     const kit = active().find((p) => p.picks === 14);
-    return html`<div class="shop-page oils-page">
-    <header class="ox">
-      <div class="ox-copy">${crumbs}
-        <p class="ox-k">${T('תמציות שמן למפיצי ריח', 'Fragrance oils for diffusers')}</p>
+    const moods = [['fresh', 'נקי ורגוע', 'Clean & calm', 'כמו מצעים של מלון, רגע אחרי שהחדר סודר.', 'Like hotel sheets, right after housekeeping.', 'ניקיון ורעננות'], ['sweet', 'מפנק ומתוק', 'Cosy & sweet', 'וניל, קפה ומאפה חם — הבית מחבק.', 'Vanilla, coffee, warm pastry — a hug.', 'מאפים ומתוקים'], ['floral', 'רך ופרחוני', 'Soft & floral', 'ורדים, פריחה ושקט של ספא.', 'Roses, blossom and spa calm.', 'טבע וספא'], ['rich', 'עמוק ויוקרתי', 'Rich & luxurious', 'הלובי של מלון חמישה כוכבים.', 'A five-star hotel lobby.', 'בתי מלון ויוקרה']];
+    const items = list.filter((p) => !p.picks);
+    return html`<div class="shop-page oz">
+    <header class="oz-hero">
+      <div class="oz-media"><span class="mist" aria-hidden="true"><i></i><i></i><i></i></span><img src="${c.img}" alt="" width="1600" height="1000" fetchpriority="high"></div>
+      <div class="oz-card">${crumbs}
+        <p class="oz-k">${T(`${items.length} תמציות שמן למפיצי ריח`, `${items.length} fragrance oils`)}</p>
         <h1>${T('נושמים פנימה.', 'Breathe in.')}<br><em>${T('ומרגישים במלון.', 'You are at the hotel.')}</em></h1>
-        <p class="ox-lead">${T(`${list.length} תמציות בהשראת בתי מלון, בשמים אייקוניים וטבע. בחרו את המקום שאתם רוצים להרגיש בו — ואנחנו נביא אותו הביתה.`, `${list.length} oils inspired by hotels, iconic perfumes and nature. Pick the place you want to feel — we bring it home.`)}</p>
-        <div class="ox-ways">
-          <a href="#/shop/oils/${encodeURIComponent('בתי מלון ויוקרה')}"><b>${T('אני רוצה ריח של מלון', 'I want a hotel scent')}</b><span>${T('הלובי שאתם זוכרים', 'The lobby you remember')}</span></a>
-          <a href="#/shop/oils/${encodeURIComponent('השראת בשמים יוקרתיים')}"><b>${T('אני אוהב/ת בושם מסוים', 'I love a certain perfume')}</b><span>${T('בהשראת בשמים מוכרים', 'Inspired by famous perfumes')}</span></a>
-          ${kit ? html`<a href="#/product/${kit.id}" class="ox-kit"><b>${T('עוד לא בטוחים?', 'Not sure yet?')}</b><span>${T('ערכת 14 ריחות — מנסים ואז מחליטים', '14-scent kit — try, then decide')}</span></a>` : ''}
-        </div>
+        <p>${T('כל תמצית נולדה מזיכרון של מקום. ספרו לנו איך אתם רוצים שהבית ירגיש — ואנחנו נראה לכם מאיפה להתחיל.', 'Every oil began as a memory of a place. Tell us how home should feel — we show you where to start.')}</p>
       </div>
-      <figure class="ox-art"><span class="mist" aria-hidden="true"><i></i><i></i><i></i></span><img src="${c.img}" alt="" width="1400" height="1100" fetchpriority="high"></figure>
     </header>
     <div class="wrap">
-      ${catTabs(cat)}
-      <section class="ox-worlds" aria-labelledby="ox-w"><h2 id="ox-w">${T('עולמות הריח', 'Scent worlds')}</h2>
-        <div class="ox-wgrid">${fams.map(({ s2, n }, i) => html`<a class="ox-w" href="#/shop/oils/${encodeURIComponent(s2)}"><img src="${i ? small(subImg(cat, s2)) : subImg(cat, s2)}" alt="" width="400" height="300" loading="lazy"><span><b>${subName(s2)}</b><small>${n} ${T('ריחות', 'scents')}</small></span></a>`)}</div>
+      <section class="oz-moods" aria-labelledby="oz-m"><h2 id="oz-m">${T('איך אתם רוצים שהבית ירגיש?', 'How should your home feel?')}</h2>
+        <div class="oz-mgrid">${moods.map(([k, h, e, d, de, s2]) => html`<button type="button" class="oz-mood ${f.notes?.includes(k) ? 'on' : ''}" data-action="mood" data-k="${k}"><img src="${small(subImg('oils', s2))}" alt="" loading="lazy" width="500" height="500"><span><b>${T(h, e)}</b>${T(d, de)}</span></button>`)}</div>
+        ${kit ? html`<a class="oz-kit" href="#/product/${kit.id}"><b>${T('עדיין לא בטוחים? אל תנחשו — תריחו.', 'Still unsure? Do not guess — smell.')}</b><span>${T('ערכת התנסות: 14 ריחות של 10 מ"ל', 'Discovery kit: 14 × 10 ml')} · ${m(minPrice(kit))}</span><i aria-hidden="true">${he() ? '←' : '→'}</i></a>` : ''}
       </section>
-      ${sortBar(q, sort, list.filter((p) => !p.picks).length, f)}
-      <div class="grid shop-grid ox-grid">${list.filter((p) => !p.picks).map((p) => card(p))}</div>
+      <section class="oz-worlds" aria-labelledby="oz-w"><h2 id="oz-w">${T('או בחרו עולם', 'Or pick a world')}</h2>
+        <div class="oz-wrail">${worlds.map(({ s2, n }) => html`<a class="oz-w" href="#/shop/oils/${encodeURIComponent(s2)}"><img src="${small(subImg('oils', s2))}" alt="" loading="lazy" width="500" height="650"><span><small>${n} ${T('ריחות', 'scents')}</small><b>${subName(s2)}</b></span></a>`)}</div>
+      </section>
+      <section id="oz-all" class="oz-all"><h2>${f.notes?.length ? T('הריחות שמתאימים לכם', 'Your matches') : T('כל התמציות', 'All oils')}</h2>
+      ${sortBar(q, sort, items.length, f)}
+      <div class="grid shop-grid ox-grid">${items.map((p) => card(p))}</div></section>
     </div></div><div class="block"></div>`;
   }
   return html`<div class="shop-page">

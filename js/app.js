@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103213648';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103213648';
-import { CATEGORIES } from './data.js?v=261103213648';
-import * as db from './db.js?v=261103213648';
-import * as S from './views-shop.js?v=261103213648';
-import * as Lg from './views-legal.js?v=261103213648';
-import * as A from './views-admin.js?v=261103213648';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103213815';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103213815';
+import { CATEGORIES } from './data.js?v=261103213815';
+import * as db from './db.js?v=261103213815';
+import * as S from './views-shop.js?v=261103213815';
+import * as Lg from './views-legal.js?v=261103213815';
+import * as A from './views-admin.js?v=261103213815';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -403,6 +403,7 @@ document.addEventListener('click', async (e) => {
     case 'search-open': if ($('#nav').classList.contains('open')) { $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); } openSearch(); break;
     case 'filter-open': modal(S.filterSheet(state.f)); break;
     case 'filter-clear': state.f = {}; rerender(); break;
+    case 'mood': { const k = el.dataset.k; const cur = state.f.notes || []; state.f = { ...state.f, notes: cur.includes(k) ? cur.filter((x) => x !== k) : [k] }; rerender(); setTimeout(() => $('#oz-all')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60); break; }
     case 'cmdk-open': openPalette(); break;
     case 'cmdk-close': closePalette(); break;
     case 'goto-new': closePalette(); state.os = 'new'; state.ov = 'queue'; location.hash = '#/orders'; rerender(); break;
