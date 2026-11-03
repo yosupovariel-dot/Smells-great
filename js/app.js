@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103160037';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103160037';
-import { CATEGORIES } from './data.js?v=261103160037';
-import * as db from './db.js?v=261103160037';
-import * as S from './views-shop.js?v=261103160037';
-import * as Lg from './views-legal.js?v=261103160037';
-import * as A from './views-admin.js?v=261103160037';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103160242';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261103160242';
+import { CATEGORIES } from './data.js?v=261103160242';
+import * as db from './db.js?v=261103160242';
+import * as S from './views-shop.js?v=261103160242';
+import * as Lg from './views-legal.js?v=261103160242';
+import * as A from './views-admin.js?v=261103160242';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -68,15 +68,28 @@ function mobileMenu() {
   </div>`;
 }
 
+function footNav() {
+  const he = getLang() === 'he'; const T2 = (a, b) => (he ? a : b);
+  const all = db.products().filter((p) => p.active !== false);
+  const live = CATEGORIES.filter((c) => all.some((p) => p.cat === c.id));
+  const soon = CATEGORIES.filter((c) => !live.includes(c));
+  const col = (title, links) => html`<div class="fn-col"><h2>${title}</h2><ul>${links.map(([h, l]) => html`<li><a href="${h}"><span>${l}</span></a></li>`)}</ul></div>`;
+  return html`<nav class="fn" aria-label="${T2('ניווט תחתון', 'Footer')}">
+    <div class="fn-col fn-shop"><h2>${t('shop')}</h2>
+      <ul class="fn-cats">${live.map((c) => html`<li><a href="#/shop/${c.id}">${c.img ? html`<img src="${c.img.replace(/\.webp$/, '-sm.webp')}" alt="" width="40" height="40" loading="lazy">` : ''}<span>${c[getLang()]}</span></a></li>`)}</ul>
+      ${soon.length ? html`<p class="fn-soon"><b>${T2('בקרוב', 'Coming soon')}</b>${soon.map((c) => c[getLang()]).join(' · ')}</p>` : ''}</div>
+    ${col(t('service'), [['#/contact', t('contact')], ['#/account', t('club')], ['#/wholesale', t('wholesale')], ['#/finder', T2('מציאת הריח שלי', 'Scent finder')]])}
+    ${col(t('info'), [['#/about', t('about')], ['#/returns', t('returns')], ['#/terms', t('terms')], ['#/privacy', t('privacy')], ['#/accessibility', t('accessibility')]])}
+  </nav>`;
+}
+
 function footer() {
   const y = new Date().getFullYear();
   return html`<footer class="ftr"><div class="wrap">
     <div class="ftr-grid">
       <div><a class="brand logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-full-light.png" alt="SAY Boutique — Luxury Home Fragrances" width="360" height="478" loading="lazy"></a><p class="muted">${t('tick2')}</p>
         <p class="ftr-contact"><a class="fc-btn" href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a><a class="fc-btn wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
-      <details class=\"ftr-col\" open><summary><h2>${t('shop')}</h2></summary><ul>${CATEGORIES.map((c) => html`<li><a href="#/shop/${c.id}">${c[getLang()]}</a></li>`)}</ul></details>
-      <details class=\"ftr-col\" open><summary><h2>${t('service')}</h2></summary><ul><li><a href="#/contact">${t('contact')}</a></li><li><a href="#/account">${t('club')}</a></li><li><a href="#/wholesale">${t('wholesale')}</a></li><li><a href="#/returns">${t('returns')}</a></li></ul></details>
-      <details class=\"ftr-col\" open><summary><h2>${t('info')}</h2></summary><ul><li><a href="#/terms">${t('terms')}</a></li><li><a href="#/privacy">${t('privacy')}</a></li><li><a href="#/accessibility">${t('accessibility')}</a></li><li><a href="#/about">${t('about')}</a></li></ul></div>
+      ${footNav()}
     </div>
     <div class="ftr-bottom"><span>© ${y} SAY Boutique · ${t('rights')}</span>
       <a class="credit" href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener">${t('builtBy')}</a></div>

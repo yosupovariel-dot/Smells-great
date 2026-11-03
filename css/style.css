@@ -2231,3 +2231,32 @@ html.a11y-stop .mnp-cat{animation:none}
   .cc-form .cc-check,.cc-form .cc-err,.cc-form .cc-go{grid-column:1/-1}
 }
 @media (min-width:700px){.cc-form label:nth-of-type(4){order:1;grid-column:1/-1}.cc-form .cc-check,.cc-form .cc-err,.cc-form .cc-go{order:2}}
+
+
+/* ===== Footer navigation v2 ===== */
+.ftr .fn{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:clamp(1.5rem,4vw,4rem);align-self:start}
+.fn-col h2{font-size:.78rem!important;letter-spacing:.14em;font-weight:700;color:var(--gold-2,#C9AD7A);margin:0 0 1.1rem;padding:0 0 .7rem;position:relative;border:0!important;text-transform:uppercase}
+.fn-col h2::after{content:"";position:absolute;bottom:0;inset-inline-start:0;width:28px;height:1.5px;background:var(--gold-2,#C9AD7A)}
+.fn-col ul{list-style:none;margin:0;padding:0;display:grid;gap:.15rem}
+.fn-col a{display:inline-flex;align-items:center;gap:.5rem;padding:.38rem 0;color:#e9e1d4;text-decoration:none;font-size:.95rem;transition:color .25s,transform .25s}
+.fn-col a span{background:linear-gradient(currentColor,currentColor) 100% 100%/0 1px no-repeat;transition:background-size .35s}
+[dir="ltr"] .fn-col a span{background-position:0 100%}
+.fn-col a:hover,.fn-col a:focus-visible{color:#fff}
+.fn-col a:hover span,.fn-col a:focus-visible span{background-size:100% 1px}
+.fn-cats{grid-template-columns:1fr 1fr!important;gap:.55rem!important}
+.fn-cats a{width:100%;padding:.45rem .55rem!important;border:1px solid rgba(201,173,122,.22);border-radius:12px;background:rgba(255,255,255,.03)}
+.fn-cats a:hover{border-color:rgba(201,173,122,.6);background:rgba(201,173,122,.08)}
+.fn-cats img{width:40px;height:40px;border-radius:9px;object-fit:cover;flex:0 0 auto;background:#2a251f}
+.fn-soon{margin:.9rem 0 0;font-size:.8rem;color:#9d9384;line-height:1.6}
+.fn-soon b{display:inline-block;margin-inline-end:.5rem;font-size:.66rem;letter-spacing:.08em;color:#16130F;background:var(--gold-2,#C9AD7A);border-radius:20px;padding:.05rem .55rem}
+@media (max-width:900px){
+  .ftr .fn{grid-template-columns:1fr 1fr;gap:1.8rem 1.2rem;margin-top:1.6rem;padding-top:1.6rem;border-top:1px solid rgba(201,173,122,.18)}
+  .fn-shop{grid-column:1/-1}
+  .fn-col a{font-size:.92rem}
+}
+.ftr .ftr-grid{grid-template-columns:minmax(220px,1fr) 2.8fr!important;gap:clamp(2rem,5vw,5rem)!important}
+@media (max-width:900px){.ftr .ftr-grid{grid-template-columns:1fr!important;gap:0!important}}
+.club-card .promo-logo{width:auto!important;height:96px!important;object-fit:contain;margin:.3rem auto .5rem!important}
+@media (min-width:700px){.club-card .promo-logo{height:84px!important}}
+.fn-cats li:last-child:nth-child(odd){grid-column:1/-1}
+@media (max-width:900px){.ftr .fn{border-top:0;padding-top:0}}
