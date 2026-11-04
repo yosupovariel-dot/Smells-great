@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261104151341';
-import { t, L, getLang } from './i18n.js?v=261104151341';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261104151341';
-import * as db from './db.js?v=261104151341';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261104162005';
+import { t, L, getLang } from './i18n.js?v=261104162005';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261104162005';
+import * as db from './db.js?v=261104162005';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -122,6 +122,24 @@ function sealSVG(text) {
 
 const subTiles = (cat) => { const c = CATEGORIES.find((x) => x.id === cat); const subs = (db.SITE.subs?.[c.he] || []).filter((s2) => active().some((p) => p.sub === s2));
   return html`<div class="hc-subs">${subs.map((s2) => html`<a class="hc-sub ${cat === 'diffusers' ? 'studio' : ''}" href="#/shop/${cat}/${encodeURIComponent(s2)}"><span class="hc-sub-img"><img src="${small(subImg(cat, s2))}" alt="" loading="lazy" width="400" height="300"></span><b>${subName(s2)}</b><small>${active().filter((p) => p.sub === s2).length} ${T('מוצרים', 'items')}</small></a>`)}</div>`; };
+// Featured bundles: honest anchor = the real price of the same items bought separately.
+const DEALS = [['bundle-say300-1l', [['say-300'], ['oil', '1 ליטר']]], ['bundle-say150-1l', [['say-150'], ['oil', '1 ליטר']]], ['bundle-say100-1l', [['say-100'], ['oil', '1 ליטר']]], ['bundle-car-kit', [['say-car'], ['kit-14']]], ['bundle-5x100', [['oil', '100 מ"ל', 5]]], ['kit-14', []]];
+function dealsSection() {
+  const anyOil = active().find((p) => p.cat === 'oils' && p.pack);
+  const priceOf = ([id, size, n = 1]) => { const p = id === 'oil' ? anyOil : db.product(id); if (!p) return 0; const sz = size ? p.sizes.find((x) => x.label === size) : p.sizes[0]; return (sz?.price || 0) * n; };
+  const items = DEALS.map(([id, parts]) => { const p = db.product(id); if (!p || p.active === false) return null; const now = minPrice(p); const sep = parts.reduce((a, x) => a + priceOf(x), 0) || p.was || 0; return { p, now, sep: sep > now ? sep : 0 }; }).filter(Boolean);
+  if (!items.length) return '';
+  return html`<section class="dl" aria-labelledby="dl-t"><div class="wrap">
+    <header class="dl-h"><p class="hz-k">${T('הכי משתלם עכשיו', 'Best value now')}</p><h2 id="dl-t">${T('מארזים נבחרים', 'Featured bundles')}</h2><p>${T('מכשיר ותמצית יחד — מוכן לשימוש מהרגע שהחבילה מגיעה.', 'Device and oil together — ready the moment it arrives.')}</p></header>
+    <div class="dl-grid">${items.map(({ p, now, sep }) => { const save = now && sep ? Math.round((1 - now / sep) * 100) : 0;
+      return html`<a class="dl-card" href="#/product/${p.id}">
+        <span class="dl-img"><img src="${small(p.img)}" alt="" loading="lazy" width="500" height="500">${save >= 5 ? html`<em class="dl-badge">${T(`חוסכים ${save}%`, `Save ${save}%`)}</em>` : html`<em class="dl-badge soft">${p.picks ? T('מומלץ להתחלה', 'Best to start') : T('מארז', 'Bundle')}</em>`}</span>
+        <span class="dl-body"><b>${L(p.name)}</b>
+          <span class="dl-price">${sep ? html`<s>${T('בנפרד', 'Separately')} ${m(sep)}</s>` : ''}${now ? html`<strong>${m(now)}</strong>` : html`<strong class="q">${T('מחיר מארז מיוחד', 'Special bundle price')}</strong>`}</span>
+          <span class="dl-go">${now ? T('לפרטים והזמנה', 'View & order') : T('לקבלת המחיר', 'Get the price')} ${arrow()}</span></span></a>`; })}</div>
+  </div></section>`;
+}
+
 export function home() {
   const all = active();
   const hero = (db.SITE.site?.hero || []).slice(0, 4);
@@ -165,6 +183,7 @@ export function home() {
       <div class="rl-cta"><a class="btn" href="#/finder">${T('מצאו את הריח שלכם', 'Find your scent')}</a><a class="u-link" href="#/shop">${T('לכל המוצרים', 'Shop all')} <span aria-hidden="true">${arrow()}</span></a></div></div>
   </div></section>
 
+  ${dealsSection()}
   <section class="hz" aria-labelledby="col-t"><div class="wrap">
     <header class="hz-head"><p class="hz-k">${T('מפיצי ריח', 'Diffusers')}</p><h2 id="col-t">${T('כמה גדול החלל שלכם?', 'How big is your space?')}</h2>
       <p>${T('זה כל מה שצריך לדעת כדי לבחור. שאר העבודה עלינו — המכשיר שקט, בלי מים ובלי חום.', 'That is all you need to know to choose. The device is silent, with no water and no heat.')}</p></header>

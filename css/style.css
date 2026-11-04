@@ -3037,3 +3037,25 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
 .rl-copy>p:not(.hz-k){font-size:1.06rem;line-height:1.75;color:#4a4238;margin:0 0 1.8rem;max-width:30rem}
 .rl-cta{display:flex;align-items:center;gap:1.6rem;flex-wrap:wrap}
 @media (max-width:860px){.rl{padding-top:1.5rem}.rl-in{grid-template-columns:1fr;gap:1.6rem}.rl-vid{max-width:none;border-radius:18px}.rl-copy{text-align:center}.rl-copy>p:not(.hz-k){margin-inline:auto}.rl-cta{justify-content:center}}
+
+/* ===== Featured bundles ===== */
+.dl{padding:clamp(2.5rem,6vw,5rem) 0 clamp(1rem,3vw,2rem)}
+.dl-h{text-align:center;max-width:36rem;margin:0 auto 1.8rem}
+.dl-h h2{font-size:clamp(2rem,3.6vw,3.2rem);margin:0 0 .6rem;font-weight:700}
+.dl-h p:last-child{margin:0;color:#4a4238}
+.dl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.dl-card{display:flex;flex-direction:column;background:#fff;border-radius:18px;overflow:hidden;text-decoration:none;color:var(--ink);box-shadow:0 1px 0 rgba(22,19,15,.04),0 22px 40px -34px rgba(22,19,15,.55);transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+.dl-card:hover{transform:translateY(-5px);box-shadow:0 30px 50px -30px rgba(22,19,15,.55)}
+.dl-img{position:relative;display:block;aspect-ratio:1;overflow:hidden;background:#EDE4D6}
+.dl-img img{width:100%;height:100%;object-fit:cover!important;transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.dl-card:hover .dl-img img{transform:scale(1.05)}
+.dl-badge{position:absolute;top:12px;inset-inline-start:12px;font-style:normal;font-size:.78rem;font-weight:800;background:#C62828;color:#fff;padding:.3rem .7rem;border-radius:999px}
+.dl-badge.soft{background:#16130F;color:#E2C88F;font-weight:700}
+.dl-body{display:flex;flex-direction:column;gap:.35rem;padding:1rem 1.1rem 1.1rem;flex:1}
+.dl-body b{font-size:1.02rem;line-height:1.3}
+.dl-price{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .6rem;margin-top:auto}
+.dl-price s{color:#8a8073;font-size:.88rem}
+.dl-price strong{font-size:1.35rem;color:#B3261E}
+.dl-price strong.q{font-size:.95rem;color:var(--ink)}
+.dl-go{font-size:.85rem;font-weight:700;color:#7E6236}
+@media (max-width:760px){.dl-grid{grid-template-columns:1fr 1fr;gap:.6rem}.dl-body{padding:.75rem .8rem .85rem}.dl-body b{font-size:.88rem}.dl-price strong{font-size:1.1rem}.dl-price s{font-size:.76rem}.dl-go{font-size:.76rem}.dl-badge{font-size:.68rem;top:8px;inset-inline-start:8px}}
