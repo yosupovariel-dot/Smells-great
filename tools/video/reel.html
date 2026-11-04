@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&family=Assistant:wght@400;600&display=block" rel="stylesheet">
+<style>
+:root{--ink:#16130F;--cream:#F4EEE4;--gold:#C9AD7A;--gold2:#E8D3A6;--A:http://localhost:8765/assets}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:720px;height:900px;overflow:hidden;background:var(--ink);font-family:Rubik,sans-serif}
+.s{position:absolute;inset:0;opacity:0;overflow:hidden}
+.s img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(22,19,15,.0) 35%,rgba(22,19,15,.85) 100%)}
+.cap{position:absolute;inset-inline:56px;bottom:90px;color:#fff;text-align:right}
+.k{font:700 18px Rubik;letter-spacing:.14em;color:var(--gold2);margin-bottom:14px}
+h1,h2{font-weight:800;line-height:1.05;letter-spacing:-.01em}
+h1{font-size:64px}h2{font-size:52px}
+em{font-style:normal;color:var(--gold2)}
+.up{opacity:0}
+/* ---------- timeline: 16s total ---------- */
+@keyframes show{0%{opacity:0}4%{opacity:1}96%{opacity:1}100%{opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(34px)}to{opacity:1;transform:none}}
+@keyframes zoomIn{from{transform:scale(1)}to{transform:scale(1.14)}}
+@keyframes zoomOut{from{transform:scale(1.16)}to{transform:scale(1)}}
+@keyframes panL{from{transform:scale(1.12) translateX(-3%)}to{transform:scale(1.12) translateX(3%)}}
+@keyframes mist{0%{transform:translateY(0) scale(.6);opacity:0}30%{opacity:.85}100%{transform:translateY(-420px) scale(1.5);opacity:0}}
+@keyframes line{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pop{0%{opacity:0;transform:translateY(60px) scale(.92)}100%{opacity:1;transform:none}}
+@keyframes flick{0%,100%{opacity:0}6%,94%{opacity:1}}
+
+/* S1 0-2.6s: black, line + question */
+#s1{background:var(--ink);display:grid;place-items:center;text-align:center;animation:show 2.6s 0s linear both}
+#s1 .ln{width:120px;height:1px;background:var(--gold);margin:0 auto 34px;transform-origin:center;animation:line 1s .2s cubic-bezier(.2,.7,.1,1) both}
+#s1 h2{color:#fff;animation:rise 1s .5s cubic-bezier(.2,.7,.1,1) both}
+#s1 p{color:#bfb3a1;font:400 24px Assistant;margin-top:18px;animation:rise 1s .9s both}
+
+/* S2 2.6-5.6s: bottle hero, slow zoom + mist */
+#s2{animation:show 3s 2.6s linear both}
+#s2 img.bg{animation:zoomIn 3s 2.6s linear both}
+#s2 .m{position:absolute;bottom:-160px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(255,250,240,.6),transparent 65%);filter:blur(22px)}
+#s2 .m1{left:30%;animation:mist 3s 2.6s ease-in both}#s2 .m2{left:5%;animation:mist 3s 3.4s ease-in both}
+#s2 .cap>*{animation:rise .9s 3s cubic-bezier(.2,.7,.1,1) both}#s2 .cap h1{animation-delay:3.2s}
+
+/* S3 5.6-9.2s: hotel names, quick cuts */
+#s3{animation:show 3.6s 5.6s linear both;background:var(--ink)}
+#s3 .f{position:absolute;inset:0;opacity:0}
+#s3 .f img{width:100%;height:100%;object-fit:cover;animation:panL 1s linear both}
+#s3 .f1{animation:flick .95s 5.6s both}#s3 .f1 img{animation-delay:5.6s}
+#s3 .f2{animation:flick .95s 6.5s both}#s3 .f2 img{animation-delay:6.5s}
+#s3 .f3{animation:flick .95s 7.4s both}#s3 .f3 img{animation-delay:7.4s}
+#s3 .f4{animation:flick .95s 8.3s both}#s3 .f4 img{animation-delay:8.3s}
+#s3 .top{position:absolute;top:70px;inset-inline:56px;color:#fff;z-index:2;text-align:right}
+#s3 .top h2{font-size:44px;animation:rise .8s 5.8s both}
+#s3 .top .k{animation:rise .8s 5.7s both}
+#s3 .tint{position:absolute;inset:0;background:linear-gradient(rgba(22,19,15,.75),rgba(22,19,15,0) 40%);z-index:1}
+
+/* S4 9.2-12.6s: diffuser lineup on cream */
+#s4{background:radial-gradient(70% 60% at 50% 70%,#fff,var(--cream) 70%);animation:show 3.4s 9.2s linear both}
+#s4 .top{position:absolute;top:80px;inset-inline:56px;text-align:center}
+#s4 .top h2{color:var(--ink);animation:rise .9s 9.4s both}#s4 .top h2 em{color:#7E6236}
+#s4 .top p{font:400 24px Assistant;color:#4a4238;margin-top:14px;animation:rise .9s 9.7s both}
+#s4 .row{position:absolute;bottom:150px;inset-inline:30px;display:flex;align-items:flex-end;justify-content:center;gap:18px}
+#s4 .row img{object-fit:contain;filter:drop-shadow(0 20px 16px rgba(22,19,15,.22));opacity:0}
+#s4 .row img:nth-child(1){height:120px;animation:pop .7s 9.9s cubic-bezier(.2,.7,.1,1) both}
+#s4 .row img:nth-child(2){height:95px;animation:pop .7s 10.05s cubic-bezier(.2,.7,.1,1) both}
+#s4 .row img:nth-child(3){height:170px;animation:pop .7s 10.2s cubic-bezier(.2,.7,.1,1) both}
+#s4 .row img:nth-child(4){height:180px;animation:pop .7s 10.35s cubic-bezier(.2,.7,.1,1) both}
+#s4 .row img:nth-child(5){height:150px;animation:pop .7s 10.5s cubic-bezier(.2,.7,.1,1) both}
+#s4 .row img:nth-child(6){height:330px;animation:pop .7s 10.65s cubic-bezier(.2,.7,.1,1) both}
+#s4 .floor{position:absolute;bottom:150px;inset-inline:40px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+#s4 .tag{position:absolute;bottom:80px;inset-inline:0;text-align:center;font:700 22px Rubik;color:#7E6236;animation:rise .8s 11.2s both}
+
+/* S5 12.6-16s: end card */
+#s5{background:var(--ink);display:grid;place-items:center;text-align:center;animation:show 3.4s 12.6s linear both}
+#s5 img{width:420px;animation:rise 1s 12.8s cubic-bezier(.2,.7,.1,1) both}
+#s5 h2{color:#fff;font-size:46px;margin-top:40px;animation:rise .9s 13.3s both}
+#s5 .cta{display:inline-block;margin-top:34px;padding:18px 34px;border-radius:999px;background:linear-gradient(100deg,#B8944F,#E2C88F);color:var(--ink);font:800 24px Rubik;animation:rise .9s 13.7s both}
+#s5 p{color:#a99d8a;font:400 20px Assistant;margin-top:22px;animation:rise .9s 14s both}
+</style></head><body>
+<section class="s" id="s1"><div><div class="ln"></div><h2>מה הדבר הראשון<br>שמרגישים בבית?</h2><p>לא רואים אותו. זוכרים אותו.</p></div></section>
+
+<section class="s" id="s2"><img class="bg" src="http://localhost:8765/assets/products/hero-0.webp"><div class="m m1"></div><div class="m m2"></div><div class="shade"></div>
+  <div class="cap"><p class="k">SAY BOUTIQUE</p><h1>הריח.<br><em>תמיד הריח.</em></h1></div></section>
+
+<section class="s" id="s3"><div class="tint"></div>
+  <div class="top"><p class="k">54 ריחות בהשראת</p><h2>המלונות שאהבתם</h2></div>
+  <div class="f f1"><img src="http://localhost:8765/assets/products/oil-king-david.webp"></div>
+  <div class="f f2"><img src="http://localhost:8765/assets/products/oil-hilton.webp"></div>
+  <div class="f f3"><img src="http://localhost:8765/assets/products/oil-bereshit.webp"></div>
+  <div class="f f4"><img src="http://localhost:8765/assets/products/oil-fattal.webp"></div></section>
+
+<section class="s" id="s4"><div class="top"><h2>שקט. בלי מים.<br><em>בלי חום.</em></h2><p>מכשיר לכל חלל — מהרכב ועד הלובי</p></div>
+  <div class="floor"></div>
+  <div class="row"><img src="http://localhost:8765/assets/products/cut-say-car.webp"><img src="http://localhost:8765/assets/products/cut-say-room-office.webp"><img src="http://localhost:8765/assets/products/cut-say-100.webp"><img src="http://localhost:8765/assets/products/cut-say-150.webp"><img src="http://localhost:8765/assets/products/cut-say-300.webp"><img src="http://localhost:8765/assets/products/cut-say-400.webp"></div>
+  <p class="tag">מכשיר + תמצית — ומוכן תוך דקות</p></section>
+
+<section class="s" id="s5"><div><img src="http://localhost:8765/assets/img/logo-wide-light.webp"><h2>הבית שלכם,<br>בניחוח של מלון.</h2><span class="cta">מצאו את הריח שלכם</span><p>משלוח חינם מעל 299 ₪</p></div></section>
+</body></html>
+<style>
+#s4 .row{gap:10px;inset-inline:24px}
+#s4 .row img{mix-blend-mode:multiply;max-width:15%;width:auto;flex:0 1 auto}
+#s4 .row img:nth-child(1){height:110px}#s4 .row img:nth-child(2){height:80px}#s4 .row img:nth-child(3){height:130px}#s4 .row img:nth-child(4){height:140px}#s4 .row img:nth-child(5){height:115px}#s4 .row img:nth-child(6){height:300px}
+#s3 .f img{object-position:0% 50%}
+@keyframes panL{from{transform:scale(1.04)}to{transform:scale(1.1)}}
+#s3 .f img{transform-origin:15% 50%}
+</style>
+<style>#s3 .f img{object-position:10% 50%;transform-origin:30% 30%}@keyframes panL{from{transform:scale(1)}to{transform:scale(1.05)}}</style>
+<style>#s3 .top{top:auto;bottom:80px}#s3 .tint{background:linear-gradient(rgba(22,19,15,0) 55%,rgba(22,19,15,.85))}</style>

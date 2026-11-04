@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261104150929';
-import { t, L, getLang } from './i18n.js?v=261104150929';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261104150929';
-import * as db from './db.js?v=261104150929';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261104151341';
+import { t, L, getLang } from './i18n.js?v=261104151341';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261104151341';
+import * as db from './db.js?v=261104151341';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -155,6 +155,15 @@ export function home() {
     ${hero.length ? html`<div class="h-dots" aria-hidden="true">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>` : ''}
     </div>
   </section>
+
+  <section class="rl" aria-labelledby="rl-t"><div class="wrap rl-in">
+    <figure class="rl-vid"><video src="assets/video/say-reel.mp4" poster="assets/video/say-reel-poster.webp" autoplay muted loop playsinline preload="metadata" width="720" height="900" aria-label="${T('סרטון קצר על מוצרי SAY', 'A short film about SAY products')}"></video>
+      <button class="rl-toggle" data-action="reel-toggle" aria-label="${T('עצירת הסרטון', 'Pause video')}" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button></figure>
+    <div class="rl-copy"><p class="hz-k">${T('15 שניות של SAY', '15 seconds of SAY')}</p>
+      <h2 id="rl-t">${T('את הריח אי אפשר לצלם.', 'You cannot film a scent.')}<br><em>${T('אבל אפשר להרגיש אותו.', 'But you can feel it.')}</em></h2>
+      <p>${T('מכשיר שקט, תמצית בהשראת המלון שאהבתם, ובית שמקבל אתכם כל ערב באותה תחושה של לובי יוקרתי.', 'A silent device, an oil inspired by the hotel you loved, and a home that greets you every evening like a luxury lobby.')}</p>
+      <div class="rl-cta"><a class="btn" href="#/finder">${T('מצאו את הריח שלכם', 'Find your scent')}</a><a class="u-link" href="#/shop">${T('לכל המוצרים', 'Shop all')} <span aria-hidden="true">${arrow()}</span></a></div></div>
+  </div></section>
 
   <section class="hz" aria-labelledby="col-t"><div class="wrap">
     <header class="hz-head"><p class="hz-k">${T('מפיצי ריח', 'Diffusers')}</p><h2 id="col-t">${T('כמה גדול החלל שלכם?', 'How big is your space?')}</h2>

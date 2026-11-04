@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261104150929';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261104150929';
-import { CATEGORIES } from './data.js?v=261104150929';
-import * as db from './db.js?v=261104150929';
-import * as S from './views-shop.js?v=261104150929';
-import * as Lg from './views-legal.js?v=261104150929';
-import * as A from './views-admin.js?v=261104150929';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261104151341';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261104151341';
+import { CATEGORIES } from './data.js?v=261104151341';
+import * as db from './db.js?v=261104151341';
+import * as S from './views-shop.js?v=261104151341';
+import * as Lg from './views-legal.js?v=261104151341';
+import * as A from './views-admin.js?v=261104151341';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -180,6 +180,7 @@ function startCatRail() {
     else r.scrollBy({ left: dir * step, behavior: 'smooth' });
   }, 2200);
 }
+function reelMotion() { const v = $('.rl-vid video'); if (v && (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop'))) { v.pause(); v.removeAttribute('autoplay'); } }
 function startSlides() {
   clearInterval(slideTimer); slideIdx = 0;
   if (!$('.slide') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -283,7 +284,7 @@ function route() {
     sw.addEventListener('scroll', () => { if (sw.scrollWidth > sw.clientWidth + 2) mark(Math.round(Math.abs(sw.scrollLeft) / sw.clientWidth)); }, { passive: true });
     if ('IntersectionObserver' in window) { const io = new IntersectionObserver((es) => es.forEach((x) => { if (x.isIntersecting && sw.scrollWidth <= sw.clientWidth + 2) mark(+x.target.dataset.i); }), { rootMargin: '-45% 0px -45% 0px' }); $$('.pg-slide', sw).forEach((f) => io.observe(f)); }
   }
-  applyA11y(); applyStyleAttrs(); startTicker(); bars(); startSlides(); startCatRail(); observeReveal(); observeBuy(); watchRails(); markCached();
+  applyA11y(); applyStyleAttrs(); startTicker(); bars(); startSlides(); startCatRail(); reelMotion(); observeReveal(); observeBuy(); watchRails(); markCached();
 }
 
 // Fade-in on scroll (skipped when reduced motion / a11y "stop animations" is on).
@@ -423,6 +424,7 @@ document.addEventListener('click', async (e) => {
     case 'search-open': if ($('#nav').classList.contains('open')) { $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); } openSearch(); break;
     case 'filter-open': modal(S.filterSheet(state.f)); break;
     case 'filter-clear': state.f = {}; rerender(); break;
+    case 'reel-toggle': { const v = el.parentElement.querySelector('video'); const he = getLang() === 'he'; if (v.paused) { v.play(); el.setAttribute('aria-pressed', 'false'); el.setAttribute('aria-label', he ? 'עצירת הסרטון' : 'Pause video'); el.classList.remove('paused'); } else { v.pause(); el.setAttribute('aria-pressed', 'true'); el.setAttribute('aria-label', he ? 'הפעלת הסרטון' : 'Play video'); el.classList.add('paused'); } break; }
     case 'rv-ok': db.setReview(id, 'approved'); rerender(); break;
     case 'rv-hide': db.setReview(id, 'hidden'); rerender(); break;
     case 'rv-del': if (confirm(getLang() === 'he' ? 'למחוק את הביקורת?' : 'Delete review?')) { db.deleteReview(id); rerender(); } break;
