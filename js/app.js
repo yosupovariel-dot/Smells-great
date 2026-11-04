@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261104165604';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261104165604';
-import { CATEGORIES } from './data.js?v=261104165604';
-import * as db from './db.js?v=261104165604';
-import * as S from './views-shop.js?v=261104165604';
-import * as Lg from './views-legal.js?v=261104165604';
-import * as A from './views-admin.js?v=261104165604';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261104165756';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261104165756';
+import { CATEGORIES } from './data.js?v=261104165756';
+import * as db from './db.js?v=261104165756';
+import * as S from './views-shop.js?v=261104165756';
+import * as Lg from './views-legal.js?v=261104165756';
+import * as A from './views-admin.js?v=261104165756';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -538,6 +538,9 @@ document.addEventListener('change', (e) => {
     if (picked.length > max) { el.checked = false; toast(getLang() === 'he' ? `אפשר לבחור עד ${max} ניחוחות` : `Up to ${max} scents`); }
     $$('[data-input="pick"]').forEach((c) => (c.disabled = sur));
     $('#pick-count').textContent = sur ? (getLang() === 'he' ? 'נבחר' : 'Set') : `${$$('[data-input="pick"]:checked').length}/${max}`;
+    const n = $$('[data-input="pick"]:checked').length; const fill = $('#pk-fill'); if (fill) fill.style.width = (sur ? 100 : Math.round((n / max) * 100)) + '%';
+    $('.pk')?.classList.toggle('done', sur || n === max); $('.pk-groups')?.classList.toggle('off', sur);
+    $$('.pk-g-n').forEach((b) => { const c = $$(`[data-input="pick"][data-g="${b.dataset.g}"]:checked`).length; b.textContent = c ? c : ''; });
   }
   if (k === 'ws-toggle') $('#biz-f').hidden = !el.checked;
   if (k === 'sel') { el.checked ? state.sel.add(el.dataset.id) : state.sel.delete(el.dataset.id); rerender(); }

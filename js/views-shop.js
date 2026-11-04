@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261104165604';
-import { t, L, getLang } from './i18n.js?v=261104165604';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261104165604';
-import * as db from './db.js?v=261104165604';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261104165756';
+import { t, L, getLang } from './i18n.js?v=261104165756';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261104165756';
+import * as db from './db.js?v=261104165756';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -460,9 +460,11 @@ export function productPage(id) {
         ${opt ? html`<fieldset class="sizes"><legend>${L(opt.name)}</legend>
           ${opt.values.map((v, i) => html`<label class="size-opt"><input type="radio" name="opt" value="${v.he}" ${raw(i ? '' : 'checked')} data-input="opt" data-img="${v.imgs?.[0] || ''}"><span>${L(v)}</span></label>`)}
         </fieldset>` : ''}
-        ${p.picks ? html`<fieldset class="picker" aria-describedby="pick-count"><legend>${T(`בחרו ${p.picks} ניחוחות`, `Choose ${p.picks} scents`)} <span id="pick-count" class="pill st-new" aria-live="polite">0/${p.picks}</span></legend>
-          <label class="check"><input type="checkbox" name="surprise" data-input="surprise"><span>${T('הפתיעו אותי — תבחרו בשבילי את הניחוחות הכי אהובים', 'Surprise me — pick the favourites for me')}</span></label>
-          <div class="pick-groups" data-max="${p.picks}">${groups.map((g) => html`<div><h3>${subName(g)}</h3>${pickList.filter((x) => x.sub === g).map((x) => html`<label class="pick"><input type="checkbox" name="pick" value="${x.name.he}" data-input="pick"><span>${L(x.name)}</span></label>`)}</div>`)}</div>
+        ${p.picks ? html`<fieldset class="picker pk" aria-describedby="pick-count"><legend class="pk-head"><span><b>${T(`בחרו ${p.picks} ניחוחות`, `Choose ${p.picks} scents`)}</b><small>${T('פתחו עולם ריח וסמנו את מה שמסקרן אתכם', 'Open a scent world and tap what intrigues you')}</small></span><span id="pick-count" class="pk-count" aria-live="polite">0/${p.picks}</span></legend>
+          <span class="pk-bar" aria-hidden="true"><i id="pk-fill"></i></span>
+          <label class="pk-surprise"><input type="checkbox" name="surprise" data-input="surprise"><span><b>${T('הפתיעו אותי', 'Surprise me')}</b>${T('נבחר בשבילכם את 14 הניחוחות הכי אהובים', 'We pick our 14 most-loved scents')}</span></label>
+          <div class="pick-groups pk-groups" data-max="${p.picks}">${groups.map((g, gi) => { const xs = pickList.filter((x) => x.sub === g); return html`<details class="pk-g" ${raw(gi ? '' : 'open')}><summary><span class="pk-g-img"><img src="${small(subImg('oils', g))}" alt="" loading="lazy" width="80" height="80"></span><span class="pk-g-t"><b>${subName(g)}</b><small>${xs.length} ${T('ריחות', 'scents')}</small></span><em class="pk-g-n" data-g="${gi}"></em><i aria-hidden="true"></i></summary>
+            <div class="pk-chips">${xs.map((x) => html`<label class="pick pk-chip"><input type="checkbox" name="pick" value="${x.name.he}" data-input="pick" data-g="${gi}"><span>${L(x.name)}</span></label>`)}</div></details>`; })}</div>
         </fieldset>` : ''}
         <div class="buy-row">
           <div class="qty"><button type="button" data-action="qty" data-d="-1" aria-label="${t('decrease')}">−</button><label class="sr-only" for="qty">${t('qty')}</label><input id="qty" name="qty" inputmode="numeric" value="1" maxlength="2"><button type="button" data-action="qty" data-d="1" aria-label="${t('increase')}">+</button></div>
