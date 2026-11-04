@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261104163243';
-import { t, L, getLang } from './i18n.js?v=261104163243';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261104163243';
-import * as db from './db.js?v=261104163243';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261104165524';
+import { t, L, getLang } from './i18n.js?v=261104165524';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261104165524';
+import * as db from './db.js?v=261104165524';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -451,7 +451,8 @@ export function productPage(id) {
       ${BENEFIT[p.id] ? html`<p class="pdp-benefit">${T(...BENEFIT[p.id])}</p>` : ''}
       <p class="price big" id="pdp-price" aria-live="polite">${p.quote ? T('מחיר בהתאמה אישית', 'Price on request') : m(priceOf(p.sizes[0]))}${!p.quote && ws ? html` <s>${m(p.sizes[0].price)}</s> <span class="ws">${t('wsPrice')}</span>` : ''}</p>
       ${p.quote ? html`<p>${he() ? p.desc.he.split('\n')[0] : p.desc.en || p.desc.he.split('\n')[0]}</p>
-        <div class="buy-row"><a class="btn gold" href="${waLink(T('שלום, אשמח להצעת מחיר עבור ', 'Hello, I would like a quote for ') + L(p.name))}" target="_blank" rel="noopener noreferrer">${T('לקבלת הצעת מחיר בוואטסאפ', 'Get a quote on WhatsApp')}</a><a class="btn ghost" href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a></div>` : html`
+        <div class="q-row"><a class="q-wa" href="${waLink(T('שלום, אשמח להצעת מחיר עבור ', 'Hello, I would like a quote for ') + L(p.name))}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1a15 15 0 01-5.6-4.9c-.7-1-1.2-2.1-1.2-3.2 0-1 .5-1.6.8-1.9.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.1z" fill="currentColor"/></svg>${T('לקבלת הצעת מחיר בוואטסאפ', 'Get a quote on WhatsApp')}</a>
+          <a class="q-tel" href="tel:+${PHONE_INTL}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 006 6L16 13l5 2v4a2 2 0 01-2 2A16 16 0 013 5a2 2 0 012-2"/></svg>${T('או התקשרו', 'Or call')} <b dir="ltr">${PHONE_DISPLAY}</b></a></div>` : html`
       <form data-form="add" data-id="${p.id}" novalidate>
         ${p.sizes.length > 1 ? html`<fieldset class="sizes"><legend>${p.cat === 'oils' ? T('נפח', 'Volume') : t('size')}</legend>
           ${p.sizes.map((s, i) => { const v = perUnit(p, s, priceOf); return html`<label class="size-opt"><input type="radio" name="size" value="${s.label}" ${raw(i ? '' : 'checked')} data-input="size" data-price="${priceOf(s)}"><span>${s.label}${v.save ? html`<em>−${v.save}%</em>` : ''}</span></label>`; })}

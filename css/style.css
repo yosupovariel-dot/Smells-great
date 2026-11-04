@@ -3059,3 +3059,12 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
 .dl-price strong.q{font-size:.95rem;color:var(--ink)}
 .dl-go{font-size:.85rem;font-weight:700;color:#7E6236}
 @media (max-width:760px){.dl-grid{grid-template-columns:1fr 1fr;gap:.6rem}.dl-body{padding:.75rem .8rem .85rem}.dl-body b{font-size:.88rem}.dl-price strong{font-size:1.1rem}.dl-price s{font-size:.76rem}.dl-go{font-size:.76rem}.dl-badge{font-size:.68rem;top:8px;inset-inline-start:8px}}
+/* Quote products: clear primary + quiet secondary */
+.q-row{display:grid;gap:.6rem;margin:.4rem 0 .2rem}
+.q-wa{display:flex;align-items:center;justify-content:center;gap:.6rem;min-height:56px;padding:0 1.2rem;border-radius:999px;background:#16130F;color:#fff;text-decoration:none;font-weight:700;font-size:1.02rem;transition:background .25s,transform .25s}
+.q-wa:hover{background:#2b2620;transform:translateY(-1px)}
+.q-wa svg{width:22px;height:22px;color:#25D366;flex:0 0 auto}
+.q-tel{display:flex;align-items:center;justify-content:center;gap:.45rem;min-height:50px;border-radius:999px;border:1px solid #d9ccb5;background:#fff;color:var(--ink);text-decoration:none;font-size:.95rem}
+.q-tel svg{width:18px;height:18px;fill:none;stroke:#7E6236;stroke-width:1.7;stroke-linejoin:round}
+.q-tel b{font-weight:700;letter-spacing:.02em}
+.q-tel:hover{border-color:#16130F}
