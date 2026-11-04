@@ -3014,3 +3014,12 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
   .hdr .m-search{display:inline-flex!important;grid-column:1;grid-row:1;justify-self:start;margin-inline-start:42px}
   .hdr .tools [data-action="search-open"]{display:none!important}
 }
+/* Phone: the offer sits under the photo, never on top of the product */
+@media (max-width:1023px){
+  .h-media{aspect-ratio:auto!important;display:flex;flex-direction:column;overflow:visible!important}
+  .h-media .h-slides{position:relative!important;inset:auto!important;aspect-ratio:4/3.3!important;order:1;overflow:hidden}
+  .h-media .h-dots{position:static!important;transform:none!important;order:2;justify-content:center;margin:.55rem auto 0}
+  .h-media .h-dots i{background:#d9ccb5}
+  .h-offers{position:static!important;order:3;margin:.6rem 14px 0}
+  .h-offer{background:#16130F!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+}
