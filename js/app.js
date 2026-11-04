@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261103223518';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261103223518';
-import { CATEGORIES } from './data.js?v=261103223518';
-import * as db from './db.js?v=261103223518';
-import * as S from './views-shop.js?v=261103223518';
-import * as Lg from './views-legal.js?v=261103223518';
-import * as A from './views-admin.js?v=261103223518';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261104150820';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261104150820';
+import { CATEGORIES } from './data.js?v=261104150820';
+import * as db from './db.js?v=261104150820';
+import * as S from './views-shop.js?v=261104150820';
+import * as Lg from './views-legal.js?v=261104150820';
+import * as A from './views-admin.js?v=261104150820';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -27,6 +27,7 @@ function header() {
     <div class="ticker-track" aria-live="off">${msgs.map((k, i) => html`<p class="ticker-msg ${i ? '' : 'on'}" ${raw(i ? 'aria-hidden="true"' : '')}>${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}">${t(k)}</a>` : k === 'tick1' ? html`<span>${t(k)}</span><a class="tk-more" href="#/terms">${getLang() === 'he' ? 'לפרטים' : 'Details'}</a>` : html`<span>${t(k)}</span>`}</p>`)}</div></div></div>
   <header class="hdr"><div class="wrap">
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
+    <button class="icon-btn m-search" data-action="search-open" aria-label="${t('search')}" aria-haspopup="dialog">${raw(ICONS.search)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
       <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
       <span class="mn-desk">${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}</span>
@@ -37,7 +38,7 @@ function header() {
       <a class="tool-link" href="#/rental">${getLang() === 'he' ? 'השכרה' : 'Rental'}</a><a class="tool-link" href="#/reviews">${getLang() === 'he' ? 'ביקורות' : 'Reviews'}</a><a class="tool-link" href="#/contact">${t('contact')}</a>
       <button class="icon-btn lang-btn" data-action="lang" lang="${getLang() === 'he' ? 'en' : 'he'}" aria-label="${t('langLabel')}">${getLang() === 'he' ? 'EN' : 'עב'}</button>
       <button class="icon-btn" data-action="search-open" aria-label="${t('search')}" aria-haspopup="dialog">${raw(ICONS.search)}</button>
-      <a class="icon-btn" href="#/account" aria-label="${t('account')}">${raw(ICONS.user)}</a>
+      <a class="icon-btn m-ws" href="#/wholesale" aria-label="${t('wholesale')}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2M3 13h18"/></svg><small>${t('wholesale')}</small></a><a class="icon-btn" href="#/account" aria-label="${t('account')}">${raw(ICONS.user)}</a>
       <button class="icon-btn" data-action="cart-open" aria-label="${t('cart')} (${n})" aria-haspopup="dialog">${raw(ICONS.bag)}${n ? html`<span class="badge" aria-hidden="true">${n}</span>` : ''}</button>
     </div></div></header>`;
 }
@@ -63,6 +64,7 @@ function mobileMenu() {
     <a class="mnp-deal" href="#/shop/bundles"><span class="mnp-deal-k">${T2('מבצעים', 'Deals')}</span><b>${T2('מארזים במחיר מיוחד', 'Bundles at a special price')}</b><small>${T2('+ 10% לחברי מועדון בהזמנה ראשונה', '+ 10% off a first order for members')}</small></a>
     ${best.length ? html`<p class="mnp-h">${T2('הכי אהובים עכשיו', 'Loved right now')}</p>
     <div class="mnp-best">${best.map((p) => html`<a href="#/product/${p.id}"><span><img src="${sm(p.img)}" alt="" loading="lazy" width="120" height="120"></span><b>${p.name?.[getLang()] || p.name?.he}</b><em>${T2('רב מכר', 'Bestseller')}</em></a>`)}</div>` : ''}
+    <button class="mnp-lang" data-action="lang" type="button">${he ? 'English' : 'עברית'}</button>
     <nav class="mnp-links" aria-label="${T2('עוד', 'More')}"><a href="#/rental">${T2('מסלול שירות חודשי לעסקים', 'Monthly service for business')}</a><a href="#/wholesale">${T2('לעסקים וסיטונאים', 'For business')}</a><a href="#/reviews">${T2('לקוחות ממליצים', 'Reviews')}</a><a href="#/about">${t('about')}</a><a href="#/contact">${t('contact')}</a><a href="#/account" class="mnp-sup">${T2('כניסה לספקים', 'Supplier login')}</a><a href="#/account">${u ? T2('החשבון שלי', 'My account') : T2('התחברות / הצטרפות למועדון', 'Sign in / join the club')}</a></nav>
     <ul class="mnp-trust"><li><b>${T2('משלוח חינם', 'Free shipping')}</b>${T2('מעל 299 ₪', 'over ₪299')}</li><li><b>${T2('14 יום', '14 days')}</b>${T2('להחזרה', 'returns')}</li><li><b>${T2('מחיר יבואן', 'Importer')}</b>${T2('ישר לצרכן', 'prices')}</li></ul>
     <a class="mnp-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer"><span class="mnp-dot" aria-hidden="true"></span><span><b>${T2('צריכים עזרה בבחירה?', 'Need help choosing?')}</b>${T2('כתבו לנו בוואטסאפ, אנחנו עונים מהר', 'WhatsApp us, we reply fast')}</span></a>

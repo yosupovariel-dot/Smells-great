@@ -2994,3 +2994,23 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
 .pdp-info .perks a{color:#7E6236;font-weight:600}
 @media (max-width:860px){.pdp-info h1{margin-bottom:.4rem}.pdp-info .price.big{font-size:1.7rem!important}}
 .pdp-info .size-opt span{justify-content:center;line-height:1.1!important;padding-top:0!important;padding-bottom:0!important;height:44px!important}
+/* Phone header: sign-in + wholesale visible; language moves to the menu */
+.m-ws{display:none!important}
+@media (max-width:900px){
+  .hdr .m-ws{display:inline-flex!important;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:auto!important;padding:0 .25rem}
+  .hdr .m-ws svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5}
+  .hdr .m-ws small{font-size:.58rem;font-weight:700;line-height:1}
+}
+@media (max-width:480px){
+  .hdr .tools a[href="#/account"]{display:inline-flex!important}
+  .hdr .lang-btn{display:none!important}
+  .hdr .tools .icon-btn{width:34px!important;height:38px!important}
+  .hdr .m-ws{width:auto!important}
+}
+.mnp-lang{display:none}
+@media (max-width:900px){.mnp-lang{display:block;margin:1.2rem 0 0;padding:.6rem 1rem;border:1px solid #d9ccb5;border-radius:999px;background:#fff;font:inherit;font-weight:700;cursor:pointer}}
+.m-search{display:none!important}
+@media (max-width:900px){
+  .hdr .m-search{display:inline-flex!important;grid-column:1;grid-row:1;justify-self:start;margin-inline-start:42px}
+  .hdr .tools [data-action="search-open"]{display:none!important}
+}
