@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261104165524';
-import { t, L, getLang } from './i18n.js?v=261104165524';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261104165524';
-import * as db from './db.js?v=261104165524';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261104165604';
+import { t, L, getLang } from './i18n.js?v=261104165604';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261104165604';
+import * as db from './db.js?v=261104165604';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -90,8 +90,8 @@ export function card(p, opts = {}) {
     <span class="lbl-fam latin card-fam">${fam}</span>
     <a class="card-media" href="#/product/${p.id}" tabindex="-1" aria-hidden="true">
       ${media(p, 'm1', false, main)}${alt ? media(p, 'm2', false, alt) : ''}
+      ${p.tag ? html`<span class="card-tag in-media">${t('tag_' + p.tag)}</span>` : ''}
     </a>
-    ${p.tag ? html`<span class="card-tag">${t('tag_' + p.tag)}</span>` : ''}
     ${p.quote ? '' : direct
       ? html`<button class="card-add" data-action="quick-add" data-id="${p.id}" aria-label="${t('quickAdd')}: ${L(p.name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`
       : html`<a class="card-add" href="#/product/${p.id}" aria-label="${T('לבחירת אפשרויות', 'Choose options')}: ${L(p.name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>`}
