@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105183803';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261105183803';
-import { CATEGORIES } from './data.js?v=261105183803';
-import * as db from './db.js?v=261105183803';
-import * as S from './views-shop.js?v=261105183803';
-import * as Lg from './views-legal.js?v=261105183803';
-import * as A from './views-admin.js?v=261105183803';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105184651';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261105184651';
+import { CATEGORIES } from './data.js?v=261105184651';
+import * as db from './db.js?v=261105184651';
+import * as S from './views-shop.js?v=261105184651';
+import * as Lg from './views-legal.js?v=261105184651';
+import * as A from './views-admin.js?v=261105184651';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -61,7 +61,7 @@ function mobileMenu() {
     <a class="mnp-finder" href="#/finder"><span class="mnp-f-k">${T2('לא בטוחים?', 'Not sure?')}</span><b>${T2('מצאו את הריח שלכם ב־30 שניות', 'Find your scent in 30 seconds')}</b><i aria-hidden="true">${he ? '←' : '→'}</i></a>
     <p class="mnp-h">${T2('קטגוריות', 'Shop by category')}<a href="#/shop">${T2('לכל החנות', 'Shop all')}</a></p>
     <div class="mnp-cats">${cats.map((c, k) => html`<a class="mnp-cat" href="#/shop/${c.id}" style-d="${k}"><span class="mnp-ci"><img src="${sm(c.id === 'diffusers' ? 'assets/products/say-150-3.webp' : c.img)}" alt="" loading="lazy" width="200" height="200"></span><b>${c[getLang()]}</b><small>${c.n ? `${c.n} ${T2('מוצרים', 'items')}` : T2('בקרוב', 'Soon')}</small></a>`)}</div>
-    <a class="mnp-deal" href="#/shop/bundles"><span class="mnp-deal-k">${T2('מבצעים', 'Deals')}</span><b>${T2('מארזים במחיר מיוחד', 'Bundles at a special price')}</b><small>${T2('+ 10% לחברי מועדון בהזמנה ראשונה', '+ 10% off a first order for members')}</small></a>
+    <a class="mnp-deal" href="#/shop/bundles"><span class="mnp-deal-k">${T2('מבצעים', 'Deals')}</span><b>${T2('מארזים במחיר מיוחד', 'Bundles at a special price')}</b><small>${T2('+ 15% לחברי מועדון בהזמנה ראשונה', '+ 15% off a first order for members')}</small></a>
     ${best.length ? html`<p class="mnp-h">${T2('הכי אהובים עכשיו', 'Loved right now')}</p>
     <div class="mnp-best">${best.map((p) => html`<a href="#/product/${p.id}"><span><img src="${sm(p.img)}" alt="" loading="lazy" width="120" height="120"></span><b>${p.name?.[getLang()] || p.name?.he}</b><em>${T2('רב מכר', 'Bestseller')}</em></a>`)}</div>` : ''}
     <button class="mnp-lang" data-action="lang" type="button">${he ? 'English' : 'עברית'}</button>
@@ -195,23 +195,27 @@ function maybePromo() {
     if (document.body.classList.contains('cart-open') || $('#modal') || $('#search-ov')) { setTimeout(show, 2500); return; }
     const he = getLang() === 'he';
     const w = document.createElement('div'); w.id = 'promo'; w.className = 'promo-bg';
-    render(w, html`<div class="supromo club-card" role="dialog" aria-modal="true" aria-labelledby="pr-t">
-      <button class="promo-x" hidden data-action="promo-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+    render(w, html`<div class="supromo club-card cc2" role="dialog" aria-modal="true" aria-labelledby="pr-t">
+      <button class="promo-x" hidden data-action="promo-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
       <div class="cc-body">
-        <span class="cc-star" aria-hidden="true">✦</span>
-        <img class="promo-logo" src="assets/img/logo-wide.webp" alt="SAY Boutique" width="923" height="350">
-        <h2 id="pr-t">${he ? 'הכרטיס שלכם למועדון SAY' : 'Your SAY Club card'}</h2>
-        <p class="cc-sub">${he ? 'הצטרפו עכשיו (בחינם) וקבלו:' : 'Join now (free) and get:'}</p>
-        <ul class="cc-perks2"><li><i class="bob" aria-hidden="true">🎁</i><b>${he ? '10% הנחה' : '10% off'}</b>${he ? 'בקנייה הראשונה' : 'first order'}</li><li><i class="bob d2" aria-hidden="true">💎</i><b>${he ? 'הטבות' : 'Perks'}</b>${he ? 'לחברי מועדון בלבד' : 'members only'}</li><li><i class="bob d3" aria-hidden="true">🎂</i><b>${he ? 'יום הולדת' : 'Birthday'}</b>${he ? 'מתנה מיוחדת' : 'a special gift'}</li></ul>
-        <form class="cc-form" data-form="club-join" novalidate>
-          <label><span>${he ? 'שם מלא' : 'Full name'} *</span><input name="name" autocomplete="name" required maxlength="80"></label>
-          <label><span>${he ? 'מספר טלפון' : 'Phone'} *</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="15" dir="ltr"></label>
-          <label><span>${he ? 'דואר אלקטרוני' : 'Email'} *</span><input name="email" type="email" autocomplete="email" required maxlength="120" dir="ltr"></label>
-          <label><span>${he ? 'סיסמה (8+ תווים)' : 'Choose a password (8+, letter & digit)'} *</span><input name="password" type="password" autocomplete="new-password" required maxlength="80" dir="ltr"></label>
-          <label class="cc-check"><input type="checkbox" name="agree" required><span>${he ? 'אני מאשר/ת הצטרפות למועדון וקבלת עדכונים והטבות בוואטסאפ ובמייל.' : 'I agree to join the club and receive updates and offers by WhatsApp and email.'}</span></label>
+        <p class="cc-club">SAY CLUB</p>
+        <h2 id="pr-t">${he ? 'נהנים יותר!' : 'Enjoy more!'}</h2>
+        <p class="cc-sub">${he ? 'מצטרפים למועדון ונהנים מהטבות בלעדיות:' : 'Join the club for exclusive perks:'}</p>
+        <ul class="cc-list">
+          <li><i class="bob" aria-hidden="true">🎁</i><b>${he ? '15% הנחה מיידית לקנייה הראשונה!' : '15% off your first order!'}</b></li>
+          <li><i class="bob d2" aria-hidden="true">✨</i><b>${he ? 'צבירת נקודות בכל רכישה (ששוות כסף בקניות הבאות)' : 'Earn points on every order (worth money next time)'}</b></li>
+          <li><i class="bob d3" aria-hidden="true">🎂</i><b>${he ? 'הטבה מפנקת במיוחד ביום ההולדת' : 'A special birthday treat'}</b></li>
+        </ul>
+        <form class="cc-form cc-form2" data-form="club-join" novalidate>
+          <label class="cc-in"><span aria-hidden="true">👤</span><input name="name" autocomplete="name" required maxlength="80" placeholder="${he ? 'שם מלא *' : 'Full name *'}" aria-label="${he ? 'שם מלא' : 'Full name'}"></label>
+          <label class="cc-in"><span aria-hidden="true">📱</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="15" placeholder="${he ? 'מספר טלפון *' : 'Phone *'}" aria-label="${he ? 'מספר טלפון' : 'Phone'}"></label>
+          <label class="cc-in"><span aria-hidden="true">✉️</span><input name="email" type="email" autocomplete="email" required maxlength="120" placeholder="${he ? 'דואר אלקטרוני *' : 'Email *'}" aria-label="${he ? 'דואר אלקטרוני' : 'Email'}"></label>
+          <label class="cc-in"><span aria-hidden="true">🔒</span><input name="password" type="password" autocomplete="new-password" required maxlength="80" placeholder="${he ? 'בחרו סיסמה (8+ תווים, אות ומספר) *' : 'Choose a password *'}" aria-label="${he ? 'סיסמה' : 'Password'}"></label>
+          <label class="cc-check"><input type="checkbox" name="agree" required><span>${he ? 'מאשר/ת הצטרפות למועדון וקבלת עדכונים בוואטסאפ ובמייל. מבטיחים לא לחפור – רק מבצעים שווים והטבות בלעדיות!' : 'I agree to join and get updates by WhatsApp and email. No spam — only great deals.'}</span></label>
           <p class="cc-err" role="alert"></p>
-          <button class="btn block cc-go" type="submit">${he ? 'הצטרפות למועדון וקבלת קוד קופון' : 'Join & get my coupon'}</button>
+          <button class="btn block cc-go" type="submit">🛍️ ${he ? 'אני רוצה 15% הנחה והצטרפות!' : 'I want 15% off & join!'}</button>
         </form>
+        <a class="cc-login" href="#/account" data-action="promo-close">${he ? 'כבר חברים? התחברות' : 'Already a member? Sign in'}</a>
       </div>
     </div>`);
     document.body.append(w); requestAnimationFrame(() => w.classList.add('in'));
@@ -532,6 +536,7 @@ document.addEventListener('change', (e) => {
     if (i < 0 && slides[0]) { slides[0].querySelector('img').src = el.dataset.img; i = 0; }
     $$('.pg-rail button')[i]?.click();
   }
+  if (k === 'use-points') { db.setUsePoints(el.checked); rerender(); return; }
   if (k === 'pick' || k === 'surprise') {
     const box = $('.pick-groups'); const max = +box.dataset.max; const sur = $('[data-input="surprise"]').checked;
     const picked = $$('[data-input="pick"]:checked');
@@ -586,8 +591,8 @@ document.addEventListener('submit', async (e) => {
     try { await db.register({ ...d, newsletter: true }); db.joinClub(d.email.toLowerCase()); }
     catch (x) { err.textContent = ['exists', 'phoneExists'].includes(x.message) ? t(x.message) : t('required'); btn.disabled = false; return; }
     render($('.cc-body'), html`<span class="cc-star" aria-hidden="true">✦</span><h2 id="pr-t">${he ? 'ברוכים הבאים למועדון!' : 'Welcome to the club!'}</h2>
-      <p class="cc-sub">${he ? 'קוד הקופון שלכם:' : 'Your coupon code:'}</p><p class="cc-code">SAY10</p>
-      <p class="cc-sub">${he ? '10% הנחה יופעלו אוטומטית בקופה בהזמנה הראשונה שלכם — אתם כבר מחוברים.' : '10% off applies automatically at checkout on your first order — you are signed in.'}</p>
+      <p class="cc-sub">${he ? 'קוד הקופון שלכם:' : 'Your coupon code:'}</p><p class="cc-code">SAY15</p>
+      <p class="cc-sub">${he ? '15% הנחה יופעלו אוטומטית בקופה בהזמנה הראשונה שלכם — אתם כבר מחוברים.' : '15% off applies automatically at checkout on your first order — you are signed in.'}</p>
       <button class="btn block cc-go" data-action="promo-close">${he ? 'לקניות' : 'Start shopping'}</button>`);
     $('.promo-x')?.removeAttribute('hidden'); rerender(); return;
   }

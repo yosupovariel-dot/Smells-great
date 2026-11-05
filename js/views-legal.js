@@ -1,6 +1,6 @@
-import { html } from './util.js?v=261105183803';
-import { getLang } from './i18n.js?v=261105183803';
-import { PHONE_DISPLAY } from './util.js?v=261105183803';
+import { html } from './util.js?v=261105184651';
+import { getLang } from './i18n.js?v=261105184651';
+import { PHONE_DISPLAY } from './util.js?v=261105184651';
 
 const BIZ = 'SAY Boutique';
 const EMAIL = 'info@say-boutique.co.il';
@@ -16,7 +16,7 @@ export function terms() {
     <h2>3. Prices & orders</h2><p>Prices include VAT. Shipping is free above ₪299, otherwise ₪29. An order is binding only after confirmation and successful payment. We may cancel in case of a clear pricing error, stock shortage or suspected fraud.</p>
     <h2>4. Delivery</h2><p>Typically 3–5 business days, excluding Eilat and remote areas.</p>
     <h2>5. Returns</h2><p>See the Returns & Cancellation policy.</p>
-    <h2>6. Members club & wholesale</h2><p>Joining is free. The 10% welcome discount applies once, to the first order. Wholesale accounts require approval.</p>
+    <h2>6. Members club & wholesale</h2><p>Joining is free. The 15% welcome discount applies once, to the first order. Wholesale accounts require approval.</p>
     <h2>7. Product safety</h2><p>Fragrance oils are concentrated: keep away from children and pets, avoid contact with eyes, do not ingest. Never leave a lit candle unattended.</p>
     <h2>8. Intellectual property</h2><p>All content belongs to ${BIZ} and may not be copied without written permission.</p>
     <h2>9. Jurisdiction</h2><p>Israeli law applies; exclusive jurisdiction to the competent courts in Tel Aviv.</p>
@@ -27,7 +27,7 @@ export function terms() {
     <h2>3. מחירים ותשלום</h2><ul><li>המחירים באתר כוללים מע"מ כחוק ונקובים בשקלים חדשים.</li><li>דמי משלוח: חינם בהזמנה מעל 299₪, אחרת 29₪.</li><li>ההזמנה תיחשב סופית רק לאחר קבלת אישור מחברת האשראי. פרטי כרטיס האשראי אינם נשמרים באתר ומעובדים על ידי ספק סליקה מאובטח העומד בתקן PCI-DSS.</li><li>מחירים ומבצעים עשויים להשתנות. ט"ל — במקרה של טעות סופר בולטת במחיר, החברה רשאית לבטל את העסקה ולהשיב את הכסף במלואו.</li></ul>
     <h2>4. אספקה ומשלוחים</h2><p>זמן האספקה הוא 3–5 ימי עסקים מיום אישור ההזמנה, למעט אילת ויישובים מרוחקים. ימי עסקים אינם כוללים שישי, שבת, חגים וערבי חג. עיכוב שנגרם עקב כוח עליון לא יהווה הפרה של התקנון.</p>
     <h2>5. ביטול עסקה והחזרות</h2><p>ביטול עסקה והחזרת מוצרים יתבצעו בהתאם לחוק הגנת הצרכן, התשמ"א-1981 ולתקנות הגנת הצרכן (ביטול עסקה), התשע"א-2010, כמפורט ב<a href="#/returns">מדיניות ההחזרות והביטולים</a>.</p>
-    <h2>6. מועדון לקוחות וסיטונאים</h2><ul><li>ההצטרפות למועדון הלקוחות ללא עלות. הנחת 10% למצטרפים חדשים תינתן פעם אחת, בהזמנה הראשונה, ואינה כפולה במבצעים אחרים.</li><li>חשבון סיטונאי כפוף לאישור החברה, ומחירי הסיטונאי מיועדים לבתי עסק בלבד.</li><li>החברה רשאית לשנות את הטבות המועדון בהודעה מראש.</li></ul>
+    <h2>6. מועדון לקוחות וסיטונאים</h2><ul><li>ההצטרפות למועדון הלקוחות ללא עלות. הנחת 15% למצטרפים חדשים תינתן פעם אחת, בהזמנה הראשונה, ואינה כפולה במבצעים אחרים.</li><li>חשבון סיטונאי כפוף לאישור החברה, ומחירי הסיטונאי מיועדים לבתי עסק בלבד.</li><li>החברה רשאית לשנות את הטבות המועדון בהודעה מראש.</li></ul>
     <h2>7. בטיחות מוצרים</h2><p>תמציות שמן הן מוצר מרוכז: יש להרחיק מהישג ידם של ילדים ובעלי חיים, להימנע ממגע בעיניים ואין לבלוע. אין להשאיר נר דולק ללא השגחה. במקרה של רגישות — יש להפסיק את השימוש. תמונות המוצרים להמחשה בלבד.</p>
     <h2>8. קניין רוחני</h2><p>כל הזכויות בתכני האתר, לרבות עיצוב, תמונות, לוגו וטקסטים, שמורות לחברה. אין להעתיק, להפיץ או לעשות בהם שימוש מסחרי ללא אישור בכתב.</p>
     <h2>9. אחריות</h2><p>החברה לא תהיה אחראית לנזק עקיף שייגרם כתוצאה משימוש שלא בהתאם להוראות היצרן. אחריות החברה מוגבלת לגובה התמורה ששולמה בפועל עבור המוצר, והכל בכפוף לדין.</p>

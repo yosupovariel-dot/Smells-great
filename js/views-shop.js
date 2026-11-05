@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105183803';
-import { t, L, getLang } from './i18n.js?v=261105183803';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105183803';
-import * as db from './db.js?v=261105183803';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105184651';
+import { t, L, getLang } from './i18n.js?v=261105184651';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105184651';
+import * as db from './db.js?v=261105184651';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -600,7 +600,7 @@ export function cartDrawer() {
       ${up ? html`<div class="cd-up"><p class="cd-up-k">${left && minPrice(up) >= left ? T('מוסיפים את זה — והמשלוח חינם', 'Add this and delivery is free') : T('לקוחות הוסיפו גם', 'Customers also added')}</p>
         <div class="cd-up-row"><span class="line-media">${media(up)}</span><span><b>${L(up.name)}</b><small>${m(minPrice(up))}</small></span>
         ${isDirect(up) ? html`<button class="cd-add" data-action="quick-add" data-id="${up.id}">${T('הוספה', 'Add')} +</button>` : html`<a class="cd-add" href="#/product/${up.id}" data-action="cart-close">${T('לבחירה', 'Choose')}</a>`}</div></div>` : ''}
-      ${!u && !tt.discount ? html`<a class="cd-club" href="#/account/register" data-action="cart-close"><span aria-hidden="true">🎁</span><span><b>${T('10% הנחה על ההזמנה הזאת', '10% off this order')}</b>${T('הצטרפו למועדון בחינם — לוקח 20 שניות', 'Join the club free — takes 20 seconds')}</span></a>` : ''}
+      ${!u && !tt.discount ? html`<a class="cd-club" href="#/account/register" data-action="cart-close"><span aria-hidden="true">🎁</span><span><b>${T('15% הנחה על ההזמנה הזאת', '15% off this order')}</b>${T('הצטרפו למועדון בחינם — לוקח 20 שניות', 'Join the club free — takes 20 seconds')}</span></a>` : ''}
     ` : html`<div class="cd-empty"><span aria-hidden="true">🛍️</span><p><b>${T('העגלה עדיין ריקה', 'Your bag is empty')}</b>${T('בואו נמצא לכם ריח שתתאהבו בו.', 'Let us find a scent you will love.')}</p><a class="btn" href="#/finder" data-action="cart-close">${T('מציאת הריח שלי', 'Find my scent')}</a><a class="u-link" href="#/shop" data-action="cart-close">${t('continueShop')}</a></div>`}
   </div>
   ${tt.lines.length ? html`<footer class="cd-foot">${totalsBlock(tt)}
@@ -610,7 +610,8 @@ export function cartDrawer() {
 
 export const totalsBlock = (tt) => html`<div class="totals">
   <div><span>${t('subtotal')}</span><span>${m(tt.subtotal)}</span></div>
-  ${tt.discount ? html`<div><span>${t('discount')} (10%)</span><span>−${m(tt.discount)}</span></div>` : ''}
+  ${tt.discount ? html`<div><span>${t('discount')} (15%)</span><span>−${m(tt.discount)}</span></div>` : ''}
+  ${tt.pointsOff ? html`<div><span>${T(`מימוש ${tt.pointsUsed} נקודות`, `${tt.pointsUsed} points`)}</span><span>−${m(tt.pointsOff)}</span></div>` : ''}
   <div><span>${t('shipping')}</span><span>${tt.shipping ? m(tt.shipping) : t('free')}</span></div>
   <div class="grand"><span>${t('total')}</span><span>${m(tt.total)}</span></div></div>`;
 
@@ -624,7 +625,7 @@ export function checkout() {
     <h1 class="co-h">${T('עוד רגע והריח בדרך אליכם', 'Almost there — your scent is on its way')}</h1>
     <div class="checkout co">
     <form data-form="checkout" novalidate>
-      ${!u ? html`<p class="co-login">${T('כבר חברי מועדון?', 'Already a member?')} <a href="#/account">${T('התחברו וקבלו 10% הנחה', 'Sign in for 10% off')}</a></p>` : ''}
+      ${!u ? html`<p class="co-login">${T('כבר חברי מועדון?', 'Already a member?')} <a href="#/account">${T('התחברו וקבלו 15% הנחה', 'Sign in for 15% off')}</a></p>` : ''}
       <section class="co-box"><h2><span>1</span>${T('איך ניצור קשר?', 'How do we reach you?')}</h2>
         <div class="row2">${f('name', t('fullName'), 'text', 'name', true, u?.name || '')}${f('phone', t('phone'), 'tel', 'tel', true, u?.phone || '', '050-0000000')}</div>
         ${f('email', t('email'), 'email', 'email', true, u?.email || '', T('לשליחת אישור ההזמנה', 'For your order confirmation'))}</section>
@@ -633,6 +634,7 @@ export function checkout() {
         ${f('apt', t('apt'), 'text', 'off', false)}
         <details class="co-notes"><summary>${T('הוספת הערה לשליח', 'Add a note for the courier')}</summary><textarea class="input" id="notes" name="notes" rows="2" maxlength="300"></textarea></details>
         <p class="co-eta">${T('משלוח עד הבית תוך 3–5 ימי עסקים', 'Home delivery in 3–5 business days')}${left ? '' : html` · <b>${T('חינם', 'free')}</b>`}</p></section>
+      ${tt.pointsAvail >= 100 ? html`<label class="co-pts"><input type="checkbox" data-input="use-points" ${raw(db.usingPoints() ? 'checked' : '')}><span><b>${T(`יש לכם ${tt.pointsAvail} נקודות`, `You have ${tt.pointsAvail} points`)}</b>${T('לממש אותן בהזמנה הזאת (כל 100 נקודות = 10 ₪)', 'Use them on this order (100 points = ₪10)')}</span></label>` : u && u.role !== 'wholesale' ? html`<p class="co-pts-earn">${T(`על ההזמנה הזאת תצברו ${Math.floor(tt.total - tt.shipping)} נקודות`, `This order earns ${Math.floor(tt.total - tt.shipping)} points`)}</p>` : ''}
       <section class="co-box"><h2><span>3</span>${t('payment')}</h2><p class="muted">${t('payNote')}</p>
         <label class="check"><input type="checkbox" name="agree" required aria-describedby="agree-e"><span>${t('agree')}<a href="#/terms" target="_blank">${t('terms')}</a>${t('and')}<a href="#/privacy" target="_blank">${t('privacy')}</a></span></label>
         <span class="err" id="agree-e" aria-live="polite"></span>
@@ -677,6 +679,7 @@ export function account(tab = 'login', aud = 'retail') {
     const staff = { admin: '#/admin', products: '#/admin/products', orders: '#/orders', courier: '#/courier' }[u.role];
     return html`<div class="wrap legal"><p class="eyebrow">${t('clubMember')}</p><h1>${t('hello')}, ${u.name}</h1>
       ${u.firstOrderDiscount && u.role === 'customer' ? html`<p class="note-gold">${t('tick3')}</p>` : ''}
+      ${u.role === 'customer' ? html`<div class="acc-pts"><span>✨</span><p><b>${db.pointsOf(u)} ${T('נקודות מועדון', 'club points')}</b>${T(`שווים ${m(Math.floor(db.pointsOf(u) / 100) * 10)} בהזמנה הבאה · כל ₪1 = נקודה, כל 100 נקודות = 10 ₪`, `Worth ${m(Math.floor(db.pointsOf(u) / 100) * 10)} on your next order`)}</p></div>` : ''}
       ${staff ? html`<p><a class="btn gold" href="${staff}">${t('backoffice')}</a></p>` : ''}
       <h2>${t('myOrders')}</h2>
       ${mine.length ? html`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>${getLang() === 'he' ? 'תאריך' : 'Date'}</th><th>${t('total')}</th><th>${getLang() === 'he' ? 'סטטוס' : 'Status'}</th></tr></thead><tbody>
@@ -686,7 +689,7 @@ export function account(tab = 'login', aud = 'retail') {
   const isLogin = tab === 'login';
   return html`<div class="auth-page"><div class="auth glass">
     <h1 class="auth-h">${T('כניסת לקוחות', 'Customer sign-in')}</h1>
-    <p class="auth-sub">${T('חברי מועדון: התחברו כדי לראות הזמנות והטבות. הצטרפות חינם עם 10% הנחה לקנייה הראשונה.', 'Club members: sign in for orders and perks. Free to join, 10% off your first order.')}</p>
+    <p class="auth-sub">${T('חברי מועדון: התחברו כדי לראות הזמנות והטבות. הצטרפות חינם עם 15% הנחה לקנייה הראשונה.', 'Club members: sign in for orders and perks. Free to join, 15% off your first order.')}</p>
     <div class="tabs" role="tablist"><button role="tab" aria-selected="${isLogin}" data-action="auth-tab" data-tab="login">${t('login')}</button><button role="tab" aria-selected="${!isLogin}" data-action="auth-tab" data-tab="register">${t('register')}</button></div>
     <form data-form="${isLogin ? 'login' : 'register'}" novalidate>
       ${isLogin ? '' : html`<div class="field"><label for="r-name">${t('fullName')} *</label><input class="input" id="r-name" name="name" autocomplete="name" required maxlength="80"></div>

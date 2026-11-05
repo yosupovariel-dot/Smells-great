@@ -1,8 +1,8 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261105183803';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261105183803';
+import { SEED_PRODUCTS } from './data.js?v=261105184651';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261105184651';
 
 const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -123,12 +123,23 @@ export function priceOf(p, sizeLabel, user = me()) {
   const s = p.sizes.find((x) => x.label === sizeLabel) || p.sizes[0];
   return user?.role === 'wholesale' && s.wholesale ? s.wholesale : s.price;
 }
+// Club points: earn 1 point per ₪1 paid; every 100 points = ₪10 off (max 50% of the order).
+export const POINT_VALUE = 0.1;
+export const pointsOf = (u = me()) => (u ? Math.max(0, Math.floor(users().find((x) => x.id === u.id)?.points || 0)) : 0);
+let usePts = false;
+export const setUsePoints = (v) => { usePts = !!v; };
+export const usingPoints = () => usePts;
 export function cartTotals(user = me()) {
   const lines = cart().map((l) => { const p = product(l.pid); return p ? { ...l, p, price: priceOf(p, l.size, user) } : null; }).filter(Boolean);
   const subtotal = lines.reduce((a, l) => a + l.price * l.qty, 0);
-  const discount = user && user.firstOrderDiscount && user.role !== 'wholesale' ? Math.round(subtotal * 0.1) : 0;
-  const shipping = !lines.length || subtotal - discount >= FREE_SHIP ? 0 : SHIP_COST;
-  return { lines, subtotal, discount, shipping, total: subtotal - discount + shipping };
+  const discount = user && user.firstOrderDiscount && user.role !== 'wholesale' ? Math.round(subtotal * 0.15) : 0;
+  const avail = user && user.role !== 'wholesale' ? pointsOf(user) : 0;
+  const maxRedeem = Math.floor(((subtotal - discount) * 0.5) / (POINT_VALUE * 100)) * 100;
+  const pointsUsed = usePts ? Math.min(Math.floor(avail / 100) * 100, maxRedeem) : 0;
+  const pointsOff = Math.round(pointsUsed * POINT_VALUE);
+  const net = subtotal - discount - pointsOff;
+  const shipping = !lines.length || net >= FREE_SHIP ? 0 : SHIP_COST;
+  return { lines, subtotal, discount, pointsAvail: avail, pointsUsed, pointsOff, shipping, total: net + shipping };
 }
 
 // ---------- Orders ----------
@@ -143,10 +154,11 @@ export function placeOrder(customer) {
   const o = {
     id: uid('o_'), num, date: Date.now(), status: 'new', payment: 'pending', userId: u?.id || null, customer,
     items: tt.lines.map((x) => ({ pid: x.pid, name: x.p.name, size: x.size, opt: x.opt || '', qty: x.qty, price: x.price, cost: (x.p.sizes.find((s) => s.label === x.size) || {}).cost || 0 })),
-    subtotal: tt.subtotal, discount: tt.discount, shipping: tt.shipping, total: tt.total, history: [{ s: 'new', at: Date.now() }],
+    subtotal: tt.subtotal, discount: tt.discount, pointsUsed: tt.pointsUsed, pointsOff: tt.pointsOff, shipping: tt.shipping, total: tt.total, history: [{ s: 'new', at: Date.now() }],
   };
   l.unshift(o); saveOrders(l);
-  if (u && tt.discount) { const all = users(); const x = all.find((y) => y.id === u.id); if (x) { x.firstOrderDiscount = false; saveUsers(all); } }
+  if (u) { const all = users(); const x = all.find((y) => y.id === u.id); if (x) { if (tt.discount) x.firstOrderDiscount = false; x.points = Math.max(0, (x.points || 0) - tt.pointsUsed) + (x.role === 'wholesale' ? 0 : Math.floor(tt.total - tt.shipping)); saveUsers(all); } }
+  usePts = false;
   saveCart([]);
   const notes = read('notify', []); notes.unshift({ id: o.id, num, at: Date.now(), read: false }); write('notify', notes.slice(0, 100));
   return o;
