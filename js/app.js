@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105202040';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261105202040';
-import { CATEGORIES } from './data.js?v=261105202040';
-import * as db from './db.js?v=261105202040';
-import * as S from './views-shop.js?v=261105202040';
-import * as Lg from './views-legal.js?v=261105202040';
-import * as A from './views-admin.js?v=261105202040';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105202145';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261105202145';
+import { CATEGORIES } from './data.js?v=261105202145';
+import * as db from './db.js?v=261105202145';
+import * as S from './views-shop.js?v=261105202145';
+import * as Lg from './views-legal.js?v=261105202145';
+import * as A from './views-admin.js?v=261105202145';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -592,7 +592,7 @@ document.addEventListener('submit', async (e) => {
     btn.disabled = true;
     try { await db.register({ ...d, newsletter: true }); db.joinClub(d.email.toLowerCase()); }
     catch (x) { err.textContent = ['exists', 'phoneExists'].includes(x.message) ? t(x.message) : t('required'); btn.disabled = false; return; }
-    render($('.cc-body'), html`<span class="cc-star" aria-hidden="true">✦</span><h2 id="pr-t">${he ? 'ברוכים הבאים למועדון!' : 'Welcome to the club!'}</h2>
+    render($('.c3-body, .cc-body'), html`<span class="cc-star" aria-hidden="true">✦</span><h2 id="pr-t">${he ? 'ברוכים הבאים למועדון!' : 'Welcome to the club!'}</h2>
       <p class="cc-sub">${he ? 'קוד הקופון שלכם:' : 'Your coupon code:'}</p><p class="cc-code">SAY15</p>
       <p class="cc-sub">${he ? '15% הנחה יופעלו אוטומטית בקופה בהזמנה הראשונה שלכם — אתם כבר מחוברים.' : '15% off applies automatically at checkout on your first order — you are signed in.'}</p>
       <button class="btn block cc-go" data-action="promo-close">${he ? 'לקניות' : 'Start shopping'}</button>`);
