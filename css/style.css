@@ -3309,3 +3309,25 @@ body.scrolled .hdr .wrap{padding-inline:clamp(14px,2.5vw,28px)!important}
   .cc3 .promo-x{background:rgba(251,248,243,.92)!important}
 }
 @media (max-width:760px) and (max-height:740px){.c3-perks span{display:flex!important;font-size:0!important}.c3-perks span b{font-size:.84rem!important}}
+/* Club popup v5: 15% is the headline */
+.cc3 h2{display:flex;align-items:baseline;gap:.5rem;font-size:clamp(2.4rem,4.6vw,3.4rem)!important}
+.cc3 h2 em{font:700 1.45em/0.9 "Frank Ruhl Libre",serif;font-style:normal;color:#9C7B45;background:linear-gradient(100deg,#9C7B45,#C9AD7A 50%,#8a6a36);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.cc3 .c3-sub{display:block!important;font-size:.95rem;color:#4a4238;margin:0 0 1rem}
+.cc3 .c3-sub b{color:#16130F}
+.c3-perks.two{grid-template-columns:1fr 1fr}
+.c3-perks.two li{flex-direction:row;text-align:start;justify-content:center;gap:.6rem}
+.cc3 .promo-x{top:14px!important;left:14px!important}
+.c3-check span{font-size:.74rem}
+@media (max-width:760px){
+  .c3-seal{display:none!important}
+  .cc3 .c3-k,.cc3 h2{margin-inline-start:0!important}
+  .cc3 .c3-art{height:120px!important}
+  .cc3 .promo-x{top:12px!important;left:12px!important;width:36px!important;height:36px!important}
+  .cc3 h2{font-size:2rem!important;margin:.1rem 0 .25rem!important}
+  .cc3 .c3-sub{font-size:.82rem;margin-bottom:.6rem;line-height:1.5}
+  .c3-perks.two li{justify-content:flex-start}
+  .c3-perks.two span{font-size:.7rem!important}
+}
+@media (max-width:760px) and (max-height:740px){.cc3 .c3-art{height:84px!important}.cc3 .c3-sub{font-size:.76rem}}
+@media (max-width:760px){.cc3 .promo-x{top:22px!important;left:20px!important;border:0!important;box-shadow:0 4px 12px -4px rgba(0,0,0,.35)!important}.cc3 .c3-art::after{inset:10px}}
+.cc3 .promo-x{border:0!important}

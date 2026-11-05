@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105202432';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261105202432';
-import { CATEGORIES } from './data.js?v=261105202432';
-import * as db from './db.js?v=261105202432';
-import * as S from './views-shop.js?v=261105202432';
-import * as Lg from './views-legal.js?v=261105202432';
-import * as A from './views-admin.js?v=261105202432';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105204013';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261105204013';
+import { CATEGORIES } from './data.js?v=261105204013';
+import * as db from './db.js?v=261105204013';
+import * as S from './views-shop.js?v=261105204013';
+import * as Lg from './views-legal.js?v=261105204013';
+import * as A from './views-admin.js?v=261105204013';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -198,15 +198,14 @@ function maybePromo() {
     const I = (d) => raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`);
     render(w, html`<div class="supromo club-card cc3" role="dialog" aria-modal="true" aria-labelledby="pr-t">
       <button class="promo-x" hidden data-action="promo-close" aria-label="${t('close')}">${I('<path d="M6 6l12 12M18 6L6 18"/>')}</button>
-      <figure class="c3-art" aria-hidden="true"><img src="assets/products/hero-0.webp" alt="" width="900" height="1100"><figcaption><span>SAY</span><span>CLUB</span></figcaption><span class="c3-seal"><b>15%</b><small>${he ? 'הנחה' : 'OFF'}</small></span></figure>
+      <figure class="c3-art" aria-hidden="true"><img src="assets/products/hero-0.webp" alt="" width="900" height="1100"><span class="c3-seal"><b>15%</b><small>${he ? 'הנחה' : 'OFF'}</small></span></figure>
       <div class="c3-body">
-        <p class="c3-k">SAY CLUB · ${he ? 'מועדון החברים' : 'Members'}</p>
-        <h2 id="pr-t">${he ? 'נהנים יותר.' : 'Enjoy more.'}</h2>
-        <p class="c3-sub">${he ? 'הצטרפות חינם. ההטבות מתחילות כבר בהזמנה הראשונה.' : 'Free to join. Perks start with your first order.'}</p>
-        <ul class="c3-perks">
-          <li>${I('<rect x="3" y="9" width="18" height="12" rx="1"/><path d="M3 13h18M12 9v12M12 9C10 5 6 5 7 8c.5 1.3 3 1 5 1zm0 0c2-4 6-4 5-1-.5 1.3-3 1-5 1z"/>')}<span><b>${he ? '15% הנחה' : '15% off'}</b>${he ? 'על הקנייה הראשונה' : 'your first order'}</span></li>
-          <li>${I('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5l1.4 2.9 3.1.4-2.3 2.2.6 3.1-2.8-1.5-2.8 1.5.6-3.1-2.3-2.2 3.1-.4z"/>')}<span><b>${he ? 'צבירת נקודות' : 'Points'}</b>${he ? 'ששוות כסף בקנייה הבאה' : 'worth money next time'}</span></li>
-          <li>${I('<path d="M4 21h16M5 21v-7h14v7M8 14v-3h8v3M12 11V8M12 4.5c.8.9.8 1.8 0 2.5-.8-.7-.8-1.6 0-2.5z"/>')}<span><b>${he ? 'יום הולדת' : 'Birthday'}</b>${he ? 'הטבה מפנקת במיוחד' : 'a special treat'}</span></li>
+        <p class="c3-k">SAY CLUB · ${he ? 'הרשמה חינם לאתר' : 'Free sign-up'}</p>
+        <h2 id="pr-t"><em>15%</em> ${he ? 'הנחה' : 'off'}</h2>
+        <p class="c3-sub"><b>${he ? 'על הקנייה הראשונה' : 'on your first order'}</b>${he ? ' — לכל מי שנרשם לאתר. ההנחה מופעלת אוטומטית בקופה.' : ' — for everyone who signs up. Applied automatically at checkout.'}</p>
+        <ul class="c3-perks two">
+          <li>${I('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5l1.4 2.9 3.1.4-2.3 2.2.6 3.1-2.8-1.5-2.8 1.5.6-3.1-2.3-2.2 3.1-.4z"/>')}<span><b>${he ? 'צבירת נקודות' : 'Earn points'}</b>${he ? 'ששוות כסף בקנייה הבאה' : 'worth money next time'}</span></li>
+          <li>${I('<path d="M4 21h16M5 21v-7h14v7M8 14v-3h8v3M12 11V8M12 4.5c.8.9.8 1.8 0 2.5-.8-.7-.8-1.6 0-2.5z"/>')}<span><b>${he ? 'הטבת יום הולדת' : 'Birthday treat'}</b>${he ? 'מפנקת במיוחד' : 'something special'}</span></li>
         </ul>
         <form class="c3-form" data-form="club-join" novalidate>
           <label class="c3-in">${I('<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.2-6.5 8-6.5s7 2 8 6.5"/>')}<input name="name" autocomplete="name" required maxlength="80" placeholder="${he ? 'שם מלא' : 'Full name'}" aria-label="${he ? 'שם מלא' : 'Full name'}"></label>
@@ -215,7 +214,7 @@ function maybePromo() {
           <label class="c3-in">${I('<rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/>')}<input name="password" type="password" autocomplete="new-password" required maxlength="80" placeholder="${he ? 'סיסמה (8+ תווים)' : 'Password (8+ chars)'}" aria-label="${he ? 'סיסמה' : 'Password'}"></label>
           <label class="cc-check c3-check"><input type="checkbox" name="agree" required><span>${he ? 'מאשר/ת הצטרפות למועדון וקבלת עדכונים בוואטסאפ ובמייל. רק מבצעים שווים והטבות בלעדיות.' : 'I agree to join and get updates by WhatsApp and email. Only great offers.'}</span></label>
           <p class="cc-err" role="alert"></p>
-          <button class="c3-go" type="submit">${he ? 'אני רוצה 15% הנחה והצטרפות' : 'Get 15% off & join'}</button>
+          <button class="c3-go" type="submit">${he ? 'הרשמה וקבלת 15% הנחה' : 'Sign up & get 15% off'}</button>
         </form>
         <a class="c3-login" href="#/account" data-action="promo-close">${he ? 'כבר חברים? התחברות' : 'Already a member? Sign in'}</a>
       </div>
