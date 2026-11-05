@@ -3477,3 +3477,7 @@ html.a11y-stop .hs-pin::before{animation:none}
   .mm-list>a:first-of-type{border-top:1px solid rgba(244,238,228,.12)!important}
 }
 body:has(.nav.open) .fab{opacity:0;pointer-events:none}
+/* Scrolled header: floating rounded bar */
+body.scrolled .hdr{margin:8px 12px 0!important;top:8px!important;border-radius:999px!important;border:1px solid rgba(201,173,122,.28)!important;box-shadow:0 18px 40px -18px rgba(0,0,0,.55)!important;overflow:visible;transition:margin .35s,border-radius .35s,box-shadow .35s}
+body.scrolled .hdr .wrap{padding-inline:clamp(14px,2.5vw,28px)!important}
+@media (max-width:900px){body.scrolled .hdr{margin:6px 8px 0!important;top:6px!important;border-radius:22px!important}}
