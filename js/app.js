@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105140107';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261105140107';
-import { CATEGORIES } from './data.js?v=261105140107';
-import * as db from './db.js?v=261105140107';
-import * as S from './views-shop.js?v=261105140107';
-import * as Lg from './views-legal.js?v=261105140107';
-import * as A from './views-admin.js?v=261105140107';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105140217';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261105140217';
+import { CATEGORIES } from './data.js?v=261105140217';
+import * as db from './db.js?v=261105140217';
+import * as S from './views-shop.js?v=261105140217';
+import * as Lg from './views-legal.js?v=261105140217';
+import * as A from './views-admin.js?v=261105140217';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -38,8 +38,8 @@ function header() {
       <a class="tool-link" href="#/rental">${getLang() === 'he' ? 'השכרה' : 'Rental'}</a><a class="tool-link" href="#/reviews">${getLang() === 'he' ? 'ביקורות' : 'Reviews'}</a><a class="tool-link" href="#/contact">${t('contact')}</a>
       <button class="icon-btn lang-btn" data-action="lang" lang="${getLang() === 'he' ? 'en' : 'he'}" aria-label="${t('langLabel')}">${getLang() === 'he' ? 'EN' : 'עב'}</button>
       <button class="icon-btn" data-action="search-open" aria-label="${t('search')}" aria-haspopup="dialog">${raw(ICONS.search)}</button>
-      <a class="icon-btn m-ws" href="#/wholesale" aria-label="${t('wholesale')}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2M3 13h18"/></svg><small>${t('wholesale')}</small></a><a class="icon-btn" href="#/account" aria-label="${t('account')}">${raw(ICONS.user)}</a>
-      <button class="icon-btn" data-action="cart-open" aria-label="${t('cart')} (${n})" aria-haspopup="dialog">${raw(ICONS.bag)}${n ? html`<span class="badge" aria-hidden="true">${n}</span>` : ''}</button>
+      <a class="icon-btn m-ws m-lab" href="#/wholesale" aria-label="${t('wholesale')}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2M3 13h18"/></svg><small>${t('wholesale')}</small></a><a class="icon-btn m-lab" href="#/account" aria-label="${t('account')}">${raw(ICONS.user)}<small>${getLang() === 'he' ? 'כניסה' : 'Sign in'}</small></a>
+      <button class="icon-btn m-lab" data-action="cart-open" aria-label="${t('cart')} (${n})" aria-haspopup="dialog">${raw(ICONS.bag)}<small>${getLang() === 'he' ? 'סל' : 'Bag'}</small>${n ? html`<span class="badge" aria-hidden="true">${n}</span>` : ''}</button>
     </div></div></header>`;
 }
 

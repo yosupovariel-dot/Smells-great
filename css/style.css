@@ -3106,3 +3106,17 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
 .pk-chip input:focus-visible+span{outline:2px solid #A9874F;outline-offset:2px}
 .pk-chip input:disabled+span{opacity:.5;cursor:not-allowed}
 [dir="rtl"] .pk-bar i{margin-left:auto}
+
+/* Phone header: three equal labelled icons + ticker that never clips */
+.m-lab small{display:none}
+@media (max-width:900px){
+  .hdr .tools .m-lab{display:inline-flex!important;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:46px!important;height:44px!important;padding:0!important;position:relative}
+  .hdr .tools .m-lab svg{width:21px!important;height:21px!important;fill:none;stroke:currentColor;stroke-width:1.5}
+  .hdr .tools .m-lab small{display:block;font-size:.6rem;font-weight:600;line-height:1;color:var(--ink);white-space:nowrap}
+  .hdr .tools .m-lab .badge{top:1px!important;inset-inline-end:6px!important}
+  .hdr .tools{gap:0!important}
+  .ticker-msg{font-size:.78rem!important;padding-inline:44px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block!important;text-align:center;line-height:38px}
+  .ticker-msg span{display:inline}
+}
+@media (max-width:380px){.hdr .tools .m-lab{width:42px!important}.hdr .brand.logo img{height:34px!important}}
+@media (max-width:480px){.hdr .tools .m-lab{width:41px!important}.hdr .brand.logo img{height:36px!important}.hdr .wrap{padding-inline:10px!important}}
