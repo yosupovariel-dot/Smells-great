@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261104165756';
-import { t, L, getLang } from './i18n.js?v=261104165756';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261104165756';
-import * as db from './db.js?v=261104165756';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105140107';
+import { t, L, getLang } from './i18n.js?v=261105140107';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105140107';
+import * as db from './db.js?v=261105140107';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -164,7 +164,7 @@ export function home() {
       ${hero.map((src, i) => html`<figure class="slide ${i ? '' : 'on'}"><img src="${src}" alt="${HERO_SLIDES[i]?.[getLang()] || 'SAY Boutique'}" width="2000" height="968" ${raw(i ? 'fetchpriority="low"' : 'fetchpriority="high"')} decoding="async"></figure>`)}
     </div>
     ${hero.length ? html`<div class="h-offers">${HERO_SLIDES.slice(0, hero.length).map((sl, i) => { const p = db.product(sl.pid); const now = p ? minPrice(p) : 0; const was = p?.was > now ? p.was : 0;
-      return html`<a class="h-offer ${i ? '' : 'on'}" href="#/product/${sl.pid}"><small class="h-k">${was ? html`<em class="h-sale">${T('מבצע', 'Sale')}</em>` : T('במוקד עכשיו', 'In focus')}</small><b>${sl[getLang()]}</b>
+      return html`<a class="h-offer ${i ? '' : 'on'}" href="#/product/${sl.pid}"><small class="h-k">${was ? html`<em class="h-sale">${T('מבצע', 'Sale')}</em>` : T('בחירת הבוטיק ✦', 'Boutique pick ✦')}</small><b>${sl[getLang()]}</b>
         <span class="h-price">${now ? html`${was ? html`<s>${m(was)}</s>` : ''}<strong>${m(now)}</strong>` : html`<strong>${T('מחיר מיוחד — בוואטסאפ', 'Special price on WhatsApp')}</strong>`}</span><i><span>${T('לפרטים והזמנה', 'View & order')}</span> ${arrow()}</i></a>`; })}</div>` : ''}
     <a class="seal" href="#/about" aria-label="${t('about')}">
       ${sealSVG('SAY BOUTIQUE · LUXURY HOME FRAGRANCES · ')}
