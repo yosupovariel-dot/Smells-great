@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105190339';
-import { t, L, getLang } from './i18n.js?v=261105190339';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105190339';
-import * as db from './db.js?v=261105190339';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105194358';
+import { t, L, getLang } from './i18n.js?v=261105194358';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105194358';
+import * as db from './db.js?v=261105194358';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -168,7 +168,7 @@ export function home() {
   return html`
   <section class="h-hero" aria-labelledby="hero-t">
     <div class="h-hero-copy">
-      <p class="kicker latin">Luxury Home Fragrances</p>
+      <p class="kicker latin">Home &amp; Office</p>
       <h1 id="hero-t"><span>${t('heroTitle1')}</span> <em>${t('heroTitle2')}</em></h1>
       <p class="h-hero-lead">${T('מכשירי SAY BOUTIQUE לסלון, חדר שינה ומשרד. ריח עדין ומתמשך שהופך כל חדר לחוויה.', 'SAY BOUTIQUE diffusers for the living room, bedroom and office. A soft, lasting scent that turns every room into an experience.')}</p>
       <div class="h-hero-cta"><a class="btn hh-btn" href="#/shop">${T('לקולקציה', 'Explore')}</a><a class="u-link" href="#/finder">${T('מציאת הריח שלי', 'Find my scent')} <span aria-hidden="true">${arrow()}</span></a></div>
@@ -190,12 +190,12 @@ export function home() {
     </div>
   </section>
 
-  ${shelf('h-best', 'Best sellers', T('הכי אהובים עכשיו', 'Loved right now'), best, '#/shop', T('לכל המוצרים', 'All products'))}
+  <section class="sh sh-lead" aria-label="${T('מוצרים נבחרים', 'Featured products')}"><div class="wrap"><div class="rail sh-rail" id="h-best">${best.map((p) => card(p))}</div></div></section>
 
   <section class="hcat" aria-labelledby="hcat-t"><div class="wrap">
     ${shelfHead('hcat', T('קטגוריות', 'Categories'), T('גלו את הקולקציה', 'Discover the collection'), 'hcat-t')}
-    <div class="rail hcat-rail" id="hcat">${CATEGORIES.filter((c) => c.img).map((c) => { const n = all.filter((p) => p.cat === c.id).length; return html`<a class="hcat-t ${c.id === 'diffusers' ? 'studio' : ''}" href="#/shop/${c.id}"><img src="${small(c.id === 'diffusers' ? 'assets/products/hero-1.webp' : c.img)}" alt="" loading="lazy" width="500" height="700"><span><b>${L(c)}</b>${n ? '' : html`<small>${T('בקרוב', 'Coming soon')}</small>`}</span></a>`; })}
-      <a class="hcat-t sale" href="#/shop/bundles"><img src="${small('assets/products/bundle-0.webp')}" alt="" loading="lazy" width="500" height="700"><span><b>SALE</b><small>${T('מארזים במחיר מיוחד', 'Bundles at a special price')}</small></span></a></div>
+    <div class="rail hcat-rail" id="hcat"><a class="hcat-t sale" href="#/shop/bundles"><img src="${small('assets/products/bundle-0.webp')}" alt="" loading="lazy" width="500" height="700"><span><b>SALE</b><small>${T('מארזים במחיר מיוחד', 'Bundles at a special price')}</small></span></a>${CATEGORIES.filter((c) => c.img).map((c) => { const n = all.filter((p) => p.cat === c.id).length; return html`<a class="hcat-t ${c.id === 'diffusers' ? 'studio' : ''}" href="#/shop/${c.id}"><img src="${small(c.id === 'diffusers' ? 'assets/products/hero-1.webp' : c.img)}" alt="" loading="lazy" width="500" height="700"><span><b>${L(c)}</b>${n ? '' : html`<small>${T('בקרוב', 'Coming soon')}</small>`}</span></a>`; })}
+</div>
   </div></section>
 
   <section class="hs" aria-labelledby="hs-t"><div class="wrap hs-in">
@@ -204,40 +204,33 @@ export function home() {
       <a class="hs-pin p1" href="#/product/say-400" dir="ltr">SAY 400<i></i></a><a class="hs-pin p2" href="#/product/say-car" dir="ltr">SAY Car<i></i></a><a class="hs-pin p3" href="#/product/say-150" dir="ltr">SAY 150<i></i></a></figure>
   </div></section>
 
-  <section class="rl" aria-labelledby="rl-t"><div class="wrap rl-in">
-    <figure class="rl-vid"><video src="assets/video/say-reel.mp4?v=2" poster="assets/video/say-reel-poster.webp" autoplay muted loop playsinline preload="metadata" width="720" height="900" aria-label="${T('סרטון קצר על מוצרי SAY', 'A short film about SAY products')}"></video>
-      <button class="rl-toggle" data-action="reel-toggle" aria-label="${T('עצירת הסרטון', 'Pause video')}" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button></figure>
-    <div class="rl-copy"><p class="hz-k">${T('15 שניות של SAY', '15 seconds of SAY')}</p>
-      <h2 id="rl-t">${T('את הריח אי אפשר לצלם.', 'You cannot film a scent.')}<br><em>${T('אבל אפשר להרגיש אותו.', 'But you can feel it.')}</em></h2>
-      <p>${T('מכשיר שקט, תמצית בהשראת המלון שאהבתם, ובית שמקבל אתכם כל ערב באותה תחושה של לובי יוקרתי.', 'A silent device, an oil inspired by the hotel you loved, and a home that greets you every evening like a luxury lobby.')}</p>
-      <div class="rl-cta"><a class="btn" href="#/finder">${T('מצאו את הריח שלכם', 'Find your scent')}</a><a class="u-link" href="#/shop">${T('לכל המוצרים', 'Shop all')} <span aria-hidden="true">${arrow()}</span></a></div></div>
-  </div></section>
-
-  ${dealsSection()}
 
   ${shelf('h-new', 'New arrivals', T('מוצרים חדשים', 'New arrivals'), fresh, '#/shop', T('לכל המוצרים', 'All products'))}
   ${shelf('h-dev', 'Fragrance devices', T('מפיצי ריח חשמליים', 'Fragrance devices'), devices, '#/shop/diffusers', T('לכל הקטגוריה', 'Whole category'))}
   ${shelf('h-oil', 'Essential oils', T('תמציות שמן', 'Fragrance oils'), oils, '#/shop/oils', T('לכל הקטגוריה', 'Whole category'))}
+  ${(() => { const art = all.filter((p) => p.cat === 'glass'); return art.length ? shelf('h-art', 'Wall art', T('תמונות זכוכית', 'Glass art'), art, '#/shop/glass', T('לכל הקטגוריה', 'Whole category')) : html`<section class="sh" aria-labelledby="h-art-t"><div class="wrap">
+    <header class="sh-h"><div><p class="hz-k"><span class="latin">Wall art</span></p><h2 id="h-art-t">${T('תמונות זכוכית', 'Glass art')}</h2></div><a class="u-link" href="#/shop/glass">${T('לכל הקטגוריה', 'Whole category')} <span aria-hidden="true">${arrow()}</span></a></header>
+    <a class="art-soon" href="${waLink(T('שלום, אשמח לשמוע על תמונות הזכוכית', 'Hi, tell me about the glass art'))}" target="_blank" rel="noopener noreferrer"><img src="${small('assets/products/cat-glass.webp')}" alt="" loading="lazy" width="900" height="600"><span><b>${T('הקולקציה בדרך', 'The collection is on its way')}</b>${T('רוצים לשמוע ראשונים? כתבו לנו בוואטסאפ', 'Want to hear first? WhatsApp us')}</span></a></div></section>`; })()}
 
   ${NICHE.length ? html`<section class="nx" aria-labelledby="nx-t"><div class="wrap">
     <header class="nx-h"><p class="hz-k latin">Luxury collection</p><h2 id="nx-t" class="latin">Niche &amp; <em>Luxury</em> Fragrances</h2>
       <p>${T('באו לגלות את הבשמים היוקרתיים שלנו, בהשראת בתי הבושם והמלונות המובילים והיוקרתיים בעולם.', 'Discover our luxury scents, inspired by the world’s leading perfume houses and hotels.')}</p>
       <a class="nx-btn" href="#/shop/oils">Discover</a></header>
-    <div class="nx-list">${NICHE.map(([f, txt], i) => html`<article class="nx-it ${i % 2 ? 'rev' : ''}"><a class="nx-img" href="#/shop/oils/${encodeURIComponent(f)}"><img src="${banners[f]}" alt="" loading="lazy" width="900" height="900"></a>
-      <div class="nx-t"><p class="hz-k">${subName(f)}</p><p>${txt}</p><a class="nx-btn" href="#/shop/oils/${encodeURIComponent(f)}">Discover</a></div></article>`)}</div>
+    <div class="nx-list">${NICHE.map(([f, txt], i) => html`<article class="nx-it ${i % 2 ? 'rev' : ''}"><h3 class="nx-name">${subName(f)}</h3><a class="nx-img" href="#/shop/oils/${encodeURIComponent(f)}"><img src="${banners[f]}" alt="" loading="lazy" width="900" height="900"></a>
+      <div class="nx-t"><p>${txt}</p><a class="nx-btn" href="#/shop/oils/${encodeURIComponent(f)}">Discover</a></div></article>`)}</div>
   </div></section>` : ''}
 
-  ${reviews.length ? html`<section class="hrv" aria-labelledby="hrv-t"><div class="wrap">
-    ${shelfHead('hrv', T('לקוחות ממליצים', 'Reviews'), T('מה אומרים עלינו', 'What customers say'), 'hrv-t')}
-    <div class="rail hrv-rail" id="hrv">${reviews.map((r) => html`<figure class="hrv-c"><span class="hrv-s" aria-label="${r.rating} ${T('מתוך 5', 'of 5')}">${'★'.repeat(r.rating)}</span><blockquote>${r.text}</blockquote><figcaption>${r.name}${r.city ? ` · ${r.city}` : ''}</figcaption></figure>`)}</div>
-  </div></section>` : ''}
-
-  <section class="faq" aria-labelledby="faq-t"><div class="wrap faq-in">
-    <header><p class="hz-k">${T('שאלות נפוצות', 'FAQ')}</p><h2 id="faq-t">${T('יש לכם שאלה? יש לנו תשובה', 'Got a question? We have the answer')}</h2>
-      <p>${T('לא מצאתם? ', 'Not here? ')}<a href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('כתבו לנו בוואטסאפ', 'WhatsApp us')}</a></p></header>
-    <div class="faq-list">${FAQ.map(([q, a], i) => html`<details class="faq-i" ${raw(i ? '' : 'open')}><summary>${q}<i aria-hidden="true"></i></summary><div class="faq-a">${a}</div></details>`)}</div>
+  <section class="hrv" aria-labelledby="hrv-t"><div class="wrap">
+    ${shelfHead('hrv', T('ביקורות לקוחות', 'Customer reviews'), T('מה אומרים עלינו', 'What customers say'), 'hrv-t')}
+    <div class="rail hrv-rail" id="hrv">${reviews.length ? reviews.map((r) => html`<figure class="hrv-c"><span class="hrv-s" aria-label="${r.rating} ${T('מתוך 5', 'of 5')}">${'★'.repeat(r.rating)}</span><blockquote>${r.text}</blockquote><figcaption>${r.name}${r.city ? ` · ${r.city}` : ''}</figcaption></figure>`) : html`<a class="hrv-c hrv-empty" href="#/reviews"><span class="hrv-s">★★★★★</span><blockquote>${T('קניתם אצלנו? ספרו לנו איך הריח מרגיש אצלכם — הביקורת שלכם תופיע כאן.', 'Bought from us? Tell us how it feels — your review will appear here.')}</blockquote><figcaption>${T('לכתיבת ביקורת ←', 'Write a review →')}</figcaption></a>`}</div>
   </div></section>
-  ${clubBlock()}`;
+
+  <section class="faq" aria-labelledby="faq-t"><div class="wrap">
+    <details class="faq-box"><summary><span><span class="hz-k">${T('שאלות נפוצות', 'FAQ')}</span><span class="faq-title" id="faq-t">${T('יש לכם שאלה? יש לנו תשובה', 'Got a question? We have the answer')}</span></span><i aria-hidden="true"></i></summary>
+      <div class="faq-list">${FAQ.map(([q, a]) => html`<details class="faq-i"><summary>${q}<i aria-hidden="true"></i></summary><div class="faq-a">${a}</div></details>`)}</div>
+      <p class="faq-more">${T('לא מצאתם? ', 'Not here? ')}<a href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('כתבו לנו בוואטסאפ', 'WhatsApp us')}</a></p>
+    </details>
+  </div></section>`;
 }
 
 const shelfHead = (id, k, title, hid) => html`<header class="sh-h"><div><p class="hz-k">${k}</p><h2 id="${hid}">${title}</h2></div>

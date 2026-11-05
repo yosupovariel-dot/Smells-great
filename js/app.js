@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105190339';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261105190339';
-import { CATEGORIES } from './data.js?v=261105190339';
-import * as db from './db.js?v=261105190339';
-import * as S from './views-shop.js?v=261105190339';
-import * as Lg from './views-legal.js?v=261105190339';
-import * as A from './views-admin.js?v=261105190339';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105194358';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261105194358';
+import { CATEGORIES } from './data.js?v=261105194358';
+import * as db from './db.js?v=261105194358';
+import * as S from './views-shop.js?v=261105194358';
+import * as Lg from './views-legal.js?v=261105194358';
+import * as A from './views-admin.js?v=261105194358';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -97,12 +97,20 @@ function footNav() {
 
 function footer() {
   const y = new Date().getFullYear();
-  return html`<footer class="ftr"><div class="wrap">
-    <div class="ftr-grid">
-      <div><a class="brand logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-wide-light.webp" alt="SAY Boutique — Luxury Home Fragrances" width="923" height="350" loading="lazy"></a><p class="muted">${t('tick2')}</p>
-        <p class="ftr-contact"><a class="fc-btn" href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a><a class="fc-btn wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
-      ${footNav()}
-    </div>
+  const he = getLang() === 'he'; const T2 = (x, e) => (he ? x : e);
+  const ic = (d) => raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`);
+  const live = CATEGORIES;
+  return html`<footer class="ftr ftr2"><div class="wrap">
+    <div class="f2-brand"><a class="brand logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-wide-light.webp" alt="SAY Boutique — Luxury Home Fragrances" width="923" height="350" loading="lazy"></a>
+      <p class="f2-k">Luxury Home Fragrances</p><p class="f2-tag">${T2('מותג ישראלי פרימיום לפתרונות ריח חכמים לבית ולעסק.', 'An Israeli premium brand for smart scent solutions for home and business.')}</p>
+      <p class="f2-social"><a href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">${raw(ICONS.wa)}</a><a href="mailto:info@sayboutique.co.il" aria-label="${T2('אימייל', 'Email')}">${ic('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>')}</a><a href="tel:+${PHONE_INTL}" aria-label="${T2('טלפון', 'Phone')}">${ic('<path d="M5 3h4l2 5-2.5 1.5a11 11 0 006 6L16 13l5 2v4a2 2 0 01-2 2A16 16 0 013 5a2 2 0 012-2"/>')}</a></p></div>
+    <nav class="f2-cols" aria-label="${T2('ניווט תחתון', 'Footer')}">
+      <div><h2>${T2('ניווט', 'Navigate')}</h2><ul><li><a href="#/">${T2('ראשי', 'Home')}</a></li><li><a href="#/shop">${t('shop')}</a></li><li><a href="#/about">${t('about')}</a></li><li><a href="#/contact">${t('contact')}</a></li><li><a href="#/terms">${t('terms')}</a></li><li><a href="#/returns">${T2('מדיניות משלוחים והחזרות', 'Shipping & returns')}</a></li><li><a href="#/privacy">${t('privacy')}</a></li></ul></div>
+      <div><h2>${T2('קטגוריות', 'Categories')}</h2><ul>${live.map((c) => html`<li><a href="#/shop/${c.id}">${c[getLang()]}</a></li>`)}<li><a class="f2-sale" href="#/shop/bundles">SALE</a></li></ul></div>
+      <div><h2>${T2('מידע', 'Info')}</h2><ul><li><a href="#/about">${t('about')}</a></li><li><a href="#/reviews">${T2('ביקורות לקוחות', 'Reviews')}</a></li><li><a href="#/wholesale">${t('wholesale')}</a></li><li><a href="#/rental">${T2('השכרה לעסקים', 'Business rental')}</a></li><li><a href="#/accessibility">${t('accessibility')}</a></li></ul></div>
+      <div><h2>${T2('יצירת קשר', 'Contact')}</h2><ul class="f2-contact"><li><a href="mailto:info@sayboutique.co.il" dir="ltr">info@sayboutique.co.il</a></li><li><a href="tel:+${PHONE_INTL}" dir="ltr">${PHONE_DISPLAY}</a></li><li>${T2('א׳–ה׳', 'Sun–Thu')} | <span dir="ltr">9:00–18:00</span></li></ul>
+        <button class="f2-cart" data-action="cart-open">${T2('הסל שלי', 'My bag')}</button></div>
+    </nav>
     <div class="ftr-bottom"><span>© ${y} SAY Boutique · ${t('rights')}</span>
       <a class="credit" href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener">${t('builtBy')}</a></div>
   </div></footer>
