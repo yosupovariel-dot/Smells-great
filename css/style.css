@@ -3246,3 +3246,6 @@ body.scrolled .hdr{margin:0!important;top:0!important;border-radius:0!important}
 @keyframes giftNudge{0%,88%,100%{transform:none}91%{transform:rotate(-12deg)}94%{transform:rotate(10deg)}97%{transform:rotate(-6deg)}}
 @media (max-width:600px){.fab-gift{bottom:72px;left:14px;width:44px;height:44px}}
 html.a11y-stop .fab-gift{animation:none}
+/* Finder mood cards: every photo fills its frame the same way */
+.fd-opt.photo img,.fd-opt.photo img[src*="/oil-"]{width:100%!important;aspect-ratio:16/9!important;height:auto!important;object-fit:cover!important;object-position:center!important;background:none!important;display:block}
+.fd-opt.photo{overflow:hidden}
