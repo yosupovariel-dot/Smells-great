@@ -3417,3 +3417,48 @@ html.a11y-stop .hs-pin::before{animation:none}
 .f2-cart{margin-top:1.2rem;width:100%;min-height:48px;border:0;background:#C9AD7A;color:#16130F;font:inherit;font-weight:800;cursor:pointer}
 @media (max-width:860px){.f2-cols{grid-template-columns:1fr;text-align:center;gap:1.8rem}.f2-cols ul{justify-items:center}}
 @media (max-width:860px){.hcat-rail{grid-auto-columns:84%!important}}
+
+/* ===== Club popup v4 — luxury, no scroll ===== */
+.supromo.cc3{display:grid!important;grid-template-columns:.85fr 1.15fr;width:min(880px,100%)!important;max-height:none!important;overflow:hidden!important;padding:0!important;border-radius:2px!important;background:#FBF8F3!important;box-shadow:0 50px 100px -40px rgba(0,0,0,.75)!important;text-align:start}
+.cc3 .c3-art{position:relative;margin:0;min-height:100%;background:#16130F}
+.cc3 .c3-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.88}
+.cc3 .c3-art::after{content:"";position:absolute;inset:14px;border:1px solid rgba(226,200,143,.55)}
+.cc3 .c3-art figcaption{position:absolute;inset:auto 0 2.2rem 0;z-index:1;display:flex;flex-direction:column;align-items:center;color:#F4EEE4;font:500 1.05rem "Frank Ruhl Libre",serif;letter-spacing:.55em;text-shadow:0 2px 16px rgba(0,0,0,.6)}
+.cc3 .c3-art figcaption span:first-child{font-size:2.3rem;letter-spacing:.3em}
+.cc3 .c3-body{padding:2.2rem 2.4rem 1.6rem}
+.c3-k{margin:0 0 .5rem;font:600 .72rem Rubik,sans-serif;letter-spacing:.28em;color:#A9874F}
+.cc3 h2{font:500 clamp(2.2rem,4vw,2.9rem)/1.05 "Frank Ruhl Libre",serif!important;margin:0 0 .45rem!important;letter-spacing:-.01em;color:#16130F}
+.c3-sub{margin:0 0 1.2rem;color:#6d6457;font-size:.92rem}
+.c3-perks{list-style:none;padding:1rem 0;margin:0 0 1.1rem;display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;border-top:1px solid #e6dccb;border-bottom:1px solid #e6dccb}
+.c3-perks li{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.35rem}
+.c3-perks svg{width:28px;height:28px;fill:none;stroke:#A9874F;stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round}
+.c3-perks span{display:flex;flex-direction:column;font-size:.74rem;color:#6d6457;line-height:1.35}
+.c3-perks b{font:700 .95rem Rubik,sans-serif;color:#16130F}
+.c3-form{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
+.c3-in{position:relative;display:block;margin:0}
+.c3-in svg{position:absolute;inset-inline-start:.8rem;top:50%;transform:translateY(-50%);width:17px;height:17px;fill:none;stroke:#A9874F;stroke-width:1.5;pointer-events:none}
+.c3-in input{width:100%;height:46px;border:0;border-bottom:1.5px solid #d9ccb5;background:transparent;padding:0 2.4rem 0 .4rem;font:inherit;font-size:.95rem;color:#16130F;border-radius:0}
+[dir="ltr"] .c3-in input{padding:0 .4rem 0 2.4rem}
+.c3-in input::placeholder{color:#9a8f80}
+.c3-in input:focus{outline:0;border-bottom-color:#16130F}
+.c3-check{grid-column:1/-1;margin-top:.3rem;font-size:.74rem!important;line-height:1.5;color:#6d6457}
+.cc3 .cc-err{grid-column:1/-1;margin:0;min-height:1em;font-size:.8rem}
+.c3-go{grid-column:1/-1;height:52px;border:0;background:#16130F;color:#F4EEE4;font:600 .98rem Rubik,sans-serif;letter-spacing:.04em;cursor:pointer;transition:background .25s}
+.c3-go:hover{background:#2e2822}
+.c3-login{display:block;text-align:center;margin-top:.8rem;font-size:.85rem;color:#4a4238;text-decoration:underline;text-underline-offset:3px}
+.cc3 .promo-x{position:absolute;top:12px!important;left:12px!important;right:auto!important;z-index:3;width:38px!important;height:38px!important;border:0!important;border-radius:50%!important;background:rgba(251,248,243,.9)!important;display:grid;place-items:center;box-shadow:none!important}
+.cc3 .promo-x svg{width:16px;height:16px;fill:none;stroke:#16130F;stroke-width:1.6}
+[dir="rtl"] .cc3 .promo-x{left:12px!important;right:auto!important}
+@media (max-height:700px){.cc3 .c3-body{padding:1.4rem 1.8rem 1.1rem}.c3-sub{display:none}.c3-perks{padding:.6rem 0;margin-bottom:.7rem}}
+@media (max-width:760px){
+  #promo.promo-bg{align-items:end!important;padding:0!important}
+  .supromo.cc3{grid-template-columns:1fr;width:100%!important;border-radius:18px 18px 0 0!important}
+  .cc3 .c3-art{display:none}
+  .cc3 .c3-body{padding:1.5rem 1.2rem 1.1rem}
+  .cc3 h2{font-size:2.1rem!important}
+  .c3-sub{display:none}
+  .c3-perks{padding:.7rem 0;margin-bottom:.8rem}
+  .c3-perks svg{width:24px;height:24px}
+  .c3-form{grid-template-columns:1fr;gap:.25rem}
+  .c3-in input{height:44px}
+}

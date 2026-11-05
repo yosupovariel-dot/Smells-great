@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105194358';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261105194358';
-import { CATEGORIES } from './data.js?v=261105194358';
-import * as db from './db.js?v=261105194358';
-import * as S from './views-shop.js?v=261105194358';
-import * as Lg from './views-legal.js?v=261105194358';
-import * as A from './views-admin.js?v=261105194358';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105200133';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261105200133';
+import { CATEGORIES } from './data.js?v=261105200133';
+import * as db from './db.js?v=261105200133';
+import * as S from './views-shop.js?v=261105200133';
+import * as Lg from './views-legal.js?v=261105200133';
+import * as A from './views-admin.js?v=261105200133';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -213,27 +213,29 @@ function maybePromo(delay = 7000) {
     if (document.body.classList.contains('cart-open') || $('#modal') || $('#search-ov')) { setTimeout(show, 2500); return; }
     const he = getLang() === 'he';
     const w = document.createElement('div'); w.id = 'promo'; w.className = 'promo-bg';
-    render(w, html`<div class="supromo club-card cc2" role="dialog" aria-modal="true" aria-labelledby="pr-t">
-      <button class="promo-x" hidden data-action="promo-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-      <div class="cc-body">
-        <p class="cc-club">SAY CLUB</p>
-        <h2 id="pr-t">${he ? 'נהנים יותר!' : 'Enjoy more!'}</h2>
-        <p class="cc-sub">${he ? 'מצטרפים למועדון ונהנים מהטבות בלעדיות:' : 'Join the club for exclusive perks:'}</p>
-        <ul class="cc-list">
-          <li><i class="bob" aria-hidden="true">🎁</i><b>${he ? '15% הנחה מיידית לקנייה הראשונה!' : '15% off your first order!'}</b></li>
-          <li><i class="bob d2" aria-hidden="true">✨</i><b>${he ? 'צבירת נקודות בכל רכישה (ששוות כסף בקניות הבאות)' : 'Earn points on every order (worth money next time)'}</b></li>
-          <li><i class="bob d3" aria-hidden="true">🎂</i><b>${he ? 'הטבה מפנקת במיוחד ביום ההולדת' : 'A special birthday treat'}</b></li>
+    const I = (d) => raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`);
+    render(w, html`<div class="supromo club-card cc3" role="dialog" aria-modal="true" aria-labelledby="pr-t">
+      <button class="promo-x" hidden data-action="promo-close" aria-label="${t('close')}">${I('<path d="M6 6l12 12M18 6L6 18"/>')}</button>
+      <figure class="c3-art" aria-hidden="true"><img src="assets/products/hero-0.webp" alt="" width="900" height="1100"><figcaption><span>SAY</span><span>CLUB</span></figcaption></figure>
+      <div class="c3-body">
+        <p class="c3-k">SAY CLUB · ${he ? 'מועדון החברים' : 'Members'}</p>
+        <h2 id="pr-t">${he ? 'נהנים יותר.' : 'Enjoy more.'}</h2>
+        <p class="c3-sub">${he ? 'הצטרפות חינם. ההטבות מתחילות כבר בהזמנה הראשונה.' : 'Free to join. Perks start with your first order.'}</p>
+        <ul class="c3-perks">
+          <li>${I('<rect x="3" y="9" width="18" height="12" rx="1"/><path d="M3 13h18M12 9v12M12 9C10 5 6 5 7 8c.5 1.3 3 1 5 1zm0 0c2-4 6-4 5-1-.5 1.3-3 1-5 1z"/>')}<span><b>${he ? '15% הנחה' : '15% off'}</b>${he ? 'על הקנייה הראשונה' : 'your first order'}</span></li>
+          <li>${I('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5l1.4 2.9 3.1.4-2.3 2.2.6 3.1-2.8-1.5-2.8 1.5.6-3.1-2.3-2.2 3.1-.4z"/>')}<span><b>${he ? 'צבירת נקודות' : 'Points'}</b>${he ? 'ששוות כסף בקנייה הבאה' : 'worth money next time'}</span></li>
+          <li>${I('<path d="M4 21h16M5 21v-7h14v7M8 14v-3h8v3M12 11V8M12 4.5c.8.9.8 1.8 0 2.5-.8-.7-.8-1.6 0-2.5z"/>')}<span><b>${he ? 'יום הולדת' : 'Birthday'}</b>${he ? 'הטבה מפנקת במיוחד' : 'a special treat'}</span></li>
         </ul>
-        <form class="cc-form cc-form2" data-form="club-join" novalidate>
-          <label class="cc-in"><span aria-hidden="true">👤</span><input name="name" autocomplete="name" required maxlength="80" placeholder="${he ? 'שם מלא *' : 'Full name *'}" aria-label="${he ? 'שם מלא' : 'Full name'}"></label>
-          <label class="cc-in"><span aria-hidden="true">📱</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="15" placeholder="${he ? 'מספר טלפון *' : 'Phone *'}" aria-label="${he ? 'מספר טלפון' : 'Phone'}"></label>
-          <label class="cc-in"><span aria-hidden="true">✉️</span><input name="email" type="email" autocomplete="email" required maxlength="120" placeholder="${he ? 'דואר אלקטרוני *' : 'Email *'}" aria-label="${he ? 'דואר אלקטרוני' : 'Email'}"></label>
-          <label class="cc-in"><span aria-hidden="true">🔒</span><input name="password" type="password" autocomplete="new-password" required maxlength="80" placeholder="${he ? 'בחרו סיסמה (8+ תווים, אות ומספר) *' : 'Choose a password *'}" aria-label="${he ? 'סיסמה' : 'Password'}"></label>
-          <label class="cc-check"><input type="checkbox" name="agree" required><span>${he ? 'מאשר/ת הצטרפות למועדון וקבלת עדכונים בוואטסאפ ובמייל. מבטיחים לא לחפור – רק מבצעים שווים והטבות בלעדיות!' : 'I agree to join and get updates by WhatsApp and email. No spam — only great deals.'}</span></label>
+        <form class="c3-form" data-form="club-join" novalidate>
+          <label class="c3-in">${I('<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.2-6.5 8-6.5s7 2 8 6.5"/>')}<input name="name" autocomplete="name" required maxlength="80" placeholder="${he ? 'שם מלא' : 'Full name'}" aria-label="${he ? 'שם מלא' : 'Full name'}"></label>
+          <label class="c3-in">${I('<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>')}<input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="15" placeholder="${he ? 'טלפון' : 'Phone'}" aria-label="${he ? 'טלפון' : 'Phone'}"></label>
+          <label class="c3-in">${I('<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3.5 6.5l8.5 6 8.5-6"/>')}<input name="email" type="email" autocomplete="email" required maxlength="120" placeholder="${he ? 'אימייל' : 'Email'}" aria-label="${he ? 'אימייל' : 'Email'}"></label>
+          <label class="c3-in">${I('<rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/>')}<input name="password" type="password" autocomplete="new-password" required maxlength="80" placeholder="${he ? 'סיסמה (8+ תווים)' : 'Password (8+ chars)'}" aria-label="${he ? 'סיסמה' : 'Password'}"></label>
+          <label class="cc-check c3-check"><input type="checkbox" name="agree" required><span>${he ? 'מאשר/ת הצטרפות למועדון וקבלת עדכונים בוואטסאפ ובמייל. רק מבצעים שווים והטבות בלעדיות.' : 'I agree to join and get updates by WhatsApp and email. Only great offers.'}</span></label>
           <p class="cc-err" role="alert"></p>
-          <button class="btn block cc-go" type="submit">🛍️ ${he ? 'אני רוצה 15% הנחה והצטרפות!' : 'I want 15% off & join!'}</button>
+          <button class="c3-go" type="submit">${he ? 'אני רוצה 15% הנחה והצטרפות' : 'Get 15% off & join'}</button>
         </form>
-        <a class="cc-login" href="#/account" data-action="promo-close">${he ? 'כבר חברים? התחברות' : 'Already a member? Sign in'}</a>
+        <a class="c3-login" href="#/account" data-action="promo-close">${he ? 'כבר חברים? התחברות' : 'Already a member? Sign in'}</a>
       </div>
     </div>`);
     document.body.append(w); requestAnimationFrame(() => w.classList.add('in'));
