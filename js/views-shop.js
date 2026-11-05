@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105185653';
-import { t, L, getLang } from './i18n.js?v=261105185653';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105185653';
-import * as db from './db.js?v=261105185653';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105190247';
+import { t, L, getLang } from './i18n.js?v=261105190247';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105190247';
+import * as db from './db.js?v=261105190247';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -143,19 +143,35 @@ function dealsSection() {
 export function home() {
   const all = active();
   const hero = (db.SITE.site?.hero || []).slice(0, 4);
-  const promo = db.SITE.site?.hero?.[4];
   const banners = db.SITE.site?.subBanners || {};
-  const diff = all.filter((p) => p.cat === 'diffusers' && !p.quote);
-  const kit = all.find((p) => p.picks === 14);
-  const families = Object.keys(banners).map((f) => ({ f, img: banners[f], n: all.filter((p) => p.sub === f).length })).filter((x) => x.n);
+  const byId = (ids) => ids.map((id) => db.product(id)).filter((p) => p && p.active !== false);
+  const best = [...all.filter((p) => p.tag === 'best'), ...byId(['say-300', 'say-150', 'say-400', 'kit-14'])].filter((p, i, a) => a.indexOf(p) === i).slice(0, 8);
+  const fresh = [...all.filter((p) => p.tag === 'new'), ...all.slice().reverse()].filter((p, i, a) => a.indexOf(p) === i && !p.quote).slice(0, 8);
+  const devices = all.filter((p) => p.cat === 'diffusers');
+  const oils = all.filter((p) => p.cat === 'oils' && !p.picks).slice(0, 10);
+  const reviews = db.approvedReviews().slice(0, 8);
+  const FAQ = [
+    [T('איך עובד מפיץ ריח בטכנולוגיית אידוי קר?', 'How does a cold-air diffuser work?'), T('המכשיר הופך את תמצית השמן לערפל עדין מאוד באמצעות אוויר — בלי מים, בלי חום ובלי אש. כך הריח נשאר נקי ונאמן למקור ומתפזר באופן אחיד בחלל.', 'The device turns the oil into a very fine mist using air — no water, heat or flame — so the scent stays true and spreads evenly.')],
+    [T('איזה מכשיר מתאים לגודל החלל שלי?', 'Which device suits my space?'), T('SAY Car לרכב, SAY room & office לחדרים עד 20 מ"ר, SAY 100 ו־SAY 150 לבית ולחללים בינוניים, ו־SAY 300 ו־SAY 400 לעסקים ולחללים גדולים. לא בטוחים? כתבו לנו בוואטסאפ ונמליץ.', 'SAY Car for cars, room & office up to 20 m², SAY 100/150 for homes, SAY 300/400 for businesses. Unsure? WhatsApp us.')],
+    [T('כמה זמן מחזיקה תמצית?', 'How long does an oil last?'), T('זה תלוי בגודל הבקבוק, בעוצמה ובשעות ההפעלה שתגדירו. ככל שהבקבוק גדול יותר — המחיר למ"ל נמוך יותר. נשמח לעזור לכם לחשב לפי החלל שלכם.', 'It depends on bottle size, intensity and hours. Larger bottles cost less per ml — we are happy to help you estimate.')],
+    [T('אפשר להחליף ריחות באותו מכשיר?', 'Can I switch scents in the same device?'), T('כן. מסיימים בקבוק, מחליפים לתמצית אחרת וממשיכים. לא בטוחים מה לבחור? ערכת ההתנסות עם 14 ריחות עושה את העבודה.', 'Yes — finish a bottle and switch. Unsure? The 14-scent discovery kit helps you choose.')],
+    [T('כמה זמן לוקח המשלוח וכמה הוא עולה?', 'How long is delivery and what does it cost?'), T('משלוח עד הבית תוך 3–5 ימי עסקים, וחינם בכל הזמנה מעל 299 ₪.', 'Home delivery in 3–5 business days, free over ₪299.')],
+    [T('מה מדיניות ההחזרות?', 'What is the return policy?'), html`${T('אפשר לבטל עסקה ולהחזיר מוצר תוך 14 יום, בהתאם לחוק הגנת הצרכן. כל הפרטים בעמוד', 'You can cancel and return within 14 days under consumer law. Details on the')} <a href="#/returns">${T('מדיניות ההחזרות', 'returns page')}</a>.`],
+    [T('מה מקבלים במועדון הלקוחות?', 'What do club members get?'), T('ההצטרפות חינם: 15% הנחה על ההזמנה הראשונה, נקודה על כל שקל ששילמתם (כל 100 נקודות = 10 ₪ בהזמנה הבאה) והטבה ביום ההולדת.', 'Free to join: 15% off your first order, a point per shekel (100 points = ₪10) and a birthday treat.')],
+    [T('אתם עובדים גם עם עסקים?', 'Do you work with businesses?'), html`${T('בהחלט — מחירי סיטונאות, התקנת סטנדים ומסלול שירות חודשי. ', 'Yes — wholesale prices, stand installation and a monthly service plan. ')}<a href="#/rental">${T('לפרטים על ההשכרה', 'Rental details')}</a>.`],
+  ];
+  const NICHE = [
+    ['השראת בשמים יוקרתיים', T('ניחוח עוצמתי ואציל בהשראת בתי הבושם הוותיקים ביותר — לגברים שאוהבים להשאיר רושם.', 'A powerful, noble scent inspired by the great perfume houses.')],
+    ['בתי מלון ויוקרה', T('הריח שפוגש אתכם בלובי של מלון חמישה כוכבים — עכשיו מקבל אתכם בבית, כל ערב מחדש.', 'The scent of a five-star lobby — now welcoming you home every evening.')],
+    ['טבע וספא', T('ניחוח נקי, ירוק ומרגיע — קלאסיקה מודרנית שמתאימה לכל שעות היום.', 'Clean, green and calming — a modern classic for any hour.')],
+  ].filter(([f]) => banners[f]);
   return html`
   <section class="h-hero" aria-labelledby="hero-t">
     <div class="h-hero-copy">
       <p class="kicker latin">Luxury Home Fragrances</p>
       <h1 id="hero-t"><span>${t('heroTitle1')}</span> <em>${t('heroTitle2')}</em></h1>
       <p class="h-hero-lead">${T('מכשירי SAY BOUTIQUE לסלון, חדר שינה ומשרד. ריח עדין ומתמשך שהופך כל חדר לחוויה.', 'SAY BOUTIQUE diffusers for the living room, bedroom and office. A soft, lasting scent that turns every room into an experience.')}</p>
-      <nav class="h-cats2" aria-label="${t('categories')}"><p>${T('הקטגוריות שלנו', 'Our categories')}</p><div>${CATEGORIES.map((c) => { const n = all.filter((p) => p.cat === c.id).length; return html`<a href="#/shop/${c.id}" class="${n ? '' : 'soon'}"><span class="hc-img ${c.id === 'diffusers' ? 'studio' : ''}">${c.img ? html`<img src="${small(c.id === 'diffusers' ? 'assets/products/say-150-3.webp' : c.img)}" alt="" width="64" height="64">` : html`<img src="assets/img/mark.webp" alt="" width="64" height="56">`}</span>${L(c)}${n ? '' : html`<small>${T('בקרוב', 'soon')}</small>`}</a>`; })}</div></nav>
-      <div class="h-hero-cta"><a class="btn" href="#/shop/diffusers">${T('לקולקציה', 'Explore')}</a><a class="u-link" href="#/finder">${T('מציאת הריח שלי', 'Find my scent')} <span aria-hidden="true">${arrow()}</span></a></div>
+      <div class="h-hero-cta"><a class="btn hh-btn" href="#/shop">${T('לקולקציה', 'Explore')}</a><a class="u-link" href="#/finder">${T('מציאת הריח שלי', 'Find my scent')} <span aria-hidden="true">${arrow()}</span></a></div>
       ${hero.length ? html`<div class="h-count latin" aria-hidden="true"><b id="slide-n">01</b><span class="h-progress">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</span><span>0${hero.length}</span></div>
       <div class="sr-only">${hero.map((_, i) => html`<button data-action="slide" data-i="${i}" aria-label="${T('שקופית', 'Slide')} ${i + 1}" aria-current="${i === 0}"></button>`)}</div>` : ''}
     </div>
@@ -174,6 +190,20 @@ export function home() {
     </div>
   </section>
 
+  ${shelf('h-best', 'Best sellers', T('הכי אהובים עכשיו', 'Loved right now'), best, '#/shop', T('לכל המוצרים', 'All products'))}
+
+  <section class="hcat" aria-labelledby="hcat-t"><div class="wrap">
+    ${shelfHead('hcat', T('קטגוריות', 'Categories'), T('גלו את הקולקציה', 'Discover the collection'), 'hcat-t')}
+    <div class="rail hcat-rail" id="hcat">${CATEGORIES.filter((c) => c.img).map((c) => { const n = all.filter((p) => p.cat === c.id).length; return html`<a class="hcat-t ${c.id === 'diffusers' ? 'studio' : ''}" href="#/shop/${c.id}"><img src="${small(c.id === 'diffusers' ? 'assets/products/hero-1.webp' : c.img)}" alt="" loading="lazy" width="500" height="700"><span><b>${L(c)}</b>${n ? '' : html`<small>${T('בקרוב', 'Coming soon')}</small>`}</span></a>`; })}
+      <a class="hcat-t sale" href="#/shop/bundles"><img src="${small('assets/products/bundle-0.webp')}" alt="" loading="lazy" width="500" height="700"><span><b>SALE</b><small>${T('מארזים במחיר מיוחד', 'Bundles at a special price')}</small></span></a></div>
+  </div></section>
+
+  <section class="hs" aria-labelledby="hs-t"><div class="wrap hs-in">
+    <div class="hs-copy"><h2 id="hs-t" class="latin">Scent in<br>every<br>corner</h2><p>${T('מהרכב ועד חדר השינה — לכל פינה בבית יש מכשיר שמתאים לה בדיוק.', 'From the car to the bedroom — a device made for every corner.')}</p><a class="u-link" href="#/shop/diffusers">${T('לכל המפיצים', 'All diffusers')} <span aria-hidden="true">${arrow()}</span></a></div>
+    <figure class="hs-art"><img src="assets/products/house-scent.webp" alt="${T('בית בחתך עם מפיצי ריח בכל חדר', 'A house cut-away with a diffuser in every room')}" width="1052" height="740" loading="lazy">
+      <a class="hs-pin p1" href="#/product/say-400" dir="ltr">SAY 400<i></i></a><a class="hs-pin p2" href="#/product/say-car" dir="ltr">SAY Car<i></i></a><a class="hs-pin p3" href="#/product/say-150" dir="ltr">SAY 150<i></i></a></figure>
+  </div></section>
+
   <section class="rl" aria-labelledby="rl-t"><div class="wrap rl-in">
     <figure class="rl-vid"><video src="assets/video/say-reel.mp4?v=2" poster="assets/video/say-reel-poster.webp" autoplay muted loop playsinline preload="metadata" width="720" height="900" aria-label="${T('סרטון קצר על מוצרי SAY', 'A short film about SAY products')}"></video>
       <button class="rl-toggle" data-action="reel-toggle" aria-label="${T('עצירת הסרטון', 'Pause video')}" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button></figure>
@@ -184,73 +214,41 @@ export function home() {
   </div></section>
 
   ${dealsSection()}
-  <section class="hz" aria-labelledby="col-t"><div class="wrap">
-    <header class="hz-head"><p class="hz-k">${T('מפיצי ריח', 'Diffusers')}</p><h2 id="col-t">${T('כמה גדול החלל שלכם?', 'How big is your space?')}</h2>
-      <p>${T('זה כל מה שצריך לדעת כדי לבחור. שאר העבודה עלינו — המכשיר שקט, בלי מים ובלי חום.', 'That is all you need to know to choose. The device is silent, with no water and no heat.')}</p></header>
-    <div class="hz-scale" aria-hidden="true"><i></i><span>30 ${T('מ"ר', 'm²')}</span><span>150 ${T('מ"ר', 'm²')}</span><span>300+ ${T('מ"ר', 'm²')}</span></div>
-    <div class="hz-grid">${(db.SITE.subs?.['מפיצי ריח'] || []).map((s2, i) => { const items = active().filter((p) => p.sub === s2); if (!items.length) return ''; const priced = items.filter((p) => !p.quote && minPrice(p) > 0); const lo = priced.length ? Math.min(...priced.map(minPrice)) : 0; const hero = items[items.length - 1];
-      return html`<a class="hz-card reveal" href="#/shop/diffusers/${encodeURIComponent(s2)}">
-        <span class="hz-n latin">0${i + 1}</span>
-        <span class="hz-img"><img src="${small(hero.img)}" alt="" loading="lazy" width="560" height="560"></span>
-        <b>${[T('חדר, רכב או משרד', 'A room, car or office'), T('בית או חלל בינוני', 'A home or mid-size space'), T('עסק, לובי או אולם', 'A business, lobby or hall')][i] || subName(s2)}</b>
-        <small>${subName(s2)}</small>
-        <span class="hz-models">${items.map((p) => L(p.name)).join(' · ')}</span>
-        <span class="hz-foot"><em>${lo ? html`${T('החל מ־', 'From ')}${m(lo)}` : T('הצעת מחיר אישית', 'Personal quote')}</em><i aria-hidden="true">${he() ? '←' : '→'}</i></span>
-      </a>`; })}</div>
-    <p class="hz-help">${T('עדיין מתלבטים?', 'Still unsure?')} <a href="${waLink(T('שלום, אשמח להמלצה על מפיץ ריח', 'Hi, I would like a diffuser recommendation'))}" target="_blank" rel="noopener noreferrer">${T('ספרו לנו על החלל ונמליץ בוואטסאפ', 'Tell us about your space on WhatsApp')}</a></p>
-  </div></section>
 
-  <section class="hw" aria-labelledby="oil-t"><div class="wrap">
-    <div class="hw-in">
-      <div class="hw-copy">
-        <p class="hz-k">${T('תמציות שמן', 'Fragrance oils')}</p>
-        <h2 id="oil-t">${T('בחרו מקום,', 'Choose a place,')}<br>${T('לא בקבוק.', 'not a bottle.')}</h2>
-        <p>${T('כל תמצית נולדה מזיכרון של מקום — לובי של מלון, חנות שאהבתם, ספא שקט. בחרו את העולם שמרגיש לכם נכון, והבית יתחיל להריח כמוהו.', 'Every oil began as a memory of a place — a hotel lobby, a favourite store, a quiet spa. Pick the world that feels right and your home starts to smell like it.')}</p>
-        ${kit ? html`<a class="hw-kit" href="#/product/${kit.id}"><span><b>${T('לא בטוחים איזה עולם?', 'Not sure which world?')}</b>${T('ערכת התנסות: 14 ריחות, מחליטים אחרי שמריחים', 'Discovery kit: 14 scents, decide after you smell')}</span><em>${m(minPrice(kit))}</em></a>` : ''}
-        <a class="u-link" href="#/shop/oils">${T('לכל התמציות', 'All oils')} <span aria-hidden="true">${arrow()}</span></a>
-      </div>
-      <div class="hw-worlds">${(db.SITE.subs?.['תמציות שמן'] || []).filter((s2) => active().filter((p) => p.sub === s2 && !p.picks).length > 2).sort((x, y) => (y === 'בתי מלון ויוקרה') - (x === 'בתי מלון ויוקרה')).slice(0, 5).map((s2, i) => html`<a class="hw-w reveal" href="#/shop/oils/${encodeURIComponent(s2)}"><img src="${i ? small(subImg('oils', s2)) : subImg('oils', s2)}" alt="" loading="lazy" width="600" height="600"><span><b>${subName(s2)}</b><small>${active().filter((p) => p.sub === s2).length} ${T('ריחות', 'scents')}</small></span></a>`)}</div>
-    </div>
-  </div></section>
+  ${shelf('h-new', 'New arrivals', T('מוצרים חדשים', 'New arrivals'), fresh, '#/shop', T('לכל המוצרים', 'All products'))}
+  ${shelf('h-dev', 'Fragrance devices', T('מפיצי ריח חשמליים', 'Fragrance devices'), devices, '#/shop/diffusers', T('לכל הקטגוריה', 'Whole category'))}
+  ${shelf('h-oil', 'Essential oils', T('תמציות שמן', 'Fragrance oils'), oils, '#/shop/oils', T('לכל הקטגוריה', 'Whole category'))}
 
-  <section class="h-hair" aria-labelledby="hair-t"><div class="wrap h-hair-in">
-    <div class="h-hair-copy"><p class="kicker latin">Hair care · Coming soon</p><h2 id="hair-t">${T('טיפוח השיער', 'Hair care')}</h2>
-      <p>${T('קולקציית טיפוח שיער חדשה מגיעה בקרוב לבוטיק — שמפו, מסכות, סרומים ומוצרי עיצוב לכל סוגי השיער.', 'A new hair-care collection is coming soon — shampoos, masks, serums and styling for every hair type.')}</p>
-      <div class="hero-cta"><a class="btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לפרטים בוואטסאפ', 'Ask on WhatsApp')}</a><a class="u-link" href="#/shop/hair">${T('לעמוד הקטגוריה', 'Category page')}</a></div></div>
-    <div class="h-hair-grid">${[1, 2, 3, 4].map((i) => html`<span class="hh hh${i}"><img src="assets/products/hair-${i}-sm.webp" alt="" loading="lazy" width="560" height="560"></span>`)}</div>
-  </div></section>
-
-
-
-  <section class="h-how" aria-labelledby="how-t"><div class="wrap">
-    <header class="h-head"><h2 id="how-t">${T('איך זה עובד', 'How it works')}</h2></header>
-    <ol class="how">
-      <li><span class="latin">I</span><b>${T('בוחרים מכשיר', 'Choose a device')}</b><p>${T('לפי גודל החלל — מרכב ועד לובי של 300 מ"ר. בלי מים, בלי חום, שקט לגמרי.', 'By the size of your space — from a car to a 300 m² lobby. No water, no heat, silent.')}</p></li>
-      <li><span class="latin">II</span><b>${T('בוחרים ניחוח', 'Choose a scent')}</b><p>${T('54 תמציות בהשראת מלונות, בשמים וטבע. לא בטוחים? ערכת התנסות עושה את העבודה.', '54 oils inspired by hotels, perfumes and nature. Unsure? A discovery kit does the work.')}</p></li>
-      <li><span class="latin">III</span><b>${T('מתזמנים ונהנים', 'Schedule & enjoy')}</b><p>${T('מגדירים שעות באפליקציה, והבית מריח כמו מלון בוטיק — כל יום, אוטומטית.', 'Set the hours in the app and your home smells like a boutique hotel — every day.')}</p></li>
-    </ol>
-  </div></section>
-
-  ${kit ? html`<section class="h-kit" aria-labelledby="kit-t"><div class="wrap h-kit-in">
-    <div class="h-kit-img reveal">${media(kit, '', false, kit.img, true)}</div>
-    <div class="h-kit-copy reveal"><p class="kicker latin">Discovery</p><h2 id="kit-t">${T('ערכת התנסות — 14 תמציות', 'Discovery kit — 14 oils')}</h2>
-      <p>${T('בוחרים 14 תמציות של 10 מ"ל ומנסים אותן במפיץ, כדי לגלות איזה ריח הכי מתאים לכם לפני שקונים בקבוק גדול.', 'Choose fourteen 10 ml oils and try them in your diffuser before buying a large bottle.')}</p>
-      <p class="h-kit-price">${m(kit.sizes[0].price)}</p>
-      <a class="btn" href="#/product/${kit.id}">${T('לבחירת הניחוחות', 'Choose your scents')}</a></div>
+  ${NICHE.length ? html`<section class="nx" aria-labelledby="nx-t"><div class="wrap">
+    <header class="nx-h"><p class="hz-k latin">Luxury collection</p><h2 id="nx-t" class="latin">Niche &amp; <em>Luxury</em> Fragrances</h2>
+      <p>${T('באו לגלות את הבשמים היוקרתיים שלנו, בהשראת בתי הבושם והמלונות המובילים והיוקרתיים בעולם.', 'Discover our luxury scents, inspired by the world’s leading perfume houses and hotels.')}</p>
+      <a class="nx-btn" href="#/shop/oils">Discover</a></header>
+    <div class="nx-list">${NICHE.map(([f, txt], i) => html`<article class="nx-it ${i % 2 ? 'rev' : ''}"><a class="nx-img" href="#/shop/oils/${encodeURIComponent(f)}"><img src="${banners[f]}" alt="" loading="lazy" width="900" height="900"></a>
+      <div class="nx-t"><p class="hz-k">${subName(f)}</p><p>${txt}</p><a class="nx-btn" href="#/shop/oils/${encodeURIComponent(f)}">Discover</a></div></article>`)}</div>
   </div></section>` : ''}
 
-  ${promo ? html`<section class="h-offer wrap reveal" aria-labelledby="of-t"><a class="of-img" href="#/product/bundle-car-kit"><img src="${small(promo)}" srcset="${small(promo)} 560w, ${promo} 1400w" sizes="(max-width:760px) 100vw, 45vw" alt="${T('SAY Car וערכת התנסות', 'SAY Car and discovery kit')}" loading="lazy" width="1400" height="680"></a>
-    <div class="of-t"><p class="kicker latin">Bundle</p><h2 id="of-t">${T('מארז ההיכרות: מכשיר + 14 ניחוחות', 'Starter bundle: device + 14 scents')}</h2>
-      <p>${T('SAY Car לבחירה בשלושה צבעים, יחד עם ערכת התנסות של 14 תמציות — כל מה שצריך כדי להתחיל, במארז אחד ובמחיר משתלם.', 'SAY Car in three colours with a 14-oil discovery kit — everything to begin, in one box, for less.')}</p>
-      <a class="btn" href="#/product/bundle-car-kit">${T('לפרטי המארז', 'View bundle')}</a></div></section>` : ''}
+  ${reviews.length ? html`<section class="hrv" aria-labelledby="hrv-t"><div class="wrap">
+    ${shelfHead('hrv', T('לקוחות ממליצים', 'Reviews'), T('מה אומרים עלינו', 'What customers say'), 'hrv-t')}
+    <div class="rail hrv-rail" id="hrv">${reviews.map((r) => html`<figure class="hrv-c"><span class="hrv-s" aria-label="${r.rating} ${T('מתוך 5', 'of 5')}">${'★'.repeat(r.rating)}</span><blockquote>${r.text}</blockquote><figcaption>${r.name}${r.city ? ` · ${r.city}` : ''}</figcaption></figure>`)}</div>
+  </div></section>` : ''}
 
-  <section class="h-service" aria-label="${T('שירות', 'Service')}"><div class="wrap">
-    <div><b>${T('משלוח חינם', 'Free delivery')}</b><p>${T('בכל הזמנה מעל 299₪, עד הבית בתוך 3–5 ימי עסקים.', 'On orders over ₪299, at your door in 3–5 business days.')}</p></div>
-    <div><b>${T('אחריות יבואן', 'Importer warranty')}</b><p>${T('שנת אחריות יבואן על SAY 150, SAY 300 ו-SAY 400.', 'One-year importer warranty on SAY 150, 300 and 400.')}</p></div>
-    <div><b>${T('ליווי אישי', 'Personal advice')}</b><p>${T('לא בטוחים מה מתאים לחלל שלכם? כתבו לנו ונמליץ.', 'Not sure what suits your space? Message us.')} <a href="${waLink(T('שלום, אשמח להמלצה', 'Hello, I would like a recommendation'))}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
-    <div><b>${T('לעסקים', 'For business')}</b><p>${T('מחירי סיטונאות והתקנת סטנדים.', 'Wholesale prices and stand installation.')} <a href="#/wholesale">${T('לפרטים', 'Details')}</a></p></div>
+  <section class="faq" aria-labelledby="faq-t"><div class="wrap faq-in">
+    <header><p class="hz-k">${T('שאלות נפוצות', 'FAQ')}</p><h2 id="faq-t">${T('יש לכם שאלה? יש לנו תשובה', 'Got a question? We have the answer')}</h2>
+      <p>${T('לא מצאתם? ', 'Not here? ')}<a href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('כתבו לנו בוואטסאפ', 'WhatsApp us')}</a></p></header>
+    <div class="faq-list">${FAQ.map(([q, a], i) => html`<details class="faq-i" ${raw(i ? '' : 'open')}><summary>${q}<i aria-hidden="true"></i></summary><div class="faq-a">${a}</div></details>`)}</div>
   </div></section>
   ${clubBlock()}`;
+}
+
+const shelfHead = (id, k, title, hid) => html`<header class="sh-h"><div><p class="hz-k">${k}</p><h2 id="${hid}">${title}</h2></div>
+  <div class="sh-nav"><button class="sh-arrow" data-action="rail-step" data-t="${id}" data-d="-1" aria-label="${T('הקודם', 'Previous')}">${he() ? '→' : '←'}</button><button class="sh-arrow" data-action="rail-step" data-t="${id}" data-d="1" aria-label="${T('הבא', 'Next')}">${he() ? '←' : '→'}</button></div></header>`;
+function shelf(id, kicker, title, items, href, allLabel) {
+  if (!items.length) return '';
+  return html`<section class="sh" aria-labelledby="${id}-t"><div class="wrap">
+    ${shelfHead(id, html`<span class="latin">${kicker}</span>`, title, id + '-t')}
+    <div class="rail sh-rail" id="${id}">${items.map((p) => card(p))}</div>
+    <a class="u-link sh-all" href="${href}">${allLabel} <span aria-hidden="true">${arrow()}</span></a>
+  </div></section>`;
 }
 
 export const clubBlock = () => html`<section class="block club" aria-labelledby="club-t"><div class="wrap">
