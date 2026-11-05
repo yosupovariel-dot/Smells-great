@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105190247';
-import { t, L, getLang } from './i18n.js?v=261105190247';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105190247';
-import * as db from './db.js?v=261105190247';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105190339';
+import { t, L, getLang } from './i18n.js?v=261105190339';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105190339';
+import * as db from './db.js?v=261105190339';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -314,9 +314,21 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
   if (!cat && !q) {
     const cats = CATEGORIES.filter((x) => active().some((p) => p.cat === x.id));
     return html`<div class="shop-page">
-      <header class="sp-head wrap"><div class="sp-head-t">${crumbs}<p class="kicker latin">The collection</p><h1>${T('הבית שלכם, בניחוח של מלון בוטיק.', 'Your home, scented like a boutique hotel.')}</h1>
-        <p class="lead">${T('מכשירי בישום, תמציות שמן ומארזים — הכל במחירי יבואן, עם משלוח חינם מעל 299₪.', 'Diffusers, fragrance oils and bundles — importer prices, free delivery over ₪299.')}</p></div>
-        <div class="sp-cats">${[...cats, ...CATEGORIES.filter((x) => !cats.includes(x) && x.img)].map((x) => { const n = active().filter((p) => p.cat === x.id).length; return html`<a href="#/shop/${x.id}" class="sp-cat ${n ? '' : 'soon'}"><span class="sp-cat-img ${x.id === 'diffusers' ? 'studio' : ''}"><img src="${small(x.img)}" alt="" width="320" height="400" loading="lazy"></span><b>${L(x)}</b><small>${n ? `${n} ${T('מוצרים', 'items')}` : T('בקרוב', 'Coming soon')}</small></a>`; })}</div>
+      <header class="sx"><div class="wrap sx-in">
+        <div class="sx-copy">${crumbs}<p class="sx-k">The collection</p>
+          <h1>${T('הבית שלכם,', 'Your home,')}<br><em>${T('בניחוח של מלון בוטיק.', 'scented like a boutique hotel.')}</em></h1>
+          <p class="sx-lead">${T('מכשירי בישום, תמציות שמן ומארזים — במחירי יבואן, עד הבית. מאיפה תרצו להתחיל?', 'Diffusers, oils and bundles at importer prices. Where would you like to start?')}</p>
+          <div class="sx-paths">
+            <a href="#/shop/diffusers"><b>${T('אני מחפש/ת מכשיר', 'I need a device')}</b><small>${T('לפי גודל החלל', 'By space size')}</small></a>
+            <a href="#/shop/oils"><b>${T('אני מחפש/ת ריח', 'I want a scent')}</b><small>${T(`${active().filter((p) => p.cat === 'oils' && !p.picks).length} ריחות`, 'Many scents')}</small></a>
+            <a class="dark" href="#/finder"><b>${T('לא בטוחים? עזרו לי', 'Not sure? Help me')}</b><small>${T('3 שאלות, 30 שניות', '3 questions, 30 seconds')}</small></a>
+          </div>
+          <ul class="sx-stats"><li><b>${active().length}</b>${T('מוצרים', 'products')}</li><li><b>299 ₪</b>${T('משלוח חינם מעל', 'free shipping over')}</li><li><b>15%</b>${T('למצטרפים למועדון', 'for club members')}</li></ul>
+        </div>
+        <div class="sx-bento">${[['diffusers', 'assets/products/hero-1.webp'], ['oils', 'assets/products/cat-oils.webp'], ['bundles', 'assets/products/bundle-0.webp'], ['kit', 'assets/products/kit-14.webp']].map(([id, img], i) => { const c = CATEGORIES.find((x) => x.id === id); const n = id === 'kit' ? 0 : active().filter((p) => p.cat === id).length; const href = id === 'kit' ? '#/product/kit-14' : `#/shop/${id}`;
+          return html`<a class="sx-t t${i}" href="${href}"><img src="${i ? small(img) : img}" alt="" width="800" height="800" ${raw(i ? 'loading="lazy"' : 'fetchpriority="high"')}><span><b>${c ? L(c) : T('ערכת התנסות', 'Discovery kit')}</b><small>${n ? `${n} ${T('מוצרים', 'items')}` : T('14 ריחות לבחירה', '14 scents to choose')}</small></span></a>`; })}</div>
+      </div>
+      ${CATEGORIES.some((x) => !cats.includes(x)) ? html`<p class="wrap sx-soon"><b>${T('בקרוב בבוטיק', 'Coming soon')}</b>${CATEGORIES.filter((x) => !cats.includes(x)).map((x) => html`<a href="#/shop/${x.id}">${L(x)}</a>`)}</p>` : ''}
       </header>
       <div class="wrap">${catTabs('')}
         ${cats.map((x) => { const items = active().filter((p) => p.cat === x.id); return html`<section class="rail-sec" aria-labelledby="r-${x.id}">
