@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105184651';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261105184651';
-import { CATEGORIES } from './data.js?v=261105184651';
-import * as db from './db.js?v=261105184651';
-import * as S from './views-shop.js?v=261105184651';
-import * as Lg from './views-legal.js?v=261105184651';
-import * as A from './views-admin.js?v=261105184651';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105184951';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261105184951';
+import { CATEGORIES } from './data.js?v=261105184951';
+import * as db from './db.js?v=261105184951';
+import * as S from './views-shop.js?v=261105184951';
+import * as Lg from './views-legal.js?v=261105184951';
+import * as A from './views-admin.js?v=261105184951';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -24,7 +24,7 @@ function header() {
   const msgs = ['tick1', 'tick2', 'tick3', 'tick4', 'tick5'];
   return html`<a class="skip" href="#main">${t('skip')}</a>
   <div class="ticker" role="region" aria-label="${getLang() === 'he' ? 'הודעות' : 'Announcements'}"><div class="wrap">
-    <div class="ticker-track" aria-live="off">${msgs.map((k, i) => html`<p class="ticker-msg ${i ? '' : 'on'}" ${raw(i ? 'aria-hidden="true"' : '')}>${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}">${t(k)}</a>` : k === 'tick1' ? html`<span>${t(k)}</span><a class="tk-more" href="#/terms">${getLang() === 'he' ? 'לפרטים' : 'Details'}</a>` : html`<span>${t(k)}</span>`}</p>`)}</div></div></div>
+    <div class="mq" aria-live="off"><div class="mq-in">${[0, 1].map((r) => html`<div class="mq-set" ${raw(r ? 'aria-hidden="true"' : '')}>${msgs.map((k) => html`<span class="mq-i">${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}" tabindex="${r ? '-1' : '0'}">${t(k)}</a>` : t(k)}</span><i class="mq-dot" aria-hidden="true">✦</i>`)}</div>`)}</div></div></div></div></div>
   <header class="hdr"><div class="wrap">
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <button class="icon-btn m-search" data-action="search-open" aria-label="${t('search')}" aria-haspopup="dialog">${raw(ICONS.search)}</button>
@@ -47,27 +47,36 @@ function header() {
 function mobileMenu() {
   const he = getLang() === 'he'; const T2 = (a, b) => (he ? a : b);
   const all = db.products().filter((p) => p.active !== false);
-  const cats = CATEGORIES.map((c) => ({ ...c, n: all.filter((p) => p.cat === c.id).length })).filter((c) => c.img).sort((a, b) => !!b.n - !!a.n);
-  const best = all.filter((p) => p.tag === 'best').slice(0, 3);
-  const sm = (x) => (x || '').replace(/(?<!-sm)\.webp$/, '-sm.webp');
-  const hr = new Date().getHours();
-  const hello = hr < 12 ? T2('בוקר טוב', 'Good morning') : hr < 18 ? T2('צהריים טובים', 'Good afternoon') : T2('ערב טוב', 'Good evening');
+  const ICO = {
+    home: '<path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>', all: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+    diffusers: '<path d="M12 3c2 3 5 5.5 5 9a5 5 0 01-10 0c0-3.5 3-6 5-9z"/>', oils: '<path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/>', dubai: '<path d="M9 3h6v3l2 3v11a1 1 0 01-1 1H8a1 1 0 01-1-1V9l2-3z"/>',
+    hair: '<path d="M6 4h12v4H6zM8 8v12h8V8"/>', home2: '<path d="M14 4l6 6-9 9H5v-6z"/>', bundles: '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/>', glass: '<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 16l5-5 4 4 3-3 4 4"/><circle cx="15" cy="9" r="1.5"/>',
+    rent: '<path d="M4 20V9l8-5 8 5v11M9 20v-6h6v6"/>', ws: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2"/>', star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>', info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>', phone: '<path d="M5 3h4l2 5-2.5 1.5a11 11 0 006 6L16 13l5 2v4a2 2 0 01-2 2A16 16 0 013 5a2 2 0 012-2"/>',
+  };
+  const ic = (k) => raw(`<svg class="mm-ic" viewBox="0 0 24 24" aria-hidden="true">${ICO[k] || ICO.all}</svg>`);
+  const catIco = { diffusers: 'diffusers', oils: 'oils', dubai: 'dubai', hair: 'hair', home: 'home2', bundles: 'bundles', glass: 'glass' };
   const u = db.me();
-  return html`<div class="mnp">
-    <div class="mnp-top"><a class="mnp-logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-wide.webp" alt="SAY Boutique" width="923" height="350" loading="lazy"></a></div>
-    <p class="mnp-hello">${hello}${u ? `, ${u.name.split(' ')[0]}` : ''} <span aria-hidden="true">✦</span></p>
-    <h2 class="mnp-q">${T2('איזה ריח בא לכם היום?', 'What will you smell like today?')}</h2>
-    <button class="mnp-search" data-action="search-open" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>${T2('חפשו מלון, בושם או מכשיר…', 'Search a hotel, perfume or device…')}</button>
-    <a class="mnp-finder" href="#/finder"><span class="mnp-f-k">${T2('לא בטוחים?', 'Not sure?')}</span><b>${T2('מצאו את הריח שלכם ב־30 שניות', 'Find your scent in 30 seconds')}</b><i aria-hidden="true">${he ? '←' : '→'}</i></a>
-    <p class="mnp-h">${T2('קטגוריות', 'Shop by category')}<a href="#/shop">${T2('לכל החנות', 'Shop all')}</a></p>
-    <div class="mnp-cats">${cats.map((c, k) => html`<a class="mnp-cat" href="#/shop/${c.id}" style-d="${k}"><span class="mnp-ci"><img src="${sm(c.id === 'diffusers' ? 'assets/products/say-150-3.webp' : c.img)}" alt="" loading="lazy" width="200" height="200"></span><b>${c[getLang()]}</b><small>${c.n ? `${c.n} ${T2('מוצרים', 'items')}` : T2('בקרוב', 'Soon')}</small></a>`)}</div>
-    <a class="mnp-deal" href="#/shop/bundles"><span class="mnp-deal-k">${T2('מבצעים', 'Deals')}</span><b>${T2('מארזים במחיר מיוחד', 'Bundles at a special price')}</b><small>${T2('+ 15% לחברי מועדון בהזמנה ראשונה', '+ 15% off a first order for members')}</small></a>
-    ${best.length ? html`<p class="mnp-h">${T2('הכי אהובים עכשיו', 'Loved right now')}</p>
-    <div class="mnp-best">${best.map((p) => html`<a href="#/product/${p.id}"><span><img src="${sm(p.img)}" alt="" loading="lazy" width="120" height="120"></span><b>${p.name?.[getLang()] || p.name?.he}</b><em>${T2('רב מכר', 'Bestseller')}</em></a>`)}</div>` : ''}
-    <button class="mnp-lang" data-action="lang" type="button">${he ? 'English' : 'עברית'}</button>
-    <nav class="mnp-links" aria-label="${T2('עוד', 'More')}"><a href="#/rental">${T2('מסלול שירות חודשי לעסקים', 'Monthly service for business')}</a><a href="#/wholesale">${T2('לעסקים וסיטונאים', 'For business')}</a><a href="#/reviews">${T2('לקוחות ממליצים', 'Reviews')}</a><a href="#/about">${t('about')}</a><a href="#/contact">${t('contact')}</a><a href="#/account" class="mnp-sup">${T2('כניסה לספקים', 'Supplier login')}</a><a href="#/account">${u ? T2('החשבון שלי', 'My account') : T2('התחברות / הצטרפות למועדון', 'Sign in / join the club')}</a></nav>
-    <ul class="mnp-trust"><li><b>${T2('משלוח חינם', 'Free shipping')}</b>${T2('מעל 299 ₪', 'over ₪299')}</li><li><b>${T2('14 יום', '14 days')}</b>${T2('להחזרה', 'returns')}</li><li><b>${T2('מחיר יבואן', 'Importer')}</b>${T2('ישר לצרכן', 'prices')}</li></ul>
-    <a class="mnp-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer"><span class="mnp-dot" aria-hidden="true"></span><span><b>${T2('צריכים עזרה בבחירה?', 'Need help choosing?')}</b>${T2('כתבו לנו בוואטסאפ, אנחנו עונים מהר', 'WhatsApp us, we reply fast')}</span></a>
+  return html`<div class="mm">
+    <a class="mm-logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-wide-light.webp" alt="SAY Boutique" width="923" height="350" loading="lazy"></a>
+    <a class="mm-care" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 00-7.8 13.5L3 21l4.6-1.2A9 9 0 1012 3z"/></svg>${T2('שירות לקוחות', 'Customer care')}</a>
+    <nav class="mm-list" aria-label="${T2('תפריט ראשי', 'Main menu')}">
+      <a href="#/">${ic('home')}<span>${T2('ראשי', 'Home')}</span></a>
+      <a href="#/shop">${ic('all')}<span>${T2('כל המוצרים', 'All products')}</span></a>
+      <p class="mm-k">${T2('קטגוריות', 'Categories')}</p>
+      ${CATEGORIES.map((c) => { const n = all.filter((p) => p.cat === c.id).length; const subs = (db.SITE.subs?.[c.he] || []).filter((s2) => all.some((p) => p.sub === s2));
+        return subs.length ? html`<details class="mm-acc"><summary>${ic(catIco[c.id])}<span>${c[getLang()]}</span><i aria-hidden="true"></i></summary>
+          <div class="mm-subs"><a href="#/shop/${c.id}">${T2('לכל ה', 'All ')}${c[getLang()]}</a>${subs.map((s2) => html`<a href="#/shop/${c.id}/${encodeURIComponent(s2)}">${db.SITE.site?.subEn && !he ? db.SITE.site.subEn[s2] || s2 : s2.replace(/[–-].*$/, '').trim()}</a>`)}<a class="mm-all" href="#/shop/${c.id}">${T2('לכל הקטגוריה', 'Whole category')} ←</a></div></details>`
+          : html`<a href="#/shop/${c.id}">${ic(catIco[c.id])}<span>${c[getLang()]}</span>${n ? '' : html`<small>${T2('בקרוב', 'Soon')}</small>`}</a>`; })}
+      <a class="mm-sale" href="#/shop/bundles"><svg class="mm-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12l-8 8-9-9V3h8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg><span>SALE</span></a>
+      <p class="mm-k">${T2('עוד', 'More')}</p>
+      <a href="#/rental">${ic('rent')}<span>${T2('השכרה ושירות חודשי לעסקים', 'Rental & monthly service')}</span></a>
+      <a href="#/wholesale">${ic('ws')}<span>${T2('הצעה וסיטונאות', 'Quotes & wholesale')}</span></a>
+      <a href="#/reviews">${ic('star')}<span>${T2('לקוחות ממליצים', 'Reviews')}</span></a>
+      <a href="#/about">${ic('info')}<span>${t('about')}</span></a>
+      <a href="#/contact">${ic('phone')}<span>${t('contact')}</span></a>
+      <a href="#/account">${ic('all')}<span>${u ? T2('החשבון שלי', 'My account') : T2('התחברות / מועדון לקוחות', 'Sign in / club')}</span></a>
+    </nav>
+    <div class="mm-foot"><button class="mm-lang" data-action="lang" type="button">${he ? 'English' : 'עברית'}</button><a class="mm-cta" href="#/contact">${t('contact')}</a></div>
   </div>`;
 }
 
@@ -97,6 +106,7 @@ function footer() {
     <div class="ftr-bottom"><span>© ${y} SAY Boutique · ${t('rights')}</span>
       <a class="credit" href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener">${t('builtBy')}</a></div>
   </div></footer>
+  ${db.me() ? '' : html`<button class="fab fab-gift" data-action="promo-open" aria-label="${getLang() === 'he' ? '15% הנחה למצטרפים למועדון' : '15% off for club members'}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M3 13h18M12 9v12M12 9C10 5 6 5 7 8c.5 1.3 3 1 5 1zm0 0c2-4 6-4 5-1-.5 1.3-3 1-5 1z"/></svg></button>`}
   <a class="fab fab-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer" aria-label="${t('whatsapp')} ${PHONE_DISPLAY}">${raw(ICONS.wa)}</a>
   <button class="fab fab-a11y" data-action="a11y" aria-label="${t('a11yTitle')}" aria-expanded="false" aria-controls="a11y-panel">${raw(ICONS.a11y)}</button>
   ${a11yPanel()}
@@ -189,7 +199,7 @@ function startSlides() {
 
 // ---------- Consent ----------
 // ---------- Sign-up promo (glass), 7s after load, only for visitors who aren't signed in ----------
-function maybePromo() {
+function maybePromo(delay = 7000) {
   setTimeout(function show() {
     if (db.me() || /^#\/(account|admin|orders|courier|checkout)/.test(location.hash) || $('#promo')) return;
     if (document.body.classList.contains('cart-open') || $('#modal') || $('#search-ov')) { setTimeout(show, 2500); return; }
@@ -221,7 +231,7 @@ function maybePromo() {
     document.body.append(w); requestAnimationFrame(() => w.classList.add('in'));
     setTimeout(() => { const x = $('.promo-x', w); if (x) { x.hidden = false; x.classList.add('show'); } }, 3000);
     promoRelease = trapFocus(w.firstElementChild, closePromo);
-  }, 7000);
+  }, delay);
 }
 let promoRelease;
 function closePromo() { const w = $('#promo'); if (!w) return; w.remove(); promoRelease?.(); promoRelease = null; }
@@ -428,6 +438,7 @@ document.addEventListener('click', async (e) => {
     case 'search-open': if ($('#nav').classList.contains('open')) { $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); } openSearch(); break;
     case 'filter-open': modal(S.filterSheet(state.f)); break;
     case 'filter-clear': state.f = {}; rerender(); break;
+    case 'promo-open': maybePromo(0); break;
     case 'reel-toggle': { const v = el.parentElement.querySelector('video'); const he = getLang() === 'he'; if (v.paused) { v.play(); el.setAttribute('aria-pressed', 'false'); el.setAttribute('aria-label', he ? 'עצירת הסרטון' : 'Pause video'); el.classList.remove('paused'); } else { v.pause(); el.setAttribute('aria-pressed', 'true'); el.setAttribute('aria-label', he ? 'הפעלת הסרטון' : 'Play video'); el.classList.add('paused'); } break; }
     case 'rv-ok': db.setReview(id, 'approved'); rerender(); break;
     case 'rv-hide': db.setReview(id, 'hidden'); rerender(); break;

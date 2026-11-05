@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105184651';
-import { t, L, getLang } from './i18n.js?v=261105184651';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105184651';
-import * as db from './db.js?v=261105184651';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105184951';
+import { t, L, getLang } from './i18n.js?v=261105184951';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105184951';
+import * as db from './db.js?v=261105184951';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -153,7 +153,7 @@ export function home() {
     <div class="h-hero-copy">
       <p class="kicker latin">Luxury Home Fragrances</p>
       <h1 id="hero-t"><span>${t('heroTitle1')}</span> <em>${t('heroTitle2')}</em></h1>
-      <p class="h-hero-lead">${T('מפיצי ריח ותמציות שמן ברמת בתי המלון — במחיר של יבואן, עד הבית.', 'Hotel-grade diffusers and fragrance oils — at importer prices, to your door.')}</p>
+      <p class="h-hero-lead">${T('מכשירי SAY BOUTIQUE לסלון, חדר שינה ומשרד. ריח עדין ומתמשך שהופך כל חדר לחוויה.', 'SAY BOUTIQUE diffusers for the living room, bedroom and office. A soft, lasting scent that turns every room into an experience.')}</p>
       <nav class="h-cats2" aria-label="${t('categories')}"><p>${T('הקטגוריות שלנו', 'Our categories')}</p><div>${CATEGORIES.map((c) => { const n = all.filter((p) => p.cat === c.id).length; return html`<a href="#/shop/${c.id}" class="${n ? '' : 'soon'}"><span class="hc-img ${c.id === 'diffusers' ? 'studio' : ''}">${c.img ? html`<img src="${small(c.id === 'diffusers' ? 'assets/products/say-150-3.webp' : c.img)}" alt="" width="64" height="64">` : html`<img src="assets/img/mark.webp" alt="" width="64" height="56">`}</span>${L(c)}${n ? '' : html`<small>${T('בקרוב', 'soon')}</small>`}</a>`; })}</div></nav>
       <div class="h-hero-cta"><a class="btn" href="#/shop/diffusers">${T('לקולקציה', 'Explore')}</a><a class="u-link" href="#/finder">${T('מציאת הריח שלי', 'Find my scent')} <span aria-hidden="true">${arrow()}</span></a></div>
       ${hero.length ? html`<div class="h-count latin" aria-hidden="true"><b id="slide-n">01</b><span class="h-progress">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</span><span>0${hero.length}</span></div>
