@@ -3120,3 +3120,5 @@ html.a11y-stop .ox-art img,html.a11y-stop .mist i{animation:none!important}
 }
 @media (max-width:380px){.hdr .tools .m-lab{width:42px!important}.hdr .brand.logo img{height:34px!important}}
 @media (max-width:480px){.hdr .tools .m-lab{width:41px!important}.hdr .brand.logo img{height:36px!important}.hdr .wrap{padding-inline:10px!important}}
+@media (max-width:480px){.hdr .brand.logo img,body.scrolled .hdr .brand.logo img{height:44px!important}}
+@media (max-width:400px){.hdr .brand.logo img,body.scrolled .hdr .brand.logo img{height:41px!important}.hdr .tools .m-lab{width:38px!important}.hdr .wrap{padding-inline:8px!important}}
