@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105202145';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261105202145';
-import { CATEGORIES } from './data.js?v=261105202145';
-import * as db from './db.js?v=261105202145';
-import * as S from './views-shop.js?v=261105202145';
-import * as Lg from './views-legal.js?v=261105202145';
-import * as A from './views-admin.js?v=261105202145';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105202432';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261105202432';
+import { CATEGORIES } from './data.js?v=261105202432';
+import * as db from './db.js?v=261105202432';
+import * as S from './views-shop.js?v=261105202432';
+import * as Lg from './views-legal.js?v=261105202432';
+import * as A from './views-admin.js?v=261105202432';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -198,7 +198,7 @@ function maybePromo() {
     const I = (d) => raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`);
     render(w, html`<div class="supromo club-card cc3" role="dialog" aria-modal="true" aria-labelledby="pr-t">
       <button class="promo-x" hidden data-action="promo-close" aria-label="${t('close')}">${I('<path d="M6 6l12 12M18 6L6 18"/>')}</button>
-      <figure class="c3-art" aria-hidden="true"><img src="assets/products/hero-0.webp" alt="" width="900" height="1100"><figcaption><span>SAY</span><span>CLUB</span></figcaption></figure>
+      <figure class="c3-art" aria-hidden="true"><img src="assets/products/hero-0.webp" alt="" width="900" height="1100"><figcaption><span>SAY</span><span>CLUB</span></figcaption><span class="c3-seal"><b>15%</b><small>${he ? 'הנחה' : 'OFF'}</small></span></figure>
       <div class="c3-body">
         <p class="c3-k">SAY CLUB · ${he ? 'מועדון החברים' : 'Members'}</p>
         <h2 id="pr-t">${he ? 'נהנים יותר.' : 'Enjoy more.'}</h2>
