@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105184951';
-import { t, L, getLang } from './i18n.js?v=261105184951';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105184951';
-import * as db from './db.js?v=261105184951';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105185532';
+import { t, L, getLang } from './i18n.js?v=261105185532';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105185532';
+import * as db from './db.js?v=261105185532';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -175,7 +175,7 @@ export function home() {
   </section>
 
   <section class="rl" aria-labelledby="rl-t"><div class="wrap rl-in">
-    <figure class="rl-vid"><video src="assets/video/say-reel.mp4" poster="assets/video/say-reel-poster.webp" autoplay muted loop playsinline preload="metadata" width="720" height="900" aria-label="${T('סרטון קצר על מוצרי SAY', 'A short film about SAY products')}"></video>
+    <figure class="rl-vid"><video src="assets/video/say-reel.mp4?v=2" poster="assets/video/say-reel-poster.webp" autoplay muted loop playsinline preload="metadata" width="720" height="900" aria-label="${T('סרטון קצר על מוצרי SAY', 'A short film about SAY products')}"></video>
       <button class="rl-toggle" data-action="reel-toggle" aria-label="${T('עצירת הסרטון', 'Pause video')}" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button></figure>
     <div class="rl-copy"><p class="hz-k">${T('15 שניות של SAY', '15 seconds of SAY')}</p>
       <h2 id="rl-t">${T('את הריח אי אפשר לצלם.', 'You cannot film a scent.')}<br><em>${T('אבל אפשר להרגיש אותו.', 'But you can feel it.')}</em></h2>
