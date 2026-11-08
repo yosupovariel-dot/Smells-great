@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261105204013';
-import { t, L, getLang } from './i18n.js?v=261105204013';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261105204013';
-import * as db from './db.js?v=261105204013';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261108175009';
+import { t, L, getLang } from './i18n.js?v=261108175009';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261108175009';
+import * as db from './db.js?v=261108175009';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -84,10 +84,8 @@ export function card(p, opts = {}) {
   if (p.cat === 'oils' && p.pack) return labelCard(p);
   const { main, alt, studio } = cardImgs(p);
   const direct = !(p.quote || p.picks || p.options?.length || p.sizes.length > 1);
-  const fam = p.picks ? 'DISCOVERY KIT' : ({ diffusers: 'DIFFUSERS', bundles: 'BUNDLE', oils: 'FRAGRANCE OIL' })[p.cat] || '';
-  return html`<article class="card ${studio ? 'studio' : 'photo'}">
-    <img class="card-mark" src="assets/img/mark.webp" alt="" width="34" height="30" loading="lazy">
-    <span class="lbl-fam latin card-fam">${fam}</span>
+  return html`<article class="card pc ${studio ? 'studio' : 'photo'}">
+    <img class="card-logo" src="assets/img/logo-wide.webp" alt="" width="923" height="350" loading="lazy">
     <a class="card-media" href="#/product/${p.id}" tabindex="-1" aria-hidden="true">
       ${media(p, 'm1', false, main)}${alt ? media(p, 'm2', false, alt) : ''}
       ${p.tag ? html`<span class="card-tag in-media">${t('tag_' + p.tag)}</span>` : ''}
@@ -245,7 +243,7 @@ export function home() {
       <a class="btn" href="#/product/bundle-car-kit">${T('לפרטי המארז', 'View bundle')}</a></div></section>` : ''}
 
   <section class="h-service" aria-label="${T('שירות', 'Service')}"><div class="wrap">
-    <div><b>${T('משלוח חינם', 'Free delivery')}</b><p>${T('בכל הזמנה מעל 299₪, עד הבית בתוך 3–5 ימי עסקים.', 'On orders over ₪299, at your door in 3–5 business days.')}</p></div>
+    <div><b>${T('משלוח חינם', 'Free delivery')}</b><p>${T('בכל הזמנה מעל 299₪, עד הבית בתוך 7–10 ימים.', 'On orders over ₪299, at your door in 7–10 days.')}</p></div>
     <div><b>${T('אחריות יבואן', 'Importer warranty')}</b><p>${T('שנת אחריות יבואן על SAY 150, SAY 300 ו-SAY 400.', 'One-year importer warranty on SAY 150, 300 and 400.')}</p></div>
     <div><b>${T('ליווי אישי', 'Personal advice')}</b><p>${T('לא בטוחים מה מתאים לחלל שלכם? כתבו לנו ונמליץ.', 'Not sure what suits your space? Message us.')} <a href="${waLink(T('שלום, אשמח להמלצה', 'Hello, I would like a recommendation'))}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
     <div><b>${T('לעסקים', 'For business')}</b><p>${T('מחירי סיטונאות והתקנת סטנדים.', 'Wholesale prices and stand installation.')} <a href="#/wholesale">${T('לפרטים', 'Details')}</a></p></div>
@@ -485,7 +483,7 @@ export function productPage(id) {
         <p class="err" id="add-err" role="alert"></p>
       </form>`}
       ${p.cat === 'oils' && p.sizes.length > 2 ? html`<p class="unit-note">${T('ככל שהבקבוק גדול יותר — המחיר למ"ל נמוך יותר. האחוז מציין את החיסכון לעומת 10 מ"ל.', 'Bigger bottles cost less per ml — the % shows the saving vs 10 ml.')}</p>` : ''}
-      <ul class="trust" aria-label="${T('ההבטחה שלנו', 'Our promise')}"><li><b>${T('14 יום', '14 days')}</b><span>${T('להחזרה', 'to return')}</span></li><li><b>${WARRANTY.has(p.id) ? T('שנה', '1 year') : T('3–5 ימים', '3–5 days')}</b><span>${WARRANTY.has(p.id) ? T('אחריות יבואן', 'warranty') : T('עד הבית', 'delivery')}</span></li><li><b>SSL</b><span>${T('תשלום מאובטח', 'secure payment')}</span></li></ul>
+      <ul class="trust" aria-label="${T('ההבטחה שלנו', 'Our promise')}"><li><b>${T('14 יום', '14 days')}</b><span>${T('להחזרה', 'to return')}</span></li><li><b>${WARRANTY.has(p.id) ? T('שנה', '1 year') : T('7–10 ימים', '7–10 days')}</b><span>${WARRANTY.has(p.id) ? T('אחריות יבואן', 'warranty') : T('עד הבית', 'delivery')}</span></li><li><b>SSL</b><span>${T('תשלום מאובטח', 'secure payment')}</span></li></ul>
       <ul class="perks"><li>${t('perk1')}</li><li>${t('perk2')}</li>${WARRANTY.has(p.id) ? html`<li>${T('שנת אחריות יבואן', '1-year importer warranty')}</li>` : ''}${p.cat === 'diffusers' ? html`<li><a href="#/guide">${T('מדריך שימוש ותחזוקה', 'Use & care guide')}</a></li>` : html`<li>${t('perk3')}</li>`}</ul>
     </div>
   </div>
@@ -587,7 +585,7 @@ export function guide() {
   return html`<div class="wrap legal rich"><p class="eyebrow">SAY Boutique</p><h1>${T('מדריך שימוש, מיקום ותחזוקה', 'Use, placement & care guide')}</h1>${richText(g)}</div>`;
 }
 
-const TRUST = () => html`<ul class="trust3"><li><b>${T('14 יום', '14 days')}</b>${T('להחזרה', 'to return')}</li><li><b>${T('3–5 ימים', '3–5 days')}</b>${T('עד הבית', 'delivery')}</li><li><b>${T('וואטסאפ', 'WhatsApp')}</b>${T('תמיכה אישית', 'support')}</li></ul>`;
+const TRUST = () => html`<ul class="trust3"><li><b>${T('14 יום', '14 days')}</b>${T('להחזרה', 'to return')}</li><li><b>${T('7–10 ימים', '7–10 days')}</b>${T('עד הבית', 'delivery')}</li><li><b>${T('וואטסאפ', 'WhatsApp')}</b>${T('תמיכה אישית', 'support')}</li></ul>`;
 const isDirect = (p) => !(p.quote || p.picks || p.options?.length || p.sizes.length > 1);
 export function cartDrawer() {
   const tt = db.cartTotals(); const u = db.me();
@@ -645,7 +643,7 @@ export function checkout() {
         <div class="row2">${f('city', t('city'), 'text', 'address-level2')}${f('street', t('street'), 'text', 'street-address')}</div>
         ${f('apt', t('apt'), 'text', 'off', false)}
         <details class="co-notes"><summary>${T('הוספת הערה לשליח', 'Add a note for the courier')}</summary><textarea class="input" id="notes" name="notes" rows="2" maxlength="300"></textarea></details>
-        <p class="co-eta">${T('משלוח עד הבית תוך 3–5 ימי עסקים', 'Home delivery in 3–5 business days')}${left ? '' : html` · <b>${T('חינם', 'free')}</b>`}</p></section>
+        <p class="co-eta">${T('משלוח עד הבית תוך 7–10 ימים', 'Home delivery in 7–10 days')}${left ? '' : html` · <b>${T('חינם', 'free')}</b>`}</p></section>
       ${tt.pointsAvail >= 100 ? html`<label class="co-pts"><input type="checkbox" data-input="use-points" ${raw(db.usingPoints() ? 'checked' : '')}><span><b>${T(`יש לכם ${tt.pointsAvail} נקודות`, `You have ${tt.pointsAvail} points`)}</b>${T('לממש אותן בהזמנה הזאת (כל 100 נקודות = 10 ₪)', 'Use them on this order (100 points = ₪10)')}</span></label>` : u && u.role !== 'wholesale' ? html`<p class="co-pts-earn">${T(`על ההזמנה הזאת תצברו ${Math.floor(tt.total - tt.shipping)} נקודות`, `This order earns ${Math.floor(tt.total - tt.shipping)} points`)}</p>` : ''}
       <section class="co-box"><h2><span>3</span>${t('payment')}</h2><p class="muted">${t('payNote')}</p>
         <label class="check"><input type="checkbox" name="agree" required aria-describedby="agree-e"><span>${t('agree')}<a href="#/terms" target="_blank">${t('terms')}</a>${t('and')}<a href="#/privacy" target="_blank">${t('privacy')}</a></span></label>
@@ -876,4 +874,21 @@ export function reviewsPage() {
         <button class="btn" type="submit">${T('שליחת ביקורת', 'Send review')}</button>
       </form></section>
   </div></div><div class="block"></div>`;
+}
+
+// Checkout: a device without an oil to fill it.
+export const needsOil = () => { const ls = db.cartTotals().lines; return ls.some((l) => l.p.cat === 'diffusers') && !ls.some((l) => l.p.cat === 'oils' || l.p.picks || /1l|5x100|kit/.test(l.p.id)); };
+export function oilNudge() {
+  const pick = ['oil-king-david', 'oil-hilton', 'oil-white-tea'].map((id) => db.product(id)).filter((p) => p && p.active !== false);
+  const kit = db.product('kit-14');
+  const sz = (p) => p.sizes.find((x) => x.label === '100 מ"ל') || p.sizes[0];
+  return html`<div class="modal-bg on-bg"><div class="on" role="dialog" aria-modal="true" aria-labelledby="on-t">
+    <button class="on-x" data-action="modal-close" aria-label="${t('close')}">×</button>
+    <p class="c3-k">${T('רגע לפני שמסיימים', 'One moment')}</p>
+    <h2 id="on-t">${T('המכשיר מגיע בלי תמצית', 'The device comes without oil')}</h2>
+    <p class="on-sub">${T('כדי שתוכלו להפעיל אותו כבר ביום שהחבילה מגיעה — הוסיפו שמן למילוי:', 'So you can use it the day it arrives — add an oil:')}</p>
+    <div class="on-list">${pick.map((p) => html`<div class="on-it"><span class="on-img">${media(p, '', false, p.img)}</span><span class="on-t"><b>${L(p.name)}</b><small>${sz(p).label} · ${m(sz(p).price)}</small></span><button class="on-add" data-action="oil-add" data-id="${p.id}" data-size="${sz(p).label}">${T('הוספה', 'Add')} +</button></div>`)}
+      ${kit ? html`<div class="on-it kit"><span class="on-img">${media(kit, '', false, kit.img)}</span><span class="on-t"><b>${T('לא בטוחים איזה ריח?', 'Not sure which scent?')}</b><small>${T('ערכת 14 ריחות', '14-scent kit')} · ${m(minPrice(kit))}</small></span><a class="on-add" href="#/product/${kit.id}" data-action="modal-close">${T('לבחירה', 'Choose')}</a></div>` : ''}</div>
+    <button class="on-skip" data-action="oil-skip">${T('להמשיך בלי תמצית', 'Continue without oil')}</button>
+  </div></div>`;
 }

@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261105204013';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261105204013';
-import { CATEGORIES } from './data.js?v=261105204013';
-import * as db from './db.js?v=261105204013';
-import * as S from './views-shop.js?v=261105204013';
-import * as Lg from './views-legal.js?v=261105204013';
-import * as A from './views-admin.js?v=261105204013';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261108175009';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261108175009';
+import { CATEGORIES } from './data.js?v=261108175009';
+import * as db from './db.js?v=261108175009';
+import * as S from './views-shop.js?v=261108175009';
+import * as Lg from './views-legal.js?v=261108175009';
+import * as A from './views-admin.js?v=261108175009';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -200,27 +200,29 @@ function maybePromo() {
       <button class="promo-x" hidden data-action="promo-close" aria-label="${t('close')}">${I('<path d="M6 6l12 12M18 6L6 18"/>')}</button>
       <figure class="c3-art" aria-hidden="true"><img src="assets/products/hero-0.webp" alt="" width="900" height="1100"><span class="c3-seal"><b>15%</b><small>${he ? 'הנחה' : 'OFF'}</small></span></figure>
       <div class="c3-body">
-        <p class="c3-k">SAY CLUB · ${he ? 'הרשמה חינם לאתר' : 'Free sign-up'}</p>
-        <h2 id="pr-t"><em>15%</em> ${he ? 'הנחה' : 'off'}</h2>
-        <p class="c3-sub"><b>${he ? 'על הקנייה הראשונה' : 'on your first order'}</b>${he ? ' — לכל מי שנרשם לאתר. ההנחה מופעלת אוטומטית בקופה.' : ' — for everyone who signs up. Applied automatically at checkout.'}</p>
-        <ul class="c3-perks two">
-          <li>${I('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5l1.4 2.9 3.1.4-2.3 2.2.6 3.1-2.8-1.5-2.8 1.5.6-3.1-2.3-2.2 3.1-.4z"/>')}<span><b>${he ? 'צבירת נקודות' : 'Earn points'}</b>${he ? 'ששוות כסף בקנייה הבאה' : 'worth money next time'}</span></li>
-          <li>${I('<path d="M4 21h16M5 21v-7h14v7M8 14v-3h8v3M12 11V8M12 4.5c.8.9.8 1.8 0 2.5-.8-.7-.8-1.6 0-2.5z"/>')}<span><b>${he ? 'הטבת יום הולדת' : 'Birthday treat'}</b>${he ? 'מפנקת במיוחד' : 'something special'}</span></li>
+        <p class="c3-k">SAY CLUB</p>
+        <h2 id="pr-t">${he ? 'נהנים יותר!' : 'Enjoy more!'}</h2>
+        <p class="c3-sub">${he ? 'מצטרפים למועדון ונהנים מהטבות בלעדיות:' : 'Join the club for exclusive perks:'}</p>
+        <ul class="c3-list">
+          <li>${I('<rect x="3" y="9" width="18" height="12" rx="1"/><path d="M3 13h18M12 9v12M12 9C10 5 6 5 7 8c.5 1.3 3 1 5 1zm0 0c2-4 6-4 5-1-.5 1.3-3 1-5 1z"/>')}<b>${he ? '15% הנחה מיידית לקנייה הראשונה!' : '15% off your first order!'}</b></li>
+          <li>${I('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5l1.4 2.9 3.1.4-2.3 2.2.6 3.1-2.8-1.5-2.8 1.5.6-3.1-2.3-2.2 3.1-.4z"/>')}<span>${he ? 'צבירת נקודות בכל רכישה (ששוות כסף בקניות הבאות)' : 'Earn points on every order (worth money next time)'}</span></li>
+          <li>${I('<path d="M4 21h16M5 21v-7h14v7M8 14v-3h8v3M12 11V8M12 4.5c.8.9.8 1.8 0 2.5-.8-.7-.8-1.6 0-2.5z"/>')}<span>${he ? 'הטבה מפנקת במיוחד ביום ההולדת' : 'A special birthday treat'}</span></li>
         </ul>
         <form class="c3-form" data-form="club-join" novalidate>
-          <label class="c3-in">${I('<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.2-6.5 8-6.5s7 2 8 6.5"/>')}<input name="name" autocomplete="name" required maxlength="80" placeholder="${he ? 'שם מלא' : 'Full name'}" aria-label="${he ? 'שם מלא' : 'Full name'}"></label>
-          <label class="c3-in">${I('<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>')}<input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="15" placeholder="${he ? 'טלפון' : 'Phone'}" aria-label="${he ? 'טלפון' : 'Phone'}"></label>
-          <label class="c3-in">${I('<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3.5 6.5l8.5 6 8.5-6"/>')}<input name="email" type="email" autocomplete="email" required maxlength="120" placeholder="${he ? 'אימייל' : 'Email'}" aria-label="${he ? 'אימייל' : 'Email'}"></label>
-          <label class="c3-in">${I('<rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/>')}<input name="password" type="password" autocomplete="new-password" required maxlength="80" placeholder="${he ? 'סיסמה (8+ תווים)' : 'Password (8+ chars)'}" aria-label="${he ? 'סיסמה' : 'Password'}"></label>
-          <label class="cc-check c3-check"><input type="checkbox" name="agree" required><span>${he ? 'מאשר/ת הצטרפות למועדון וקבלת עדכונים בוואטסאפ ובמייל. רק מבצעים שווים והטבות בלעדיות.' : 'I agree to join and get updates by WhatsApp and email. Only great offers.'}</span></label>
+          <label class="c3-in">${I('<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.2-6.5 8-6.5s7 2 8 6.5"/>')}<input name="name" autocomplete="name" required maxlength="80" placeholder="${he ? 'שם מלא *' : 'Full name *'}" aria-label="${he ? 'שם מלא' : 'Full name'}"></label>
+          <label class="c3-in">${I('<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>')}<input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="15" placeholder="${he ? 'מספר טלפון *' : 'Phone *'}" aria-label="${he ? 'טלפון' : 'Phone'}"></label>
+          <label class="c3-in">${I('<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3.5 6.5l8.5 6 8.5-6"/>')}<input name="email" type="email" autocomplete="email" required maxlength="120" placeholder="${he ? 'דואר אלקטרוני *' : 'Email *'}" aria-label="${he ? 'אימייל' : 'Email'}"></label>
+          <label class="c3-in">${I('<rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/>')}<input name="password" type="password" autocomplete="new-password" required maxlength="80" placeholder="${he ? 'בחרו סיסמה (8+ תווים, אות ומספר) *' : 'Choose a password *'}" aria-label="${he ? 'סיסמה' : 'Password'}"></label>
+          <label class="cc-check c3-check"><input type="checkbox" name="agree" required><span>${he ? 'מאשר/ת הצטרפות למועדון וקבלת עדכונים בוואטסאפ ובמייל. מבטיחים לא לחפור – רק מבצעים שווים והטבות בלעדיות!' : 'I agree to join and get updates by WhatsApp and email. Only great offers.'}</span></label>
           <p class="cc-err" role="alert"></p>
-          <button class="c3-go" type="submit">${he ? 'הרשמה וקבלת 15% הנחה' : 'Sign up & get 15% off'}</button>
+          <button class="c3-go" type="submit">${he ? 'אני רוצה 15% הנחה והצטרפות!' : 'I want 15% off & join!'}</button>
         </form>
         <a class="c3-login" href="#/account" data-action="promo-close">${he ? 'כבר חברים? התחברות' : 'Already a member? Sign in'}</a>
       </div>
     </div>`);
     document.body.append(w); requestAnimationFrame(() => w.classList.add('in'));
     setTimeout(() => { const x = $('.promo-x', w); if (x) { x.hidden = false; x.classList.add('show'); } }, 3000);
+    w.addEventListener('click', (e) => { if (e.target === w && !$('.promo-x', w)?.hidden) closePromo(); });
     promoRelease = trapFocus(w.firstElementChild, closePromo);
   }, 7000);
 }
@@ -429,6 +431,8 @@ document.addEventListener('click', async (e) => {
     case 'search-open': if ($('#nav').classList.contains('open')) { $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); } openSearch(); break;
     case 'filter-open': modal(S.filterSheet(state.f)); break;
     case 'filter-clear': state.f = {}; rerender(); break;
+    case 'oil-add': { db.addToCart(id, el.dataset.size, 1); closeModal(); rerender(); toast(getLang() === 'he' ? 'התמצית נוספה להזמנה' : 'Oil added'); break; }
+    case 'oil-skip': { closeModal(); const f = $('form[data-form="checkout"]'); f?.requestSubmit(); break; }
     case 'reel-toggle': { const v = el.parentElement.querySelector('video'); const he = getLang() === 'he'; if (v.paused) { v.play(); el.setAttribute('aria-pressed', 'false'); el.setAttribute('aria-label', he ? 'עצירת הסרטון' : 'Pause video'); el.classList.remove('paused'); } else { v.pause(); el.setAttribute('aria-pressed', 'true'); el.setAttribute('aria-label', he ? 'הפעלת הסרטון' : 'Play video'); el.classList.add('paused'); } break; }
     case 'rv-ok': db.setReview(id, 'approved'); rerender(); break;
     case 'rv-hide': db.setReview(id, 'hidden'); rerender(); break;
@@ -609,6 +613,7 @@ document.addEventListener('submit', async (e) => {
     db.addReview(r); f.innerHTML = `<p class="rv-thanks">${he ? 'תודה רבה! הביקורת תתפרסם אחרי אישור קצר.' : 'Thank you! Your review will appear after a quick check.'}</p>`; return;
   }
   if (kind === 'checkout') {
+    if (!state.oilAsked && S.needsOil()) { state.oilAsked = true; modal(S.oilNudge()); return; }
     btn.disabled = true;
     try { const o = S.checkoutSubmit(f); if (o) { state.lastOrder = o; location.hash = '#/done'; } } finally { btn.disabled = false; }
   }

@@ -3331,3 +3331,56 @@ body.scrolled .hdr .wrap{padding-inline:clamp(14px,2.5vw,28px)!important}
 @media (max-width:760px) and (max-height:740px){.cc3 .c3-art{height:84px!important}.cc3 .c3-sub{font-size:.76rem}}
 @media (max-width:760px){.cc3 .promo-x{top:22px!important;left:20px!important;border:0!important;box-shadow:0 4px 12px -4px rgba(0,0,0,.35)!important}.cc3 .c3-art::after{inset:10px}}
 .cc3 .promo-x{border:0!important}
+/* Club popup: original wording in the current design */
+.cc3 h2{display:block!important;font-size:clamp(2.3rem,4.4vw,3.1rem)!important}
+.c3-list{list-style:none;padding:.9rem 0;margin:0 0 1rem;display:grid;gap:.6rem;border-top:1px solid #e6dccb;border-bottom:1px solid #e6dccb}
+.c3-list li{display:flex;align-items:center;gap:.7rem;font-size:.95rem;color:#2b2620;line-height:1.4}
+.c3-list svg{flex:0 0 26px;width:26px;height:26px;fill:none;stroke:#A9874F;stroke-width:1.25;stroke-linejoin:round;stroke-linecap:round}
+.c3-list b{color:#16130F;font-weight:700}
+@media (max-width:760px){.cc3 .c3-sub{display:block!important;font-size:.85rem;margin-bottom:.5rem}.c3-list{padding:.55rem 0;gap:.4rem;margin-bottom:.6rem}.c3-list li{font-size:.84rem}.c3-list svg{flex-basis:22px;width:22px;height:22px}}
+@media (max-width:760px) and (max-height:740px){.cc3 .c3-sub{display:none!important}.c3-list li{font-size:.78rem}}
+/* ===== Product cards v4: warm stage, big floating product, wide logo on top ===== */
+.card.pc{position:relative;display:flex;flex-direction:column;padding:0!important;overflow:hidden;background:linear-gradient(180deg,#FBF6EE 0%,#F2E7D8 100%)!important;border:1px solid rgba(169,135,79,.32)!important;border-radius:0!important;box-shadow:none!important}
+.card.pc::before,.card.pc::after{display:none!important}
+.card.pc .card-logo{display:block;height:30px;width:auto;margin:1rem auto .2rem;position:relative;z-index:2}
+.card.pc .card-media{position:relative;display:block;margin:0!important;border:0!important;border-radius:0!important;aspect-ratio:1/1!important;overflow:visible!important;background:radial-gradient(70% 60% at 50% 48%,#FFFFFF 0%,rgba(255,255,255,0) 72%)!important}
+.card.pc.studio .card-media img{position:absolute;inset:6% 10% 16%!important;width:80%!important;height:78%!important;object-fit:contain!important;padding:0!important;mix-blend-mode:multiply;background:none!important;opacity:1!important;animation:pcFloat 4.2s ease-in-out infinite;transform-origin:50% 100%}
+.card.pc.studio .card-media .m2{display:none!important}
+.card.pc.studio .card-media::after{content:"";position:absolute;left:24%;right:24%;bottom:9%;height:7%;border-radius:50%;background:radial-gradient(closest-side,rgba(22,19,15,.26),rgba(22,19,15,0));animation:pcShadow 4.2s ease-in-out infinite;z-index:0}
+.card.pc.photo .card-media{aspect-ratio:4/3.4!important;overflow:hidden!important;margin:.4rem .9rem 0!important}
+.card.pc.photo .card-media img{object-fit:cover!important}
+.card.pc:nth-child(2n) .card-media img,.card.pc:nth-child(2n) .card-media::after{animation-delay:-1.4s}
+.card.pc:nth-child(3n) .card-media img,.card.pc:nth-child(3n) .card-media::after{animation-delay:-2.8s}
+.card.pc:hover .card-media img{animation-duration:2.6s}
+.card.pc .card-tag.in-media{top:8px!important;z-index:3}
+.card.pc .card-body{background:transparent!important;padding:.4rem 1.1rem 1.1rem!important;text-align:center;flex:1;display:flex;flex-direction:column;align-items:center}
+.card.pc .card-body h3{font-size:1.3rem!important;margin:0 0 .25rem!important}
+.card.pc .card-body .price,.card.pc .card-body .price-tag{margin-top:auto}
+.card.pc .card-add{z-index:3}
+@keyframes pcFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-9px) rotate(-1.2deg)}}
+@keyframes pcShadow{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(.82);opacity:.6}}
+@media (max-width:600px){.card.pc .card-logo{height:22px;margin-top:.7rem}.card.pc .card-body{padding:.2rem .7rem .9rem!important}.card.pc .card-body h3{font-size:1.05rem!important}}
+@media (prefers-reduced-motion:reduce){.card.pc .card-media img,.card.pc .card-media::after{animation:none!important}}
+html.a11y-stop .card.pc .card-media img,html.a11y-stop .card.pc .card-media::after{animation:none!important}
+.card.pc .card-add{opacity:1!important;transform:none!important;top:auto!important;bottom:14px!important;inset-inline-start:auto!important;inset-inline-end:14px!important;left:14px!important;right:auto!important;width:42px!important;height:42px!important;border-radius:50%!important;background:#16130F!important;color:#fff!important;display:grid!important;place-items:center;box-shadow:0 10px 20px -10px rgba(0,0,0,.5)}
+[dir="ltr"] .card.pc .card-add{right:14px!important;left:auto!important}
+.card.pc .card-add svg{width:18px;height:18px;stroke:#fff}
+.card.pc .card-add:hover{background:#7E6236!important}
+.card.pc .card-logo{height:36px}
+@media (max-width:600px){.card.pc .card-add{width:36px!important;height:36px!important;bottom:10px!important;left:10px!important}.card.pc .card-logo{height:24px}}
+/* Oil reminder at checkout */
+.on-bg{position:fixed;inset:0;z-index:160;display:grid;place-items:center;padding:16px;background:rgba(16,13,10,.6);backdrop-filter:blur(5px)}
+.on{position:relative;width:min(520px,100%);background:#FBF8F3;padding:1.8rem 1.6rem 1.3rem;border-top:3px solid #C9AD7A;box-shadow:0 40px 90px -30px rgba(0,0,0,.7)}
+.on h2{font:500 clamp(1.7rem,4vw,2.2rem)/1.1 "Frank Ruhl Libre",serif;margin:0 0 .4rem}
+.on-sub{margin:0 0 1rem;color:#4a4238;font-size:.95rem}
+.on-x{position:absolute;top:10px;left:12px;width:36px;height:36px;border:0;background:#fff;border-radius:50%;font-size:1.3rem;cursor:pointer}
+.on-list{display:grid;gap:.5rem}
+.on-it{display:grid;grid-template-columns:56px 1fr auto;gap:.8rem;align-items:center;background:#fff;border:1px solid #ece4d6;padding:.5rem .7rem}
+.on-it.kit{border-style:dashed;border-color:#A9874F}
+.on-img{width:56px;height:56px;overflow:hidden;background:#F2E7D8;display:block}
+.on-img img,.on-img svg{width:100%;height:100%;object-fit:cover}
+.on-t{display:flex;flex-direction:column}.on-t b{font-size:.95rem}.on-t small{color:var(--muted);font-size:.8rem}
+.on-add{border:0;background:#16130F;color:#fff;font:inherit;font-weight:700;font-size:.85rem;padding:.55rem .9rem;cursor:pointer;text-decoration:none;white-space:nowrap}
+.on-skip{display:block;margin:1rem auto 0;background:none;border:0;color:#6d6457;text-decoration:underline;font:inherit;font-size:.88rem;cursor:pointer}
+@media (max-width:600px){.on-bg{place-items:end center;padding:0}.on{border-radius:18px 18px 0 0}}
+.c3-form .c3-in:nth-of-type(4){grid-column:1/-1}
