@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261109111024';
-import { t, L, getLang } from './i18n.js?v=261109111024';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261109111024';
-import * as db from './db.js?v=261109111024';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261109111511';
+import { t, L, getLang } from './i18n.js?v=261109111511';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261109111511';
+import * as db from './db.js?v=261109111511';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -252,9 +252,7 @@ export function home() {
 
 export const clubBlock = () => html`<section class="block club" aria-labelledby="club-t"><div class="wrap">
   <p class="eyebrow latin">Members Club</p><h2 id="club-t">${t('clubTitle')}</h2><p>${t('clubText')}</p>
-  <form data-form="club" novalidate><label class="sr-only" for="club-email">${t('email')}</label>
-  <input class="input" id="club-email" name="email" type="email" autocomplete="email" required placeholder="${t('email')}" maxlength="120">
-  <button class="btn" type="submit">${t('clubBtn')}</button></form>
+  ${db.me() ? html`<a class="btn" href="#/account">${T('לאזור האישי', 'My account')}</a>` : html`<button class="btn club-join-btn" data-action="join-club" type="button">${T('הצטרפות למועדון — 15% הנחה', 'Join the club — 15% off')}</button>`}
   <p class="sr-only" aria-live="polite" id="club-msg"></p>
 </div></section>`;
 
@@ -510,6 +508,7 @@ export function productPage(id) {
         </div>
         <p class="err" id="add-err" role="alert"></p>
       </form>`}
+      ${p.cat === 'oils' && db.product('kit-14') ? (() => { const kit = db.product('kit-14'); const per = Math.round(minPrice(kit) / 14); return html`<a class="ml10" href="#/product/${kit.id}" ${raw(ml(p.sizes[0].label) === 10 ? '' : 'hidden')}><span class="ml10-ic" aria-hidden="true">✦</span><span><b>${T('לוקחים 10 מ"ל כדי לנסות?', 'Trying a 10 ml?')}</b>${T(`הרכיבו ערכה של 14 ריחות לבחירתכם — ${m(minPrice(kit))} בלבד, כ־${per} ₪ לריח במקום ${m(p.sizes[0].price)}`, `Build a 14-scent kit — only ${m(minPrice(kit))}, about ₪${per} per scent`)}</span><i aria-hidden="true">${he() ? '←' : '→'}</i></a>`; })() : ''}
       ${p.cat === 'oils' && p.sizes.length > 2 ? html`<p class="unit-note">${T('ככל שהבקבוק גדול יותר — המחיר למ"ל נמוך יותר. האחוז מציין את החיסכון לעומת 10 מ"ל.', 'Bigger bottles cost less per ml — the % shows the saving vs 10 ml.')}</p>` : ''}
       <ul class="trust" aria-label="${T('ההבטחה שלנו', 'Our promise')}"><li><b>${T('14 יום', '14 days')}</b><span>${T('להחזרה', 'to return')}</span></li><li><b>${WARRANTY.has(p.id) ? T('שנה', '1 year') : T('7-10 ימים', '7–10 days')}</b><span>${WARRANTY.has(p.id) ? T('אחריות יבואן', 'warranty') : T('עד הבית', 'delivery')}</span></li><li><b>SSL</b><span>${T('תשלום מאובטח', 'secure payment')}</span></li></ul>
       <ul class="perks"><li>${t('perk1')}</li><li>${t('perk2')}</li>${WARRANTY.has(p.id) ? html`<li>${T('שנת אחריות יבואן', '1-year importer warranty')}</li>` : ''}${p.cat === 'diffusers' ? html`<li><a href="#/guide">${T('מדריך שימוש ותחזוקה', 'Use & care guide')}</a></li>` : html`<li>${t('perk3')}</li>`}</ul>
@@ -647,7 +646,8 @@ export function cartDrawer() {
   const count = tt.lines.reduce((a, l) => a + l.qty, 0);
   const pool = tt.lines.length ? complements(tt.lines[0].p, 8).filter((x) => !x.quote && !tt.lines.some((l) => l.pid === x.id)) : [];
   // Best add-on: the cheapest one that unlocks free shipping, else the first suggestion.
-  const up = left ? (pool.filter((x) => minPrice(x) >= left).sort((a, b) => minPrice(a) - minPrice(b))[0] || pool[0]) : pool[0];
+  const kit14 = db.product('kit-14'); const has10 = tt.lines.some((l) => ml(l.size) === 10) && kit14 && !tt.lines.some((l) => l.pid === kit14.id);
+  const up = has10 ? kit14 : left ? (pool.filter((x) => minPrice(x) >= left).sort((a, b) => minPrice(a) - minPrice(b))[0] || pool[0]) : pool[0];
   return html`<header class="cd-head"><h2 id="cart-t">${t('cart')} <span>${count ? `(${count})` : ''}</span></h2><button class="icon-btn" data-action="cart-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button></header>
   <div class="drawer-body">
     ${tt.lines.length ? html`
@@ -659,10 +659,10 @@ export function cartDrawer() {
           <div class="cd-row"><div class="qty"><button data-action="line-qty" data-i="${i}" data-d="-1" aria-label="${t('decrease')}">−</button><input aria-label="${t('qty')}" value="${l.qty}" readonly><button data-action="line-qty" data-i="${i}" data-d="1" aria-label="${t('increase')}">+</button></div><b>${m(l.price * l.qty)}</b></div>
           <button class="link-btn cd-rm" data-action="line-rm" data-i="${i}">${t('remove')}</button></div>
       </div>`)}
-      ${up ? html`<div class="cd-up"><p class="cd-up-k">${left && minPrice(up) >= left ? T('מוסיפים את זה — והמשלוח חינם', 'Add this and delivery is free') : T('לקוחות הוסיפו גם', 'Customers also added')}</p>
+      ${up ? html`<div class="cd-up"><p class="cd-up-k">${has10 ? T('לוקחים 10 מ"ל? הרכיבו ערכה של 14 ריחות במחיר מוזל', 'Taking 10 ml? Build a 14-scent kit for less') : left && minPrice(up) >= left ? T('מוסיפים את זה — והמשלוח חינם', 'Add this and delivery is free') : T('לקוחות הוסיפו גם', 'Customers also added')}</p>
         <div class="cd-up-row"><span class="line-media">${media(up)}</span><span><b>${L(up.name)}</b><small>${m(minPrice(up))}</small></span>
         ${isDirect(up) ? html`<button class="cd-add" data-action="quick-add" data-id="${up.id}">${T('הוספה', 'Add')} +</button>` : html`<a class="cd-add" href="#/product/${up.id}" data-action="cart-close">${T('לבחירה', 'Choose')}</a>`}</div></div>` : ''}
-      ${!u && !tt.discount ? html`<a class="cd-club" href="#/account/register" data-action="cart-close"><span aria-hidden="true">🎁</span><span><b>${T('15% הנחה על ההזמנה הזאת', '15% off this order')}</b>${T('הצטרפו למועדון בחינם — לוקח 20 שניות', 'Join the club free — takes 20 seconds')}</span></a>` : ''}
+      ${!u && !tt.discount ? html`<a class="cd-club" href="#/account/register" data-action="join-club"><span aria-hidden="true">🎁</span><span><b>${T('מגיע לכם 15% הנחה על ההזמנה הזאת', 'You deserve 15% off this order')}</b>${T(`חוסכים ${m(Math.round(tt.subtotal * 0.15))} — הצטרפות חינם למועדון, 20 שניות`, `Save ${m(Math.round(tt.subtotal * 0.15))} — free to join, 20 seconds`)}</span></a>` : ''}
     ` : html`<div class="cd-empty"><span aria-hidden="true">🛍️</span><p><b>${T('העגלה עדיין ריקה', 'Your bag is empty')}</b>${T('בואו נמצא לכם ריח שתתאהבו בו.', 'Let us find a scent you will love.')}</p><a class="btn" href="#/finder" data-action="cart-close">${T('מציאת הריח שלי', 'Find my scent')}</a><a class="u-link" href="#/shop" data-action="cart-close">${t('continueShop')}</a></div>`}
   </div>
   ${tt.lines.length ? html`<footer class="cd-foot">${totalsBlock(tt)}
@@ -687,7 +687,7 @@ export function checkout() {
     <h1 class="co-h">${T('עוד רגע והריח בדרך אליכם', 'Almost there — your scent is on its way')}</h1>
     <div class="checkout co">
     <form data-form="checkout" novalidate>
-      ${!u ? html`<p class="co-login">${T('כבר חברי מועדון?', 'Already a member?')} <a href="#/account">${T('התחברו וקבלו 15% הנחה', 'Sign in for 15% off')}</a></p>` : ''}
+      ${!u ? html`<p class="co-login">${T('כבר חברי מועדון?', 'Already a member?')} <a href="#/account">${T('התחברו', 'Sign in')}</a> · <a href="#/account/register" data-action="join-club">${T('או הצטרפו וקבלו 15% הנחה', 'or join for 15% off')}</a></p>` : ''}
       <section class="co-box"><h2><span>1</span>${T('איך ניצור קשר?', 'How do we reach you?')}</h2>
         <div class="row2">${f('name', t('fullName'), 'text', 'name', true, u?.name || '')}${f('phone', t('phone'), 'tel', 'tel', true, u?.phone || '', '050-0000000')}</div>
         ${f('email', t('email'), 'email', 'email', true, u?.email || '', T('לשליחת אישור ההזמנה', 'For your order confirmation'))}</section>

@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261109111024';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261109111024';
-import { CATEGORIES } from './data.js?v=261109111024';
-import * as db from './db.js?v=261109111024';
-import * as S from './views-shop.js?v=261109111024';
-import * as Lg from './views-legal.js?v=261109111024';
-import * as A from './views-admin.js?v=261109111024';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261109111511';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261109111511';
+import { CATEGORIES } from './data.js?v=261109111511';
+import * as db from './db.js?v=261109111511';
+import * as S from './views-shop.js?v=261109111511';
+import * as Lg from './views-legal.js?v=261109111511';
+import * as A from './views-admin.js?v=261109111511';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -35,7 +35,7 @@ function header() {
     </nav>
     <a class="brand logo" href="#/" aria-label="SAY Boutique — ${t('home')}"><img src="assets/img/logo-wide.webp" alt="SAY Boutique — Luxury Home Fragrances" width="923" height="350" fetchpriority="high"></a>
     <div class="tools">
-      <a class="tool-link" href="#/rental">${getLang() === 'he' ? 'השכרה' : 'Rental'}</a><a class="tool-link" href="#/reviews">${getLang() === 'he' ? 'ביקורות' : 'Reviews'}</a><a class="tool-link" href="#/contact">${t('contact')}</a>
+      ${db.me() ? '' : html`<button class="join-pill" data-action="join-club" type="button">${getLang() === 'he' ? 'מועדון חברים · 15%' : 'Club · 15% off'}</button>`}<a class="tool-link" href="#/rental">${getLang() === 'he' ? 'השכרה' : 'Rental'}</a><a class="tool-link" href="#/reviews">${getLang() === 'he' ? 'ביקורות' : 'Reviews'}</a><a class="tool-link" href="#/contact">${t('contact')}</a>
       <button class="icon-btn lang-btn" data-action="lang" lang="${getLang() === 'he' ? 'en' : 'he'}" aria-label="${t('langLabel')}">${getLang() === 'he' ? 'EN' : 'עב'}</button>
       <button class="icon-btn" data-action="search-open" aria-label="${t('search')}" aria-haspopup="dialog">${raw(ICONS.search)}</button>
       <a class="icon-btn m-ws m-lab" href="#/wholesale" aria-label="${t('wholesale')}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2M3 13h18"/></svg><small>${t('wholesale')}</small></a><a class="icon-btn m-lab" href="#/account" aria-label="${t('account')}">${raw(ICONS.user)}<small>${getLang() === 'he' ? 'כניסה' : 'Sign in'}</small></a>
@@ -65,6 +65,7 @@ function mobileMenu() {
     ${best.length ? html`<p class="mnp-h">${T2('הכי אהובים עכשיו', 'Loved right now')}</p>
     <div class="mnp-best">${best.map((p) => html`<a href="#/product/${p.id}"><span><img src="${sm(p.img)}" alt="" loading="lazy" width="120" height="120"></span><b>${p.name?.[getLang()] || p.name?.he}</b><em>${T2('רב מכר', 'Bestseller')}</em></a>`)}</div>` : ''}
     <button class="mnp-lang" data-action="lang" type="button">${he ? 'English' : 'עברית'}</button>
+    <button class="mnp-join" data-action="join-club" type="button"><span>✦</span>${T2('הצטרפות למועדון החברים — 15% הנחה', 'Join the club — 15% off')}</button>
     <nav class="mnp-links" aria-label="${T2('עוד', 'More')}"><a href="#/rental">${T2('מסלול שירות חודשי לעסקים', 'Monthly service for business')}</a><a href="#/wholesale">${T2('לעסקים וסיטונאים', 'For business')}</a><a href="#/reviews">${T2('לקוחות ממליצים', 'Reviews')}</a><a href="#/about">${t('about')}</a><a href="#/contact">${t('contact')}</a><a href="#/account" class="mnp-sup">${T2('כניסה לספקים', 'Supplier login')}</a><a href="#/account">${u ? T2('החשבון שלי', 'My account') : T2('התחברות / הצטרפות למועדון', 'Sign in / join the club')}</a></nav>
     <ul class="mnp-trust"><li><b>${T2('משלוח חינם', 'Free shipping')}</b>${T2('מעל 299 ₪', 'over ₪299')}</li><li><b>${T2('14 יום', '14 days')}</b>${T2('להחזרה', 'returns')}</li><li><b>${T2('מחיר יבואן', 'Importer')}</b>${T2('ישר לצרכן', 'prices')}</li></ul>
     <a class="mnp-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer"><span class="mnp-dot" aria-hidden="true"></span><span><b>${T2('צריכים עזרה בבחירה?', 'Need help choosing?')}</b>${T2('כתבו לנו בוואטסאפ, אנחנו עונים מהר', 'WhatsApp us, we reply fast')}</span></a>
@@ -189,16 +190,16 @@ function startSlides() {
 
 // ---------- Consent ----------
 // ---------- Sign-up promo (glass), 7s after load, only for visitors who aren't signed in ----------
-function maybePromo() {
+function maybePromo(delay = 7000, force = false) {
   setTimeout(function show() {
-    if (db.me() || /^#\/(account|admin|orders|courier|checkout)/.test(location.hash) || $('#promo')) return;
+    if (db.me() || $('#promo') || (!force && /^#\/(account|admin|orders|courier|checkout)/.test(location.hash))) return;
     if (document.body.classList.contains('cart-open') || $('#modal') || $('#search-ov')) { setTimeout(show, 2500); return; }
     const he = getLang() === 'he';
     const w = document.createElement('div'); w.id = 'promo'; w.className = 'promo-bg';
     const I = (d) => raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`);
     render(w, html`<div class="supromo club-card cc3" role="dialog" aria-modal="true" aria-labelledby="pr-t">
       <button class="promo-x" hidden data-action="promo-close" aria-label="${t('close')}">${I('<path d="M6 6l12 12M18 6L6 18"/>')}</button>
-      <figure class="c3-art" aria-hidden="true"><img src="assets/products/hero-0.webp" alt="" width="900" height="1100"><span class="c3-seal"><b>15%</b><small>${he ? 'הנחה' : 'OFF'}</small></span></figure>
+      <figure class="c3-art" aria-hidden="true"><div class="mcard"><span class="mc-shine"></span><img class="mc-logo" src="assets/img/logo-wide-light.webp" alt="" width="923" height="350"><span class="mc-chip"></span><span class="mc-label">MEMBER</span><span class="mc-no" dir="ltr">SAY · CLUB · 0015</span><span class="mc-pct"><b>15%</b><small>${he ? 'הנחה' : 'OFF'}</small></span></div><figcaption>${he ? 'הכרטיס שלכם למועדון SAY' : 'Your SAY Club card'}</figcaption></figure>
       <div class="c3-body">
         <p class="c3-k">SAY CLUB</p>
         <h2 id="pr-t">${he ? 'נהנים יותר!' : 'Enjoy more!'}</h2>
@@ -221,10 +222,10 @@ function maybePromo() {
       </div>
     </div>`);
     document.body.append(w); requestAnimationFrame(() => w.classList.add('in'));
-    setTimeout(() => { const x = $('.promo-x', w); if (x) { x.hidden = false; x.classList.add('show'); } }, 3000);
+    setTimeout(() => { const x = $('.promo-x', w); if (x) { x.hidden = false; x.classList.add('show'); } }, force ? 0 : 3000);
     w.addEventListener('click', (e) => { if (e.target === w && !$('.promo-x', w)?.hidden) closePromo(); });
     promoRelease = trapFocus(w.firstElementChild, closePromo);
-  }, 7000);
+  }, delay);
 }
 let promoRelease;
 function closePromo() { const w = $('#promo'); if (!w) return; w.remove(); promoRelease?.(); promoRelease = null; }
@@ -431,6 +432,7 @@ document.addEventListener('click', async (e) => {
     case 'search-open': if ($('#nav').classList.contains('open')) { $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); } openSearch(); break;
     case 'filter-open': modal(S.filterSheet(state.f)); break;
     case 'filter-clear': state.f = {}; rerender(); break;
+    case 'join-club': e.preventDefault(); if (document.body.classList.contains('cart-open')) $('[data-action="cart-close"]')?.click(); if ($('#nav')?.classList.contains('open')) $('[data-action="menu-close"]')?.click(); if (db.me()) { location.hash = '#/account'; break; } maybePromo(0, true); break;
     case 'gd-jump': e.preventDefault(); document.getElementById(el.dataset.t)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); break;
     case 'oil-add': { db.addToCart(id, el.dataset.size, 1); closeModal(); rerender(); toast(getLang() === 'he' ? 'התמצית נוספה להזמנה' : 'Oil added'); break; }
     case 'oil-skip': { closeModal(); const f = $('form[data-form="checkout"]'); f?.requestSubmit(); break; }
@@ -542,6 +544,7 @@ document.addEventListener('change', (e) => {
     if (now) now.textContent = fmt(+el.dataset.price);
     if (was) { was.hidden = !w; $('s', was).textContent = w ? fmt(w) : ''; $('em', was).textContent = w ? `−${el.dataset.save}%` : ''; }
     if (note) note.hidden = !w;
+    const k = $('.ml10'); if (k) k.hidden = !/^10\s*מ"ל$|^10\s*ml$/i.test(el.value.trim());
   }
   if (k === 'opt' && el.dataset.img) {
     const want = el.dataset.img.replace(/-sm\.webp$/, '.webp'); const slides = $$('.pg-slide'); let i = slides.findIndex((f) => f.querySelector('img').getAttribute('src').replace(/-sm\.webp$/, '.webp') === want);
