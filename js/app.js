@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261108175009';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261108175009';
-import { CATEGORIES } from './data.js?v=261108175009';
-import * as db from './db.js?v=261108175009';
-import * as S from './views-shop.js?v=261108175009';
-import * as Lg from './views-legal.js?v=261108175009';
-import * as A from './views-admin.js?v=261108175009';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261109111024';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261109111024';
+import { CATEGORIES } from './data.js?v=261109111024';
+import * as db from './db.js?v=261109111024';
+import * as S from './views-shop.js?v=261109111024';
+import * as Lg from './views-legal.js?v=261109111024';
+import * as A from './views-admin.js?v=261109111024';
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -323,7 +323,7 @@ function observeBuy() {
   const btn = $('form[data-form="add"] [type="submit"]'); const p = location.hash.startsWith('#/product/') && db.product(location.hash.split('/')[2]);
   if (!btn || !p) return;
   const bar = document.createElement('div'); bar.className = 'buy-bar'; bar.setAttribute('aria-hidden', 'true');
-  render(bar, html`<div class="wrap"><span class="bb-name">${p.name[getLang()]}</span><span class="bb-price" id="bb-price">${$('#pdp-price')?.textContent || ''}</span><button class="btn" data-action="buy-bar" tabindex="-1">${t('addToCart')}</button></div>`);
+  render(bar, html`<div class="wrap"><span class="bb-name">${p.name[getLang()]}</span><span class="bb-price" id="bb-price">${($('.pp-now') || $('#pdp-price'))?.textContent || ''}</span><button class="btn" data-action="buy-bar" tabindex="-1">${t('addToCart')}</button></div>`);
   document.body.append(bar);
   buyObs = new IntersectionObserver(([e]) => bar.classList.toggle('on', !e.isIntersecting && e.boundingClientRect.top < 0));
   buyObs.observe(btn);
@@ -431,6 +431,7 @@ document.addEventListener('click', async (e) => {
     case 'search-open': if ($('#nav').classList.contains('open')) { $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); } openSearch(); break;
     case 'filter-open': modal(S.filterSheet(state.f)); break;
     case 'filter-clear': state.f = {}; rerender(); break;
+    case 'gd-jump': e.preventDefault(); document.getElementById(el.dataset.t)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); break;
     case 'oil-add': { db.addToCart(id, el.dataset.size, 1); closeModal(); rerender(); toast(getLang() === 'he' ? 'התמצית נוספה להזמנה' : 'Oil added'); break; }
     case 'oil-skip': { closeModal(); const f = $('form[data-form="checkout"]'); f?.requestSubmit(); break; }
     case 'reel-toggle': { const v = el.parentElement.querySelector('video'); const he = getLang() === 'he'; if (v.paused) { v.play(); el.setAttribute('aria-pressed', 'false'); el.setAttribute('aria-label', he ? 'עצירת הסרטון' : 'Pause video'); el.classList.remove('paused'); } else { v.pause(); el.setAttribute('aria-pressed', 'true'); el.setAttribute('aria-label', he ? 'הפעלת הסרטון' : 'Play video'); el.classList.add('paused'); } break; }
@@ -535,7 +536,13 @@ document.addEventListener('change', (e) => {
   const el = e.target; const k = el.dataset.input; if (!k) return;
   const map = { sort: 'sort', range: 'range', pcat: 'pcat', ur: 'ur', om: 'om', os: 'os' };
   if (map[k]) { state[map[k]] = k === 'range' ? +el.value : el.value; rerender(); }
-  if (k === 'size') { const pr = $('#pdp-price'); if (pr) pr.firstChild.textContent = new Intl.NumberFormat(getLang() === 'he' ? 'he-IL' : 'en-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 }).format(+el.dataset.price); }
+  if (k === 'size') {
+    const fmt = (n) => new Intl.NumberFormat(getLang() === 'he' ? 'he-IL' : 'en-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 }).format(n);
+    const now = $('.pp-now'), was = $('.pp-was'), note = $('.pp-note'), w = +el.dataset.was || 0;
+    if (now) now.textContent = fmt(+el.dataset.price);
+    if (was) { was.hidden = !w; $('s', was).textContent = w ? fmt(w) : ''; $('em', was).textContent = w ? `−${el.dataset.save}%` : ''; }
+    if (note) note.hidden = !w;
+  }
   if (k === 'opt' && el.dataset.img) {
     const want = el.dataset.img.replace(/-sm\.webp$/, '.webp'); const slides = $$('.pg-slide'); let i = slides.findIndex((f) => f.querySelector('img').getAttribute('src').replace(/-sm\.webp$/, '.webp') === want);
     if (i < 0 && slides[0]) { slides[0].querySelector('img').src = el.dataset.img; i = 0; }

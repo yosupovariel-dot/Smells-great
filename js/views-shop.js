@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261108175009';
-import { t, L, getLang } from './i18n.js?v=261108175009';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261108175009';
-import * as db from './db.js?v=261108175009';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261109111024';
+import { t, L, getLang } from './i18n.js?v=261109111024';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261109111024';
+import * as db from './db.js?v=261109111024';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -147,30 +147,29 @@ export function home() {
   const kit = all.find((p) => p.picks === 14);
   const families = Object.keys(banners).map((f) => ({ f, img: banners[f], n: all.filter((p) => p.sub === f).length })).filter((x) => x.n);
   return html`
-  <section class="h-hero" aria-labelledby="hero-t">
-    <div class="h-hero-copy">
-      <p class="kicker latin">Luxury Home Fragrances</p>
-      <h1 id="hero-t"><span>${t('heroTitle1')}</span> <em>${t('heroTitle2')}</em></h1>
-      <p class="h-hero-lead">${T('מפיצי ריח ותמציות שמן ברמת בתי המלון — במחיר של יבואן, עד הבית.', 'Hotel-grade diffusers and fragrance oils — at importer prices, to your door.')}</p>
-      <nav class="h-cats2" aria-label="${t('categories')}"><p>${T('הקטגוריות שלנו', 'Our categories')}</p><div>${CATEGORIES.map((c) => { const n = all.filter((p) => p.cat === c.id).length; return html`<a href="#/shop/${c.id}" class="${n ? '' : 'soon'}"><span class="hc-img ${c.id === 'diffusers' ? 'studio' : ''}">${c.img ? html`<img src="${small(c.id === 'diffusers' ? 'assets/products/say-150-3.webp' : c.img)}" alt="" width="64" height="64">` : html`<img src="assets/img/mark.webp" alt="" width="64" height="56">`}</span>${L(c)}${n ? '' : html`<small>${T('בקרוב', 'soon')}</small>`}</a>`; })}</div></nav>
-      <div class="h-hero-cta"><a class="btn" href="#/shop/diffusers">${T('לקולקציה', 'Explore')}</a><a class="u-link" href="#/finder">${T('מציאת הריח שלי', 'Find my scent')} <span aria-hidden="true">${arrow()}</span></a></div>
-      ${hero.length ? html`<div class="h-count latin" aria-hidden="true"><b id="slide-n">01</b><span class="h-progress">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</span><span>0${hero.length}</span></div>
-      <div class="sr-only">${hero.map((_, i) => html`<button data-action="slide" data-i="${i}" aria-label="${T('שקופית', 'Slide')} ${i + 1}" aria-current="${i === 0}"></button>`)}</div>` : ''}
-    </div>
-    <div class="h-media">
+  <section class="hx" aria-labelledby="hero-t">
     <div class="h-slides" role="region" aria-roledescription="carousel" aria-label="${T('מוצרים נבחרים', 'Featured')}">
       ${hero.map((src, i) => html`<figure class="slide ${i ? '' : 'on'}"><img src="${src}" alt="${HERO_SLIDES[i]?.[getLang()] || 'SAY Boutique'}" width="2000" height="968" ${raw(i ? 'fetchpriority="low"' : 'fetchpriority="high"')} decoding="async"></figure>`)}
     </div>
+    <div class="hx-shade" aria-hidden="true"></div>
+    <div class="hx-copy wrap">
+      <p class="hx-k"><span class="hx-sale">SALE</span>Luxury Home Fragrances</p>
+      <h1 id="hero-t">${T('יוקרה שמרגישים', 'Luxury you can feel')}<br><em>${T('בכל חלל.', 'in every space.')}</em></h1>
+      <p class="hx-lead">${T('מפיצי ריח ותמציות שמן ברמת בתי המלון — לבית ולעסק, במחיר של יבואן.', 'Hotel-grade diffusers and fragrance oils for home and business, at importer prices.')}</p>
+      <div class="hx-cta"><a class="hx-btn" href="#/shop">${T('לקולקציה', 'Shop the collection')}</a><a class="hx-link" href="#/finder">${T('מציאת הריח שלי', 'Find my scent')}</a></div>
+    </div>
     ${hero.length ? html`<div class="h-offers">${HERO_SLIDES.slice(0, hero.length).map((sl, i) => { const p = db.product(sl.pid); const now = p ? minPrice(p) : 0; const was = p?.was > now ? p.was : 0;
       return html`<a class="h-offer ${i ? '' : 'on'}" href="#/product/${sl.pid}"><small class="h-k">${was ? html`<em class="h-sale">${T('מבצע', 'Sale')}</em>` : T('בחירת הבוטיק ✦', 'Boutique pick ✦')}</small><b>${sl[getLang()]}</b>
-        <span class="h-price">${now ? html`${was ? html`<s>${m(was)}</s>` : ''}<strong>${m(now)}</strong>` : html`<strong>${T('מחיר מיוחד — בוואטסאפ', 'Special price on WhatsApp')}</strong>`}</span><i><span>${T('לפרטים והזמנה', 'View & order')}</span> ${arrow()}</i></a>`; })}</div>` : ''}
-    <a class="seal" href="#/about" aria-label="${t('about')}">
-      ${sealSVG('SAY BOUTIQUE · LUXURY HOME FRAGRANCES · ')}
-      <img src="assets/img/mark.webp" alt="" width="90" height="78">
-    </a>
-    ${hero.length ? html`<div class="h-dots" aria-hidden="true">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>` : ''}
-    </div>
+        <span class="h-price">${now ? html`${was ? html`<s>${m(was)}</s>` : ''}<strong>${m(now)}</strong>` : html`<strong>${T('מחיר מיוחד — בוואטסאפ', 'Special price on WhatsApp')}</strong>`}</span><i><span>${T('לפרטים והזמנה', 'View & order')}</span> ${arrow()}</i></a>`; })}</div>
+    <div class="h-dots" aria-hidden="true">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>
+    <div class="sr-only">${hero.map((_, i) => html`<button data-action="slide" data-i="${i}" aria-label="${T('שקופית', 'Slide')} ${i + 1}" aria-current="${i === 0}"></button>`)}</div>` : ''}
   </section>
+
+  <nav class="hxc" aria-label="${t('categories')}"><div class="wrap"><div class="hxc-row">${CATEGORIES.map((c) => { const n = all.filter((p) => p.cat === c.id).length; return html`<a href="#/shop/${c.id}" class="${n ? '' : 'soon'}"><span class="hxc-img"><img src="${small(c.id === 'diffusers' ? 'assets/products/say-150-3.webp' : c.img || 'assets/img/mark.webp')}" alt="" width="120" height="120" loading="lazy"></span><b>${L(c)}</b>${n ? '' : html`<small>${T('בקרוב', 'soon')}</small>`}</a>`; })}</div></div></nav>
+
+  ${(() => { const best = [...all.filter((p) => p.tag === 'best'), ...['say-150', 'say-300', 'kit-14', 'say-100'].map((id) => db.product(id))].filter((p, i, a2) => p && p.active !== false && a2.indexOf(p) === i).slice(0, 8);
+    return html`<section class="hxp" aria-labelledby="hxp-t"><div class="wrap"><header class="hxp-h"><h2 id="hxp-t">${T('הכי נמכרים', 'Best sellers')}</h2><a class="u-link" href="#/shop">${T('לכל המוצרים', 'All products')} <span aria-hidden="true">${arrow()}</span></a></header>
+      <div class="grid shop-grid hxp-grid">${best.map((p) => card(p))}</div></div></section>`; })()}
 
   <section class="rl" aria-labelledby="rl-t"><div class="wrap rl-in">
     <figure class="rl-vid"><video src="assets/video/say-reel.mp4" poster="assets/video/say-reel-poster.webp" autoplay muted loop playsinline preload="metadata" width="720" height="900" aria-label="${T('סרטון קצר על מוצרי SAY', 'A short film about SAY products')}"></video>
@@ -243,7 +242,7 @@ export function home() {
       <a class="btn" href="#/product/bundle-car-kit">${T('לפרטי המארז', 'View bundle')}</a></div></section>` : ''}
 
   <section class="h-service" aria-label="${T('שירות', 'Service')}"><div class="wrap">
-    <div><b>${T('משלוח חינם', 'Free delivery')}</b><p>${T('בכל הזמנה מעל 299₪, עד הבית בתוך 7–10 ימים.', 'On orders over ₪299, at your door in 7–10 days.')}</p></div>
+    <div><b>${T('משלוח חינם', 'Free delivery')}</b><p>${T('בכל הזמנה מעל 299₪, עד הבית בתוך 7-10 ימים.', 'On orders over ₪299, at your door in 7–10 days.')}</p></div>
     <div><b>${T('אחריות יבואן', 'Importer warranty')}</b><p>${T('שנת אחריות יבואן על SAY 150, SAY 300 ו-SAY 400.', 'One-year importer warranty on SAY 150, 300 and 400.')}</p></div>
     <div><b>${T('ליווי אישי', 'Personal advice')}</b><p>${T('לא בטוחים מה מתאים לחלל שלכם? כתבו לנו ונמליץ.', 'Not sure what suits your space? Message us.')} <a href="${waLink(T('שלום, אשמח להמלצה', 'Hello, I would like a recommendation'))}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
     <div><b>${T('לעסקים', 'For business')}</b><p>${T('מחירי סיטונאות והתקנת סטנדים.', 'Wholesale prices and stand installation.')} <a href="#/wholesale">${T('לפרטים', 'Details')}</a></p></div>
@@ -429,6 +428,35 @@ function richText(text) {
 
 // Price per ml and saving vs the smallest size — an honest comparison, computed from the real prices.
 const ml = (label) => { const n = parseFloat(String(label).replace(/[^\d.]/g, '')); if (!n) return 0; return /ליטר|l\b/i.test(label) ? n * 1000 : n; };
+// Honest compare price: oils vs the same amount in the smallest bottle; others only with a real before-sale price.
+function cmpPrice(p, s, priceOf) {
+  const now = priceOf(s);
+  if (p.cat === 'oils') { const base = p.sizes.find((x) => ml(x.label)); const v = ml(s.label); if (base && v && s !== base) { const was = Math.round((priceOf(base) / ml(base.label)) * v); if (was > now) return { was, save: Math.round((1 - now / was) * 100) }; } return { was: 0, save: 0 }; }
+  return p.was > now ? { was: p.was, save: Math.round((1 - now / p.was) * 100) } : { was: 0, save: 0 };
+}
+const FIT = {
+  'say-car': ['רכב', 'חדר קטן', 'ארון בגדים', 'שירותים'], 'say-room-office': ['חדר שינה', 'משרד', 'חדר ילדים', 'שירותים', 'ארון'],
+  'say-100': ['סלון', 'דירה', 'משרד', 'חנות קטנה', 'קליניקה'], 'say-150': ['סלון', 'בית', 'מסדרון', 'חדר שינה', 'קליניקה'],
+  'say-300': ['לובי', 'משרד גדול', 'חנות', 'מסעדה', 'בית גדול'], 'say-400': ['לובי מלון', 'אולם', 'חנות גדולה', 'מסעדה', 'בניין משרדים'],
+};
+const spec = (p, ...keys) => { for (const k of keys) { const r = (p.specs || []).find(([a]) => a === k); if (r) return r[1]; } return ''; };
+const shortV = (v) => String(v || '').replace(/\s*\(.*$/, '').replace(/^.*[–-]\s*(?=עד|\d)/, '').trim();
+function specBoxes(p) {
+  if (p.cat !== 'diffusers' || !p.specs?.length) return BENEFIT[p.id] ? html`<p class="pdp-benefit">${T(...BENEFIT[p.id])}</p>` : '';
+  const cov = (spec(p, 'שטח כיסוי').match(/עד\s*[\d,]+\s*מ"[רק]/) || [shortV(spec(p, 'שטח כיסוי'))])[0];
+  const ctl = spec(p, 'שליטה ובקרה', 'שליטה'); const ctlS = /wi-?fi/i.test(ctl) ? 'Wi-Fi + אפליקציה' : /אפליקציה|bluetooth/i.test(ctl) ? 'אפליקציה + Bluetooth' : shortV(ctl) || shortV(spec(p, 'חיישן חכם')) || 'לחצן הפעלה';
+  const pow = shortV(spec(p, 'הספק', 'מקור כוח'));
+  const fill = shortV(spec(p, 'קיבולת מכל שמן', 'קיבולת בקבוק שמן', 'קיבולת בקבוק מילוי'));
+  const box = (ic, k, v) => v ? html`<li>${raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg>`)}<span><small>${k}</small><b>${v}</b></span></li>` : '';
+  return html`<ul class="pdp-specs">
+    ${box('<path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6"/>', T('כיסוי', 'Coverage'), cov)}
+    ${box('<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>', T('שליטה', 'Control'), ctlS.length > 26 ? ctlS.slice(0, 24) + '…' : ctlS)}
+    ${box('<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>', T('הספק', 'Power'), pow.length > 20 ? pow.slice(0, 18) + '…' : pow)}
+    ${box('<path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/>', T('מילוי', 'Tank'), fill)}
+  </ul>`;
+}
+const fitBlock = (p) => FIT[p.id] ? html`<div class="fit"><b>${T('מתאים ל:', 'Suits:')}</b>${FIT[p.id].map((x) => html`<span>${x}</span>`)}${(spec(p, 'שטח כיסוי').match(/עד\s*[\d,]+\s*מ"[רק]/) || [])[0] ? html`<em>${(spec(p, 'שטח כיסוי').match(/עד\s*[\d,]+\s*מ"[רק]/))[0]}</em>` : ''}</div>` : '';
+
 function perUnit(p, s, priceOf) {
   const base = p.sizes.find((x) => ml(x.label)); const v = ml(s.label);
   if (!base || !v || s === base) return { save: 0 };
@@ -458,14 +486,14 @@ export function productPage(id) {
       <div class="crumbs"><a href="#/">${t('home')}</a> / <a href="#/shop/${p.cat}">${catName(p.cat)}</a>${p.sub ? html` / <a href="#/shop/${p.cat}/${encodeURIComponent(p.sub)}">${subName(p.sub)}</a>` : ''}</div>
       <p class="eyebrow">${p.sub ? subName(p.sub) : catName(p.cat)}</p>
       <h1>${L(p.name)}</h1>
-      ${BENEFIT[p.id] ? html`<p class="pdp-benefit">${T(...BENEFIT[p.id])}</p>` : ''}
-      <p class="price big" id="pdp-price" aria-live="polite">${p.quote ? T('מחיר בהתאמה אישית', 'Price on request') : m(priceOf(p.sizes[0]))}${!p.quote && ws ? html` <s>${m(p.sizes[0].price)}</s> <span class="ws">${t('wsPrice')}</span>` : ''}</p>
+      ${specBoxes(p)}
+      ${p.quote ? html`<p class="price big" id="pdp-price">${T('מחיר בהתאמה אישית', 'Price on request')}</p>` : (() => { const c = cmpPrice(p, p.sizes[0], priceOf); return html`<div class="pp" id="pdp-price" aria-live="polite"><strong class="pp-now">${m(priceOf(p.sizes[0]))}</strong><span class="pp-was" ${raw(c.was ? '' : 'hidden')}><s>${c.was ? m(c.was) : ''}</s><em>${c.save ? `−${c.save}%` : ''}</em></span>${ws ? html`<span class="ws">${t('wsPrice')}</span>` : ''}</div>${p.cat === 'oils' ? html`<p class="pp-note" ${raw(c.was ? '' : 'hidden')}>${T('המחיר המחוק: אותה כמות בבקבוקי 10 מ"ל', 'Crossed price: the same amount in 10 ml bottles')}</p>` : ''}`; })()}
       ${p.quote ? html`<p>${he() ? p.desc.he.split('\n')[0] : p.desc.en || p.desc.he.split('\n')[0]}</p>
         <div class="q-row"><a class="q-wa" href="${waLink(T('שלום, אשמח להצעת מחיר עבור ', 'Hello, I would like a quote for ') + L(p.name))}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1a15 15 0 01-5.6-4.9c-.7-1-1.2-2.1-1.2-3.2 0-1 .5-1.6.8-1.9.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.1z" fill="currentColor"/></svg>${T('לקבלת הצעת מחיר בוואטסאפ', 'Get a quote on WhatsApp')}</a>
           <a class="q-tel" href="tel:+${PHONE_INTL}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 006 6L16 13l5 2v4a2 2 0 01-2 2A16 16 0 013 5a2 2 0 012-2"/></svg>${T('או התקשרו', 'Or call')} <b dir="ltr">${PHONE_DISPLAY}</b></a></div>` : html`
       <form data-form="add" data-id="${p.id}" novalidate>
         ${p.sizes.length > 1 ? html`<fieldset class="sizes"><legend>${p.cat === 'oils' ? T('נפח', 'Volume') : t('size')}</legend>
-          ${p.sizes.map((s, i) => { const v = perUnit(p, s, priceOf); return html`<label class="size-opt"><input type="radio" name="size" value="${s.label}" ${raw(i ? '' : 'checked')} data-input="size" data-price="${priceOf(s)}"><span>${s.label}${v.save ? html`<em>−${v.save}%</em>` : ''}</span></label>`; })}
+          ${p.sizes.map((s, i) => { const v = perUnit(p, s, priceOf); return html`<label class="size-opt"><input type="radio" name="size" value="${s.label}" ${raw(i ? '' : 'checked')} data-input="size" data-price="${priceOf(s)}" data-was="${cmpPrice(p, s, priceOf).was}" data-save="${cmpPrice(p, s, priceOf).save}"><span>${s.label}${v.save ? html`<em>−${v.save}%</em>` : ''}</span></label>`; })}
         </fieldset>` : html`<input type="hidden" name="size" value="${p.sizes[0].label}">`}
         ${opt ? html`<fieldset class="sizes"><legend>${L(opt.name)}</legend>
           ${opt.values.map((v, i) => html`<label class="size-opt"><input type="radio" name="opt" value="${v.he}" ${raw(i ? '' : 'checked')} data-input="opt" data-img="${v.imgs?.[0] || ''}"><span>${L(v)}</span></label>`)}
@@ -483,12 +511,12 @@ export function productPage(id) {
         <p class="err" id="add-err" role="alert"></p>
       </form>`}
       ${p.cat === 'oils' && p.sizes.length > 2 ? html`<p class="unit-note">${T('ככל שהבקבוק גדול יותר — המחיר למ"ל נמוך יותר. האחוז מציין את החיסכון לעומת 10 מ"ל.', 'Bigger bottles cost less per ml — the % shows the saving vs 10 ml.')}</p>` : ''}
-      <ul class="trust" aria-label="${T('ההבטחה שלנו', 'Our promise')}"><li><b>${T('14 יום', '14 days')}</b><span>${T('להחזרה', 'to return')}</span></li><li><b>${WARRANTY.has(p.id) ? T('שנה', '1 year') : T('7–10 ימים', '7–10 days')}</b><span>${WARRANTY.has(p.id) ? T('אחריות יבואן', 'warranty') : T('עד הבית', 'delivery')}</span></li><li><b>SSL</b><span>${T('תשלום מאובטח', 'secure payment')}</span></li></ul>
+      <ul class="trust" aria-label="${T('ההבטחה שלנו', 'Our promise')}"><li><b>${T('14 יום', '14 days')}</b><span>${T('להחזרה', 'to return')}</span></li><li><b>${WARRANTY.has(p.id) ? T('שנה', '1 year') : T('7-10 ימים', '7–10 days')}</b><span>${WARRANTY.has(p.id) ? T('אחריות יבואן', 'warranty') : T('עד הבית', 'delivery')}</span></li><li><b>SSL</b><span>${T('תשלום מאובטח', 'secure payment')}</span></li></ul>
       <ul class="perks"><li>${t('perk1')}</li><li>${t('perk2')}</li>${WARRANTY.has(p.id) ? html`<li>${T('שנת אחריות יבואן', '1-year importer warranty')}</li>` : ''}${p.cat === 'diffusers' ? html`<li><a href="#/guide">${T('מדריך שימוש ותחזוקה', 'Use & care guide')}</a></li>` : html`<li>${t('perk3')}</li>`}</ul>
     </div>
   </div>
   ${p.specs?.length ? html`<section class="specs" aria-labelledby="spec-t"><h2 id="spec-t">${T('מפרט טכני', 'Specifications')}</h2><table class="spec-tbl"><tbody>${p.specs.map(([k, v]) => html`<tr><th scope="row">${k}</th><td>${v}</td></tr>`)}</tbody></table></section>` : ''}
-  ${!p.quote ? html`<section class="rich" aria-label="${T('תיאור המוצר', 'Product description')}">${he() || !p.desc.en ? richText(p.desc.he) : richText(p.desc.en)}</section>` : ''}
+  ${!p.quote ? html`<section class="rich" aria-label="${T('תיאור המוצר', 'Product description')}">${fitBlock(p)}${he() || !p.desc.en ? richText(p.desc.he) : richText(p.desc.en)}</section>` : ''}
   <section class="block" aria-labelledby="comp-t"><h2 id="comp-t">${t('complements')}</h2><span class="rule"></span><div class="grid">${complements(p).map(card)}</div></section></div>`;
 }
 
@@ -580,12 +608,36 @@ export function finder(f = {}) {
   return html`<section class="finder wrap" aria-live="polite">${back}${body}</section><div class="block"></div>`;
 }
 
+const GUIDE = [
+  ['place', ['איפה למקם את המפיץ', 'Where to place it'], [
+    ['גובה', 'במקום גבוה ופתוח — מדף, שידה או קיר — כך שהערפל מתפזר באוויר ולא נבלע ברהיטים.', 'High and open — a shelf, sideboard or wall — so the mist spreads instead of hitting furniture.'],
+    ['זרימת אוויר', 'ליד מעבר אוויר טבעי (כניסה, מסדרון, פתח מיזוג) — האוויר "סוחב" את הריח לכל החלל.', 'Near natural airflow (entrance, hallway, AC vent) — moving air carries the scent through the room.'],
+    ['מה להימנע', 'לא צמוד לקיר או לווילון, לא מול חלון פתוח, ולא בשמש ישירה או ליד מקור חום.', 'Not against a wall or curtain, not facing an open window, not in direct sun or near heat.'],
+    ['גודל החלל', 'התאימו מכשיר לגודל החלל: רכב וחדר קטן — SAY Car / room & office; בית — SAY 100 / 150; עסק ולובי — SAY 300 / 400.', 'Match the device to the space: car/small room — SAY Car or room & office; home — SAY 100/150; business — SAY 300/400.']]],
+  ['use', ['הפעלה ומילוי', 'Use & refilling'], [
+    ['מילוי', 'מוזגים את התמצית ישירות לבקבוק המכשיר — בלי מים ובלי דילול. לא ממלאים מעל הקו המסומן.', 'Pour the oil straight into the device bottle — no water, no dilution. Do not fill above the line.'],
+    ['עוצמה ושעות', 'מתחילים בעוצמה נמוכה ומעלים בהדרגה. מומלץ להגדיר פעולה לסירוגין (למשל 30 שניות פעולה / 2 דקות הפסקה) ושעות פעילות באפליקציה או בלחצנים.', 'Start low and increase gradually. Use on/off cycles (e.g. 30s on / 2 min off) and set hours in the app or buttons.'],
+    ['"הריח נפתח באוויר"', 'הריח בבקבוק אינו הריח בחלל — תנו למכשיר לעבוד 15–30 דקות לפני ששופטים את הניחוח.', 'The bottle is not the room — give it 15–30 minutes before judging the scent.'],
+    ['החלפת ריח', 'לפני מעבר לתמצית אחרת — מרוקנים את השארית ומריצים את המכשיר כמה דקות ריק, כדי שהריחות לא יתערבבו.', 'Before switching oils, empty the rest and run the device empty for a few minutes so scents do not mix.']]],
+  ['care', ['תחזוקה ושמירה', 'Care & maintenance'], [
+    ['ניקוי', 'פעם בחודש — מנגבים את החלק החיצוני במטלית יבשה. אם הפיזור נחלש, מנקים את פתח הפיזור לפי הוראות היצרן המצורפות למכשיר.', 'Monthly — wipe the outside with a dry cloth. If output weakens, clean the outlet per the included instructions.'],
+    ['אחסון התמצית', 'סוגרים היטב את הבקבוק ושומרים במקום קריר ומוצל, הרחק מהישג ידם של ילדים וחיות.', 'Close the bottle tightly; store cool and shaded, away from children and pets.'],
+    ['בטיחות', 'התמצית מיועדת לפיזור באוויר בלבד — לא לשתייה ולא למריחה על העור. במגע עם העיניים — שוטפים במים.', 'For air diffusion only — not for drinking or skin. If it touches the eyes, rinse with water.'],
+    ['צריכים עזרה?', 'שאלה על מיקום, עוצמה או בחירת ריח? כתבו לנו בוואטסאפ — נשמח לעזור.', 'A question about placement, strength or scent? WhatsApp us.']]],
+];
 export function guide() {
   const g = db.SITE.guide || '';
-  return html`<div class="wrap legal rich"><p class="eyebrow">SAY Boutique</p><h1>${T('מדריך שימוש, מיקום ותחזוקה', 'Use, placement & care guide')}</h1>${richText(g)}</div>`;
+  if (g) return html`<div class="wrap legal rich"><p class="eyebrow">SAY Boutique</p><h1>${T('מדריך שימוש, מיקום ותחזוקה', 'Use, placement & care guide')}</h1>${richText(g)}</div><div class="block"></div>`;
+  const ico = { place: '<path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>', use: '<path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/>', care: '<path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/>' };
+  return html`<div class="gd"><header class="gd-h wrap"><p class="c3-k">SAY Boutique</p><h1>${T('מדריך שימוש, מיקום ותחזוקה', 'Use, placement & care guide')}</h1>
+    <p>${T('כמה דקות קריאה — ותקבלו מהמכשיר את הריח הכי טוב, הכי אחיד והכי ארוך.', 'A few minutes of reading for the best, most even and longest-lasting scent.')}</p>
+    <nav class="gd-toc">${GUIDE.map(([id, t2]) => html`<a href="#/guide" data-action="gd-jump" data-t="gd-${id}">${T(...t2)}</a>`)}</nav></header>
+    <div class="wrap gd-in">${GUIDE.map(([id, t2, items], i) => html`<section class="gd-sec" id="gd-${id}"><h2><span>${raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${ico[id]}</svg>`)}</span>${i + 1}. ${T(...t2)}</h2>
+      <div class="gd-grid">${items.map(([h, he_, en]) => html`<article><b>${h}</b><p>${T(he_, en)}</p></article>`)}</div></section>`)}
+      <p class="gd-wa"><a class="btn" href="${waLink(T('שלום, יש לי שאלה על המפיץ', 'Hi, I have a question about my diffuser'))}" target="_blank" rel="noopener noreferrer">${T('שאלה? כתבו לנו בוואטסאפ', 'Questions? WhatsApp us')}</a></p></div></div><div class="block"></div>`;
 }
 
-const TRUST = () => html`<ul class="trust3"><li><b>${T('14 יום', '14 days')}</b>${T('להחזרה', 'to return')}</li><li><b>${T('7–10 ימים', '7–10 days')}</b>${T('עד הבית', 'delivery')}</li><li><b>${T('וואטסאפ', 'WhatsApp')}</b>${T('תמיכה אישית', 'support')}</li></ul>`;
+const TRUST = () => html`<ul class="trust3"><li><b>${T('14 יום', '14 days')}</b>${T('להחזרה', 'to return')}</li><li><b>${T('7-10 ימים', '7–10 days')}</b>${T('עד הבית', 'delivery')}</li><li><b>${T('וואטסאפ', 'WhatsApp')}</b>${T('תמיכה אישית', 'support')}</li></ul>`;
 const isDirect = (p) => !(p.quote || p.picks || p.options?.length || p.sizes.length > 1);
 export function cartDrawer() {
   const tt = db.cartTotals(); const u = db.me();
@@ -643,7 +695,7 @@ export function checkout() {
         <div class="row2">${f('city', t('city'), 'text', 'address-level2')}${f('street', t('street'), 'text', 'street-address')}</div>
         ${f('apt', t('apt'), 'text', 'off', false)}
         <details class="co-notes"><summary>${T('הוספת הערה לשליח', 'Add a note for the courier')}</summary><textarea class="input" id="notes" name="notes" rows="2" maxlength="300"></textarea></details>
-        <p class="co-eta">${T('משלוח עד הבית תוך 7–10 ימים', 'Home delivery in 7–10 days')}${left ? '' : html` · <b>${T('חינם', 'free')}</b>`}</p></section>
+        <p class="co-eta">${T('משלוח עד הבית תוך 7-10 ימים', 'Home delivery in 7–10 days')}${left ? '' : html` · <b>${T('חינם', 'free')}</b>`}</p></section>
       ${tt.pointsAvail >= 100 ? html`<label class="co-pts"><input type="checkbox" data-input="use-points" ${raw(db.usingPoints() ? 'checked' : '')}><span><b>${T(`יש לכם ${tt.pointsAvail} נקודות`, `You have ${tt.pointsAvail} points`)}</b>${T('לממש אותן בהזמנה הזאת (כל 100 נקודות = 10 ₪)', 'Use them on this order (100 points = ₪10)')}</span></label>` : u && u.role !== 'wholesale' ? html`<p class="co-pts-earn">${T(`על ההזמנה הזאת תצברו ${Math.floor(tt.total - tt.shipping)} נקודות`, `This order earns ${Math.floor(tt.total - tt.shipping)} points`)}</p>` : ''}
       <section class="co-box"><h2><span>3</span>${t('payment')}</h2><p class="muted">${t('payNote')}</p>
         <label class="check"><input type="checkbox" name="agree" required aria-describedby="agree-e"><span>${t('agree')}<a href="#/terms" target="_blank">${t('terms')}</a>${t('and')}<a href="#/privacy" target="_blank">${t('privacy')}</a></span></label>
@@ -882,7 +934,7 @@ export function oilNudge() {
   const pick = ['oil-king-david', 'oil-hilton', 'oil-white-tea'].map((id) => db.product(id)).filter((p) => p && p.active !== false);
   const kit = db.product('kit-14');
   const sz = (p) => p.sizes.find((x) => x.label === '100 מ"ל') || p.sizes[0];
-  return html`<div class="modal-bg on-bg"><div class="on" role="dialog" aria-modal="true" aria-labelledby="on-t">
+  return html`<div class="modal-bg on-bg"><div class="oln" role="dialog" aria-modal="true" aria-labelledby="on-t">
     <button class="on-x" data-action="modal-close" aria-label="${t('close')}">×</button>
     <p class="c3-k">${T('רגע לפני שמסיימים', 'One moment')}</p>
     <h2 id="on-t">${T('המכשיר מגיע בלי תמצית', 'The device comes without oil')}</h2>

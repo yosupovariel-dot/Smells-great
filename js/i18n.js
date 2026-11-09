@@ -11,7 +11,7 @@ const D = {
     clubTitle: 'הצטרפו למועדון — וקבלו 15% הנחה', clubText: 'הצטרפות חינם. הטבות בלעדיות, השקות ראשונות ומבצעים לחברי מועדון בלבד.', clubBtn: 'הצטרפות חינם', email: 'אימייל', joined: 'נרשמת בהצלחה! קוד ההנחה שלך: WELCOME10',
     addToCart: 'הוספה לסל', quickAdd: 'הוספה מהירה', added: 'נוסף לסל', size: 'גודל', qty: 'כמות', decrease: 'הפחתת כמות', increase: 'הגדלת כמות', remove: 'הסרה',
     inStock: 'במלאי', outStock: 'אזל מהמלאי', complements: 'מוצרים משלימים', youMayLike: 'משלים מושלם', notes: 'תווי ריח', top: 'ראש', heart: 'לב', base: 'בסיס',
-    perk1: 'משלוח חינם מעל 299₪', perk2: 'משלוח עד 7–10 ימים', perk3: 'החזרה עד 14 יום', wsPrice: 'מחיר סיטונאי',
+    perk1: 'משלוח חינם מעל 299₪', perk2: 'משלוח עד 7-10 ימים', perk3: 'החזרה עד 14 יום', wsPrice: 'מחיר סיטונאי',
     all: 'הכל', sortBy: 'מיון', sortPop: 'פופולרי', sortLow: 'מחיר: מהנמוך', sortHigh: 'מחיר: מהגבוה', sortName: 'שם', results: 'מוצרים', noResults: 'לא נמצאו מוצרים',
     cartEmpty: 'הסל שלך ריק', continueShop: 'להמשך קנייה', subtotal: 'סכום ביניים', shipping: 'משלוח', free: 'חינם', discount: 'הנחת מועדון', total: 'סה"כ לתשלום', checkout: 'למעבר לתשלום',
     toFree: 'נשארו {x} למשלוח חינם', gotFree: 'מגיע לך משלוח חינם!',
