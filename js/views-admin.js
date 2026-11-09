@@ -1,8 +1,8 @@
-import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261109111511';
-import { L, getLang } from './i18n.js?v=261109111511';
-import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261109111511';
-import * as db from './db.js?v=261109111511';
-import { media, statusLabel, small, subName } from './views-shop.js?v=261109111511';
+import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261109111722';
+import { L, getLang } from './i18n.js?v=261109111722';
+import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261109111722';
+import * as db from './db.js?v=261109111722';
+import { media, statusLabel, small, subName } from './views-shop.js?v=261109111722';
 
 const he = () => getLang() === 'he';
 const T = (h, e) => (he() ? h : e);
@@ -245,7 +245,7 @@ export function reports(range = 6) {
 
 export function reportCSV(range) {
   const months = lastMonths(range); const { prod } = stats(months);
-  const q = (s) => `"${String(s).replace(/"/g, '""').replace(/^[=+\-@]/, "'$&")}"`;
+  const q = (s) => `"${String(s).replace(/"/g, '""').replace(/^[=+\-@\t\r]/, "'$&")}"`;
   const lines = [[T('מוצר', 'Product'), ...months, T('סה״כ', 'Total')].map(q).join(',')];
   for (const p of Object.values(prod)) lines.push([L(p.name), ...months.map((k) => p.months[k].q), months.reduce((a, k) => a + p.months[k].q, 0)].map(q).join(','));
   return '﻿' + lines.join('\n');

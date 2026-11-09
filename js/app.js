@@ -1,10 +1,13 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261109111511';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261109111511';
-import { CATEGORIES } from './data.js?v=261109111511';
-import * as db from './db.js?v=261109111511';
-import * as S from './views-shop.js?v=261109111511';
-import * as Lg from './views-legal.js?v=261109111511';
-import * as A from './views-admin.js?v=261109111511';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261109111722';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261109111722';
+import { CATEGORIES } from './data.js?v=261109111722';
+import * as db from './db.js?v=261109111722';
+import * as S from './views-shop.js?v=261109111722';
+import * as Lg from './views-legal.js?v=261109111722';
+import * as A from './views-admin.js?v=261109111722';
+
+// Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
+if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
 
 const app = $('#app');
 const state = { f: {}, sel: new Set(), pv: 'grid', finder: {}, q: '', sort: 'pop', authTab: 'login', range: 6, pcat: '', pq: '', uq: '', ur: '', ov: 'queue', om: 'all', metric: 'rev', os: '', oq: '', ctab: 'todo', lastOrder: null };
@@ -24,7 +27,7 @@ function header() {
   const msgs = ['tick1', 'tick2', 'tick3', 'tick4', 'tick5'];
   return html`<a class="skip" href="#main">${t('skip')}</a>
   <div class="ticker" role="region" aria-label="${getLang() === 'he' ? 'הודעות' : 'Announcements'}"><div class="wrap">
-    <div class="ticker-track" aria-live="off">${msgs.map((k, i) => html`<p class="ticker-msg ${i ? '' : 'on'}" ${raw(i ? 'aria-hidden="true"' : '')}>${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}">${t(k)}</a>` : k === 'tick1' ? html`<span>${t(k)}</span><a class="tk-more" href="#/terms">${getLang() === 'he' ? 'לפרטים' : 'Details'}</a>` : html`<span>${t(k)}</span>`}</p>`)}</div></div></div>
+    <div class="ticker-track" aria-live="off">${msgs.map((k, i) => html`<p class="ticker-msg ${i ? '' : 'on'}" ${raw(i ? 'aria-hidden="true"' : '')}>${k === 'tick5' ? html`<a href="tel:+${PHONE_INTL}">${t(k)}</a>` : k === 'tick1' ? html`<span>${t(k)}</span><a class="tk-more" href="#/terms">${getLang() === 'he' ? 'לפרטים' : 'Details'}</a>` : (k === 'tick3' || k === 'tick4') && !db.me() ? html`<button class="tk-join" data-action="join-club" type="button">${t(k)}<span>${getLang() === 'he' ? 'להצטרפות' : 'Join'}</span></button>` : html`<span>${t(k)}</span>`}</p>`)}</div></div></div>
   <header class="hdr"><div class="wrap">
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <button class="icon-btn m-search" data-action="search-open" aria-label="${t('search')}" aria-haspopup="dialog">${raw(ICONS.search)}</button>
@@ -96,7 +99,7 @@ function footer() {
       ${footNav()}
     </div>
     <div class="ftr-bottom"><span>© ${y} SAY Boutique · ${t('rights')}</span>
-      <a class="credit" href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener">${t('builtBy')}</a></div>
+      <a class="credit" href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener noreferrer">${t('builtBy')}</a></div>
   </div></footer>
   <a class="fab fab-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer" aria-label="${t('whatsapp')} ${PHONE_DISPLAY}">${raw(ICONS.wa)}</a>
   <button class="fab fab-a11y" data-action="a11y" aria-label="${t('a11yTitle')}" aria-expanded="false" aria-controls="a11y-panel">${raw(ICONS.a11y)}</button>

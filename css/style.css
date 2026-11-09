@@ -3511,3 +3511,6 @@ html.a11y-stop .card.pc .card-media img,html.a11y-stop .card.pc .card-media::aft
 .ml10 b{display:block;color:#E2C88F;font-size:.98rem}
 .ml10-ic{width:34px;height:34px;border-radius:50%;background:#2b241c;color:#E2C88F;display:grid;place-items:center}
 .ml10 i{font-style:normal;width:32px;height:32px;border-radius:50%;background:#E2C88F;color:#16130F;display:grid;place-items:center}
+.join-pill{display:none!important}
+.tk-join{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer}
+.tk-join span{text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(226,200,143,.7);color:#E2C88F;margin-inline-start:.4rem}

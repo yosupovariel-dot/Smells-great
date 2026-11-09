@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261109111511';
-import { t, L, getLang } from './i18n.js?v=261109111511';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261109111511';
-import * as db from './db.js?v=261109111511';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261109111722';
+import { t, L, getLang } from './i18n.js?v=261109111722';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261109111722';
+import * as db from './db.js?v=261109111722';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -698,7 +698,7 @@ export function checkout() {
         <p class="co-eta">${T('משלוח עד הבית תוך 7-10 ימים', 'Home delivery in 7–10 days')}${left ? '' : html` · <b>${T('חינם', 'free')}</b>`}</p></section>
       ${tt.pointsAvail >= 100 ? html`<label class="co-pts"><input type="checkbox" data-input="use-points" ${raw(db.usingPoints() ? 'checked' : '')}><span><b>${T(`יש לכם ${tt.pointsAvail} נקודות`, `You have ${tt.pointsAvail} points`)}</b>${T('לממש אותן בהזמנה הזאת (כל 100 נקודות = 10 ₪)', 'Use them on this order (100 points = ₪10)')}</span></label>` : u && u.role !== 'wholesale' ? html`<p class="co-pts-earn">${T(`על ההזמנה הזאת תצברו ${Math.floor(tt.total - tt.shipping)} נקודות`, `This order earns ${Math.floor(tt.total - tt.shipping)} points`)}</p>` : ''}
       <section class="co-box"><h2><span>3</span>${t('payment')}</h2><p class="muted">${t('payNote')}</p>
-        <label class="check"><input type="checkbox" name="agree" required aria-describedby="agree-e"><span>${t('agree')}<a href="#/terms" target="_blank">${t('terms')}</a>${t('and')}<a href="#/privacy" target="_blank">${t('privacy')}</a></span></label>
+        <label class="check"><input type="checkbox" name="agree" required aria-describedby="agree-e"><span>${t('agree')}<a href="#/terms" target="_blank" rel="noopener noreferrer">${t('terms')}</a>${t('and')}<a href="#/privacy" target="_blank" rel="noopener noreferrer">${t('privacy')}</a></span></label>
         <span class="err" id="agree-e" aria-live="polite"></span>
         <button class="btn block co-go" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>${t('placeOrder')} · ${m(tt.total)}</button>
         <p class="secure-note">${t('secure')}</p>${TRUST()}</section>
