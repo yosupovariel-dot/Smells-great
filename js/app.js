@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261109111722';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261109111722';
-import { CATEGORIES } from './data.js?v=261109111722';
-import * as db from './db.js?v=261109111722';
-import * as S from './views-shop.js?v=261109111722';
-import * as Lg from './views-legal.js?v=261109111722';
-import * as A from './views-admin.js?v=261109111722';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261110113258';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261110113258';
+import { CATEGORIES } from './data.js?v=261110113258';
+import * as db from './db.js?v=261110113258';
+import * as S from './views-shop.js?v=261110113258';
+import * as Lg from './views-legal.js?v=261110113258';
+import * as A from './views-admin.js?v=261110113258';
 
 // Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
 if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
@@ -95,7 +95,7 @@ function footer() {
   return html`<footer class="ftr"><div class="wrap">
     <div class="ftr-grid">
       <div><a class="brand logo" href="#/" aria-label="SAY Boutique"><img src="assets/img/logo-wide-light.webp" alt="SAY Boutique — Luxury Home Fragrances" width="923" height="350" loading="lazy"></a><p class="muted">${t('tick2')}</p>
-        <p class="ftr-contact"><a class="fc-btn" href="tel:+${PHONE_INTL}">${PHONE_DISPLAY}</a><a class="fc-btn wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer">WhatsApp</a></p></div>
+        <p class="ftr-contact"><a class="fc-cta" href="#/contact">${getLang() === 'he' ? 'צור קשר' : 'Contact us'}</a><a class="fc-tel" href="tel:+${PHONE_INTL}" dir="ltr">${PHONE_DISPLAY}</a></p></div>
       ${footNav()}
     </div>
     <div class="ftr-bottom"><span>© ${y} SAY Boutique · ${t('rights')}</span>
@@ -437,7 +437,7 @@ document.addEventListener('click', async (e) => {
     case 'filter-clear': state.f = {}; rerender(); break;
     case 'join-club': e.preventDefault(); if (document.body.classList.contains('cart-open')) $('[data-action="cart-close"]')?.click(); if ($('#nav')?.classList.contains('open')) $('[data-action="menu-close"]')?.click(); if (db.me()) { location.hash = '#/account'; break; } maybePromo(0, true); break;
     case 'gd-jump': e.preventDefault(); document.getElementById(el.dataset.t)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); break;
-    case 'oil-add': { db.addToCart(id, el.dataset.size, 1); closeModal(); rerender(); toast(getLang() === 'he' ? 'התמצית נוספה להזמנה' : 'Oil added'); break; }
+    case 'oil-add': { db.addToCart(id, el.dataset.size, 1); closeModal(); rerender(); if (!location.hash.startsWith('#/checkout')) openCart(); toast(getLang() === 'he' ? 'התמצית נוספה להזמנה' : 'Oil added'); break; }
     case 'oil-skip': { closeModal(); const f = $('form[data-form="checkout"]'); f?.requestSubmit(); break; }
     case 'reel-toggle': { const v = el.parentElement.querySelector('video'); const he = getLang() === 'he'; if (v.paused) { v.play(); el.setAttribute('aria-pressed', 'false'); el.setAttribute('aria-label', he ? 'עצירת הסרטון' : 'Pause video'); el.classList.remove('paused'); } else { v.pause(); el.setAttribute('aria-pressed', 'true'); el.setAttribute('aria-label', he ? 'הפעלת הסרטון' : 'Play video'); el.classList.add('paused'); } break; }
     case 'rv-ok': db.setReview(id, 'approved'); rerender(); break;
@@ -480,7 +480,11 @@ document.addEventListener('click', async (e) => {
     case 'slide-step': showSlide(slideIdx + +el.dataset.d); clearInterval(slideTimer); break;
     case 'thumb': { const f = $$('.pg-slide')[+el.dataset.i]; const sw = $('.swipe'); if (!f || !sw) break; if (sw.scrollWidth > sw.clientWidth + 2) sw.scrollTo({ left: f.offsetLeft - sw.offsetLeft, behavior: 'smooth' }); else window.scrollTo({ top: f.getBoundingClientRect().top + scrollY - 110, behavior: 'smooth' }); break; }
     case 'go-cart': closeModal(); openCart(); break;
-    case 'quick-add': { const p = db.product(id); db.addToCart(id, p.sizes[0].label, 1); toast(`${t('added')}: ${p.name[getLang()]}`); if (!document.body.classList.contains('cart-open')) openCart(); break; }
+    case 'qa-step': { const n = el.closest('.qa')?.querySelector('.qa-n'); if (n) n.textContent = Math.max(1, Math.min(20, (+n.textContent || 1) + +el.dataset.d)); break; }
+    case 'quick-add': { const p = db.product(id); const n = Math.max(1, Math.min(20, +(el.closest('.qa')?.querySelector('.qa-n')?.textContent) || 1)); db.addToCart(id, p.sizes[0].label, n, p.options?.[0]?.values?.[0]?.he || ''); refreshCart?.(); toast(`${t('added')}: ${p.name[getLang()]}${n > 1 ? ` × ${n}` : ''}`); const q = el.closest('.qa')?.querySelector('.qa-n'); if (q) q.textContent = '1';
+      if (p.cat === 'diffusers' && S.needsOil()) { modal(S.oilNudge('add')); break; }
+      if (!document.body.classList.contains('cart-open')) openCart(); break; }
+    case 'oil-later': closeModal(); openCart(); break;
     case 'qty': { const i = $('#qty'); i.value = Math.max(1, Math.min(99, (parseInt(i.value) || 1) + +el.dataset.d)); break; }
     case 'line-qty': { const c = db.cart(); const l = c[+el.dataset.i]; if (!l) break; l.qty += +el.dataset.d; if (l.qty < 1) c.splice(+el.dataset.i, 1); db.saveCart(c); break; }
     case 'line-rm': { const c = db.cart(); c.splice(+el.dataset.i, 1); db.saveCart(c); break; }
@@ -530,6 +534,7 @@ document.addEventListener('input', (e) => {
   const v = clean(el.value, 60);
   if (k === 'search') { state.q = v; searchDeb(); keepFocus('#q'); }
   if (k === 'sq') runSearch(v);
+  if (k === 'oz-q') { const q = v.toLowerCase().replace(/["'׳״\-]/g, ''); let n = 0; $$('.ox-grid > .card').forEach((c) => { const ok = !q || c.textContent.toLowerCase().replace(/["'׳״\-]/g, '').includes(q); c.hidden = !ok; if (ok) n++; }); const cnt = $('#oz-all .count b'); if (cnt) cnt.textContent = n; }
   if (k === 'pq') { state.pq = v; searchDeb(); keepFocus('#pq'); }
   if (k === 'uq') { state.uq = v; searchDeb(); keepFocus('#uq'); }
   if (k === 'oq') { state.oq = v; searchDeb(); keepFocus('#oq'); }
@@ -593,7 +598,7 @@ document.addEventListener('submit', async (e) => {
     }
     $('#add-err').textContent = '';
     db.addToCart(f.dataset.id, d.get('size'), qty, opt); toast(t('added'));
-    if (p.upsellKit && !db.cart().some((l) => db.product(l.pid)?.picks)) modal(S.kitUpsell()); else openCart();
+    if (p.cat === 'diffusers' && S.needsOil()) modal(S.oilNudge('add')); else if (p.upsellKit && !db.cart().some((l) => db.product(l.pid)?.picks)) modal(S.kitUpsell()); else openCart();
   }
   if (kind === 'club') {
     const email = clean(f.email.value, 120);
@@ -625,6 +630,7 @@ document.addEventListener('submit', async (e) => {
     if (!valid.name(r.name) || !d.rating || r.text.length < 10) { err.textContent = he ? 'נא למלא שם, דירוג וכמה מילים על החוויה' : 'Please add your name, a rating and a few words'; return; }
     db.addReview(r); f.innerHTML = `<p class="rv-thanks">${he ? 'תודה רבה! הביקורת תתפרסם אחרי אישור קצר.' : 'Thank you! Your review will appear after a quick check.'}</p>`; return;
   }
+  if (kind === 'oil-search') { $('#oz-all')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
   if (kind === 'checkout') {
     if (!state.oilAsked && S.needsOil()) { state.oilAsked = true; modal(S.oilNudge()); return; }
     btn.disabled = true;

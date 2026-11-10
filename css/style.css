@@ -3514,3 +3514,76 @@ html.a11y-stop .card.pc .card-media img,html.a11y-stop .card.pc .card-media::aft
 .join-pill{display:none!important}
 .tk-join{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer}
 .tk-join span{text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(226,200,143,.7);color:#E2C88F;margin-inline-start:.4rem}
+
+/* ===== Card buy row ===== */
+.card .price{display:flex;align-items:baseline;justify-content:center;gap:.45rem;flex-wrap:wrap}
+.pt-now{font-weight:800;color:#16130F}
+.pt-was{font-size:.8em;color:#9a9086;font-weight:400}
+.qa{display:grid;grid-template-columns:auto 1fr;gap:.4rem;width:100%;margin-top:.7rem}
+.qa-q{display:flex;align-items:center;border:1px solid #d9ccb5;background:#fff;border-radius:999px;overflow:hidden}
+.qa-q button{width:30px;height:38px;border:0;background:none;font:inherit;font-size:1.05rem;cursor:pointer;color:#16130F}
+.qa-n{min-width:1.4em;text-align:center;font-weight:700;font-size:.92rem}
+.qa-add{min-height:40px;border:0;border-radius:999px;background:#16130F;color:#fff;font:inherit;font-weight:700;font-size:.86rem;cursor:pointer;white-space:nowrap;transition:background .2s}
+.qa-add:hover{background:#7E6236}
+.qa-note{display:block;margin-top:.35rem;font-size:.72rem;color:var(--muted)}.qa-note a{color:#7E6236}
+.qa-go,.qa-wa{display:flex;align-items:center;justify-content:center;width:100%;min-height:40px;margin-top:.7rem;border-radius:999px;background:#16130F;color:#fff!important;text-decoration:none;font-weight:700;font-size:.86rem}
+.qa-wa{background:transparent;color:#16130F!important;border:1px solid #16130F}
+.card.pc .card-add,.card.label .card-add{display:none!important}
+.lbl-buy{padding:0 .9rem 1rem}
+.card.label .lbl{padding-bottom:.4rem!important}
+@media (max-width:600px){.qa{grid-template-columns:1fr;gap:.35rem}.qa-q{justify-content:space-between}.qa-q button{width:38px}.qa-add{font-size:.8rem;min-height:38px}.lbl-buy{padding:0 .6rem .8rem}}
+.card[hidden]{display:none!important}
+
+/* ===== PDP: everything above the fold on phones + swatches + sale ===== */
+.pp-sale{font:800 .78rem Rubik,sans-serif;letter-spacing:.06em;color:#fff;background:#C62828;padding:.3rem .65rem;border-radius:4px}
+.sw-opt span{display:inline-flex!important;align-items:center;gap:.5rem}
+.sw{width:18px;height:18px;border-radius:50%;flex:0 0 auto;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.sw-white{background:#f5f3ef}.sw-black{background:#1b1917}.sw-bronze{background:linear-gradient(135deg,#c0905e,#7d5532)}.sw-silver{background:linear-gradient(135deg,#eceff1,#9ea4aa)}.sw-gold{background:linear-gradient(135deg,#f0ddb3,#b8944f)}.sw-grey{background:#8a8a8a}
+.sw-mix{background:linear-gradient(135deg,#f5f3ef 50%,#1b1917 50%)}
+@media (max-width:860px){
+  .pdp .pg-slide{max-height:46svh}
+  .pdp .pg-slide img{max-height:46svh!important}
+  .pdp .swipe-dots{margin:.35rem 0 0!important}
+  .pdp-info .crumbs{display:none}
+  .pdp-info .eyebrow{margin:.2rem 0 0!important;font-size:.72rem}
+  .pdp-info h1{font-size:1.75rem!important;margin:.1rem 0 .5rem!important}
+  .pdp-specs{grid-template-columns:repeat(4,1fr)!important;gap:.3rem!important;margin:.2rem 0 .5rem!important}
+  .pdp-specs li{padding:.45rem .15rem!important;gap:.15rem!important}
+  .pdp-specs svg{width:17px;height:17px}
+  .pdp-specs small{font-size:.58rem}.pdp-specs b{font-size:.7rem}
+  .pp{padding:.3rem 0 .55rem!important;gap:.6rem!important}
+  .pp-now{font-size:1.7rem!important}
+  .pp-note{margin:.2rem 0 .4rem!important}
+  .pdp-info fieldset.sizes{margin:0 0 .6rem!important}
+  .pdp-info fieldset.sizes legend{margin-bottom:.3rem!important;font-size:.78rem}
+  .pdp-info .size-opt span{min-height:38px!important;height:38px!important;font-size:.85rem;padding:0 .8rem!important}
+  .pdp-info .buy-row .btn,.pdp-info .qty{min-height:48px!important}
+}
+
+/* ===== Oils search bar ===== */
+.oz-search{margin:clamp(2rem,5vw,3.4rem) 0 0;padding:1.3rem 1.4rem;background:#16130F;color:#cfc4b3}
+.oz-search label{display:flex;flex-direction:column;gap:.15rem;margin-bottom:.8rem;font-size:.88rem}
+.oz-search label b{color:#E2C88F;font-size:1.25rem}
+.oz-sbox{display:flex;align-items:center;gap:.6rem;background:#fff;border-radius:999px;padding:.3rem .3rem .3rem 1rem}
+[dir="rtl"] .oz-sbox{padding:.3rem 1rem .3rem .3rem}
+.oz-sbox svg{width:20px;height:20px;fill:none;stroke:#7E6236;stroke-width:1.8;flex:0 0 auto}
+.oz-sbox input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:1rem;background:transparent;color:#16130F;height:42px}
+.oz-sbox button{border:0;border-radius:999px;background:linear-gradient(100deg,#B8944F,#E2C88F);color:#16130F;font:inherit;font-weight:800;padding:0 1.3rem;height:42px;cursor:pointer}
+
+/* ===== Footer contact + brand-coloured WhatsApp ===== */
+.ftr-contact{display:flex!important;gap:.6rem;flex-wrap:wrap}
+.fc-cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 1.8rem;background:linear-gradient(100deg,#B8944F,#E2C88F);color:#16130F!important;font-weight:800;text-decoration:none;border-radius:999px}
+.fc-tel{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 1.4rem;border:1px solid rgba(201,173,122,.55);color:#F4EEE4!important;text-decoration:none;border-radius:999px}
+@media (max-width:900px){.ftr-contact{justify-content:center}.fc-cta,.fc-tel{flex:1}}
+.fab-wa{background:#16130F!important;color:#E2C88F!important;border:1px solid rgba(201,173,122,.6)!important;box-shadow:0 12px 26px -12px rgba(0,0,0,.55)!important}
+.fab-wa svg{fill:#E2C88F!important}
+@media (max-width:860px){
+  .pdp .swipe{height:36svh!important;min-height:220px}
+  .pdp .pg-slide{height:100%!important;max-height:none!important;background:#fff!important}
+  .pdp .pg-slide img{height:100%!important;max-height:100%!important;width:100%!important;object-fit:contain!important}
+  .pdp-info{padding-top:.2rem}
+  .pdp-specs b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .pdp-specs li{min-width:0}
+}
+.pdp-info .sw-opt span{display:inline-flex!important;flex-direction:row!important;align-items:center!important;gap:.45rem!important;white-space:nowrap}
+.pdp-info .sw-opt span em{display:none}

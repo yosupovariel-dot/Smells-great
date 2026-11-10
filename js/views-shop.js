@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261109111722';
-import { t, L, getLang } from './i18n.js?v=261109111722';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261109111722';
-import * as db from './db.js?v=261109111722';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261110113258';
+import { t, L, getLang } from './i18n.js?v=261110113258';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261110113258';
+import * as db from './db.js?v=261110113258';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -24,7 +24,8 @@ export function priceTag(p) {
   if (p.quote) return html`<span class="price">${T('מחיר בהתאמה אישית', 'Price on request')}</span>`;
   const ws = db.me()?.role === 'wholesale';
   const from = p.sizes.length > 1 ? T('החל מ־', 'From ') : '';
-  return html`<span class="price">${from}${m(minPrice(p, ws))}${ws ? html`<s>${m(minPrice(p, false))}</s>` : ''}</span>`;
+  const now = minPrice(p, ws); const was = !ws && p.was > now ? p.was : 0;
+  return html`<span class="price">${was ? html`<s class="pt-was">${m(was)}</s>` : ''}<b class="pt-now">${from}${m(now)}</b>${ws ? html`<s>${m(minPrice(p, false))}</s>` : ''}</span>`;
 }
 
 // Card image: a consistent "packshot" (oil bottle / clean device front), with a second look on hover.
@@ -44,13 +45,13 @@ function labelCard(p) {
     <a class="lbl" href="#/product/${p.id}">
       <img class="card-mark" src="assets/img/mark.webp" alt="" width="34" height="30" loading="lazy">
       <span class="lbl-fam latin">${(FAMILY_EN_SHORT[p.sub] || '').toUpperCase()}</span>
-      <span class="lbl-arch full">${media(p, 'bgfill', false, p.img)}${media(p, 'm1', false, p.img)}<span class="card-add in-arch" aria-hidden="true">${plus}</span></span>
+      <span class="lbl-arch full">${media(p, 'bgfill', false, p.img)}${media(p, 'm1', false, p.img)}</span>
       <span class="lbl-name">${L(p.name)}</span>
       <span class="lbl-sub">${subName(p.sub)}</span>
       <span class="lbl-rule" aria-hidden="true"></span>
       <span class="lbl-price">${priceTag(p)}</span>
     </a>
-    <a class="card-add" href="#/product/${p.id}" aria-label="${T('לבחירת גודל', 'Choose a size')}: ${L(p.name)}">${plus}</a>
+    <div class="lbl-buy">${buyRow(p)}</div>
   </article>`;
 }
 // Featured products: a wide editorial tile spanning two columns.
@@ -79,6 +80,16 @@ const BENEFIT = {
   'bundle-say300-1l': ['כולל: SAY 300 + תמצית 1 ליטר', 'Includes SAY 300 + 1L oil'], 'bundle-5x100': ['כולל: 5 תמציות × 100 מ"ל', 'Includes 5 × 100 ml oils'],
   'bundle-car-kit': ['כולל: SAY Car + 14 תמציות', 'Includes SAY Car + 14 oils'],
 };
+// Quantity + add-to-cart right on the card.
+function buyRow(p) {
+  if (p.quote) return html`<a class="qa-wa" href="${waLink(T('שלום, אשמח להצעת מחיר עבור ', 'Hi, a quote for ') + L(p.name))}" target="_blank" rel="noopener noreferrer">${T('הצעת מחיר בוואטסאפ', 'Quote on WhatsApp')}</a>`;
+  if (p.picks) return html`<a class="qa-go" href="#/product/${p.id}">${T('לבחירת הריחות', 'Choose scents')}</a>`;
+  return html`<div class="qa" data-id="${p.id}"><div class="qa-q" role="group" aria-label="${t('qty')}"><button type="button" data-action="qa-step" data-d="1" aria-label="${t('increase')}">+</button><output class="qa-n" aria-live="polite">1</output><button type="button" data-action="qa-step" data-d="-1" aria-label="${t('decrease')}">−</button></div>
+    <button type="button" class="qa-add" data-action="quick-add" data-id="${p.id}">${T('הוספה לסל', 'Add to bag')}</button></div>
+    ${p.sizes.length > 1 ? html`<small class="qa-note">${p.sizes[0].label}${p.options?.length ? '' : ''} · <a href="#/product/${p.id}">${T('גדלים נוספים', 'More sizes')}</a></small>` : p.options?.length ? html`<small class="qa-note">${L(p.options[0].values[0])} · <a href="#/product/${p.id}">${T('צבעים נוספים', 'More colours')}</a></small>` : ''}`;
+}
+
+const swatch = (n) => /שחור.*לבן|לבן.*שחור/.test(n) ? 'sw-mix' : /לבן|white/i.test(n) ? 'sw-white' : /שחור|black/i.test(n) ? 'sw-black' : /ברונזה|נחושת|bronze/i.test(n) ? 'sw-bronze' : /כסף|כסוף|silver/i.test(n) ? 'sw-silver' : /זהב|gold/i.test(n) ? 'sw-gold' : /אפור|grey|gray/i.test(n) ? 'sw-grey' : 'sw-gold';
 export function card(p, opts = {}) {
   if (opts.feature) return featureCard(p);
   if (p.cat === 'oils' && p.pack) return labelCard(p);
@@ -90,14 +101,12 @@ export function card(p, opts = {}) {
       ${media(p, 'm1', false, main)}${alt ? media(p, 'm2', false, alt) : ''}
       ${p.tag ? html`<span class="card-tag in-media">${t('tag_' + p.tag)}</span>` : ''}
     </a>
-    ${p.quote ? '' : direct
-      ? html`<button class="card-add" data-action="quick-add" data-id="${p.id}" aria-label="${t('quickAdd')}: ${L(p.name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`
-      : html`<a class="card-add" href="#/product/${p.id}" aria-label="${T('לבחירת אפשרויות', 'Choose options')}: ${L(p.name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>`}
     <div class="card-body">
       <h3><a href="#/product/${p.id}">${L(p.name)}</a></h3>
       <small>${p.sub ? subName(p.sub) : catName(p.cat)}${p.options?.[0] ? html` · ${p.options[0].values.length} ${T('צבעים', 'colours')}` : ''}</small>
       ${BENEFIT[p.id] ? html`<span class="benefit">${T(...BENEFIT[p.id])}</span>` : ''}
-      ${p.quote ? html`<a class="quote-cta" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('קבלו הצעה מהירה בוואטסאפ', 'Get a quick quote on WhatsApp')}</a>` : priceTag(p)}
+      ${p.quote ? '' : priceTag(p)}
+      ${buyRow(p)}
     </div>
   </article>`;
 }
@@ -354,6 +363,8 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
       </div>
     </header>
     <div class="wrap">
+      <form class="oz-search" role="search" data-form="oil-search"><label for="oz-q"><b>${T('מכירים כבר את הריח?', 'Already know the scent?')}</b>${T('חפשו לפי שם — מלון, בושם או ניחוח', 'Search by name — hotel, perfume or note')}</label>
+        <div class="oz-sbox"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="oz-q" name="q" type="search" data-input="oz-q" maxlength="60" autocomplete="off" placeholder="${T('למשל: הילטון, וניל, טום פורד…', 'e.g. Hilton, vanilla, Tom Ford…')}"><button type="submit">${T('חיפוש', 'Search')}</button></div></form>
       <section class="oz-moods" aria-labelledby="oz-m"><h2 id="oz-m">${T('איך אתם רוצים שהבית ירגיש?', 'How should your home feel?')}</h2>
         <div class="oz-mgrid">${moods.map(([k, h, e, d, de, s2]) => html`<button type="button" class="oz-mood ${f.notes?.includes(k) ? 'on' : ''}" data-action="mood" data-k="${k}"><img src="${small(subImg('oils', s2))}" alt="" loading="lazy" width="500" height="500"><span><b>${T(h, e)}</b>${T(d, de)}</span></button>`)}</div>
         ${kit ? html`<a class="oz-kit" href="#/product/${kit.id}"><b>${T('עדיין לא בטוחים? אל תנחשו — תריחו.', 'Still unsure? Do not guess — smell.')}</b><span>${T('ערכת התנסות: 14 ריחות של 10 מ"ל', 'Discovery kit: 14 × 10 ml')} · ${m(minPrice(kit))}</span><i aria-hidden="true">${he() ? '←' : '→'}</i></a>` : ''}
@@ -485,7 +496,7 @@ export function productPage(id) {
       <p class="eyebrow">${p.sub ? subName(p.sub) : catName(p.cat)}</p>
       <h1>${L(p.name)}</h1>
       ${specBoxes(p)}
-      ${p.quote ? html`<p class="price big" id="pdp-price">${T('מחיר בהתאמה אישית', 'Price on request')}</p>` : (() => { const c = cmpPrice(p, p.sizes[0], priceOf); return html`<div class="pp" id="pdp-price" aria-live="polite"><strong class="pp-now">${m(priceOf(p.sizes[0]))}</strong><span class="pp-was" ${raw(c.was ? '' : 'hidden')}><s>${c.was ? m(c.was) : ''}</s><em>${c.save ? `−${c.save}%` : ''}</em></span>${ws ? html`<span class="ws">${t('wsPrice')}</span>` : ''}</div>${p.cat === 'oils' ? html`<p class="pp-note" ${raw(c.was ? '' : 'hidden')}>${T('המחיר המחוק: אותה כמות בבקבוקי 10 מ"ל', 'Crossed price: the same amount in 10 ml bottles')}</p>` : ''}`; })()}
+      ${p.quote ? html`<p class="price big" id="pdp-price">${T('מחיר בהתאמה אישית', 'Price on request')}</p>` : (() => { const c = cmpPrice(p, p.sizes[0], priceOf); return html`<div class="pp" id="pdp-price" aria-live="polite">${c.was && p.cat !== 'oils' ? html`<span class="pp-sale">${T('מבצע', 'Sale')}</span>` : ''}<strong class="pp-now">${m(priceOf(p.sizes[0]))}</strong><span class="pp-was" ${raw(c.was ? '' : 'hidden')}><s>${c.was ? m(c.was) : ''}</s><em>${c.save ? `−${c.save}%` : ''}</em></span>${ws ? html`<span class="ws">${t('wsPrice')}</span>` : ''}</div>${p.cat === 'oils' ? html`<p class="pp-note" ${raw(c.was ? '' : 'hidden')}>${T('המחיר המחוק: אותה כמות בבקבוקי 10 מ"ל', 'Crossed price: the same amount in 10 ml bottles')}</p>` : ''}`; })()}
       ${p.quote ? html`<p>${he() ? p.desc.he.split('\n')[0] : p.desc.en || p.desc.he.split('\n')[0]}</p>
         <div class="q-row"><a class="q-wa" href="${waLink(T('שלום, אשמח להצעת מחיר עבור ', 'Hello, I would like a quote for ') + L(p.name))}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1a15 15 0 01-5.6-4.9c-.7-1-1.2-2.1-1.2-3.2 0-1 .5-1.6.8-1.9.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.1z" fill="currentColor"/></svg>${T('לקבלת הצעת מחיר בוואטסאפ', 'Get a quote on WhatsApp')}</a>
           <a class="q-tel" href="tel:+${PHONE_INTL}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 006 6L16 13l5 2v4a2 2 0 01-2 2A16 16 0 013 5a2 2 0 012-2"/></svg>${T('או התקשרו', 'Or call')} <b dir="ltr">${PHONE_DISPLAY}</b></a></div>` : html`
@@ -494,7 +505,7 @@ export function productPage(id) {
           ${p.sizes.map((s, i) => { const v = perUnit(p, s, priceOf); return html`<label class="size-opt"><input type="radio" name="size" value="${s.label}" ${raw(i ? '' : 'checked')} data-input="size" data-price="${priceOf(s)}" data-was="${cmpPrice(p, s, priceOf).was}" data-save="${cmpPrice(p, s, priceOf).save}"><span>${s.label}${v.save ? html`<em>−${v.save}%</em>` : ''}</span></label>`; })}
         </fieldset>` : html`<input type="hidden" name="size" value="${p.sizes[0].label}">`}
         ${opt ? html`<fieldset class="sizes"><legend>${L(opt.name)}</legend>
-          ${opt.values.map((v, i) => html`<label class="size-opt"><input type="radio" name="opt" value="${v.he}" ${raw(i ? '' : 'checked')} data-input="opt" data-img="${v.imgs?.[0] || ''}"><span>${L(v)}</span></label>`)}
+          ${opt.values.map((v, i) => html`<label class="size-opt sw-opt"><input type="radio" name="opt" value="${v.he}" ${raw(i ? '' : 'checked')} data-input="opt" data-img="${v.imgs?.[0] || ''}"><span><i class="sw ${swatch(v.he)}" aria-hidden="true"></i>${L(v)}</span></label>`)}
         </fieldset>` : ''}
         ${p.picks ? html`<fieldset class="picker pk" aria-describedby="pick-count"><legend class="pk-head"><span><b>${T(`בחרו ${p.picks} ניחוחות`, `Choose ${p.picks} scents`)}</b><small>${T('פתחו עולם ריח וסמנו את מה שמסקרן אתכם', 'Open a scent world and tap what intrigues you')}</small></span><span id="pick-count" class="pk-count" aria-live="polite">0/${p.picks}</span></legend>
           <span class="pk-bar" aria-hidden="true"><i id="pk-fill"></i></span>
@@ -930,17 +941,17 @@ export function reviewsPage() {
 
 // Checkout: a device without an oil to fill it.
 export const needsOil = () => { const ls = db.cartTotals().lines; return ls.some((l) => l.p.cat === 'diffusers') && !ls.some((l) => l.p.cat === 'oils' || l.p.picks || /1l|5x100|kit/.test(l.p.id)); };
-export function oilNudge() {
+export function oilNudge(ctx = 'checkout') {
   const pick = ['oil-king-david', 'oil-hilton', 'oil-white-tea'].map((id) => db.product(id)).filter((p) => p && p.active !== false);
   const kit = db.product('kit-14');
   const sz = (p) => p.sizes.find((x) => x.label === '100 מ"ל') || p.sizes[0];
   return html`<div class="modal-bg on-bg"><div class="oln" role="dialog" aria-modal="true" aria-labelledby="on-t">
     <button class="on-x" data-action="modal-close" aria-label="${t('close')}">×</button>
-    <p class="c3-k">${T('רגע לפני שמסיימים', 'One moment')}</p>
+    <p class="c3-k">${ctx === 'add' ? T('נוסף לסל ✓ · מוצר משלים', 'Added ✓ · goes well with') : T('רגע לפני שמסיימים', 'One moment')}</p>
     <h2 id="on-t">${T('המכשיר מגיע בלי תמצית', 'The device comes without oil')}</h2>
     <p class="on-sub">${T('כדי שתוכלו להפעיל אותו כבר ביום שהחבילה מגיעה — הוסיפו שמן למילוי:', 'So you can use it the day it arrives — add an oil:')}</p>
     <div class="on-list">${pick.map((p) => html`<div class="on-it"><span class="on-img">${media(p, '', false, p.img)}</span><span class="on-t"><b>${L(p.name)}</b><small>${sz(p).label} · ${m(sz(p).price)}</small></span><button class="on-add" data-action="oil-add" data-id="${p.id}" data-size="${sz(p).label}">${T('הוספה', 'Add')} +</button></div>`)}
       ${kit ? html`<div class="on-it kit"><span class="on-img">${media(kit, '', false, kit.img)}</span><span class="on-t"><b>${T('לא בטוחים איזה ריח?', 'Not sure which scent?')}</b><small>${T('ערכת 14 ריחות', '14-scent kit')} · ${m(minPrice(kit))}</small></span><a class="on-add" href="#/product/${kit.id}" data-action="modal-close">${T('לבחירה', 'Choose')}</a></div>` : ''}</div>
-    <button class="on-skip" data-action="oil-skip">${T('להמשיך בלי תמצית', 'Continue without oil')}</button>
+    <button class="on-skip" data-action="${ctx === 'add' ? 'oil-later' : 'oil-skip'}">${ctx === 'add' ? T('אולי אחר כך — להמשיך לקנות', 'Maybe later — keep shopping') : T('להמשיך בלי תמצית', 'Continue without oil')}</button>
   </div></div>`;
 }
