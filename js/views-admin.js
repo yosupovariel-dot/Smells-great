@@ -1,8 +1,8 @@
-import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261111235130';
-import { L, getLang } from './i18n.js?v=261111235130';
-import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261111235130';
-import * as db from './db.js?v=261111235130';
-import { media, statusLabel, small, subName } from './views-shop.js?v=261111235130';
+import { html, raw, money, monthKey, pct, PHONE_INTL } from './util.js?v=261111235253';
+import { L, getLang } from './i18n.js?v=261111235253';
+import { CATEGORIES, scentOf, STRENGTHS, NOTES } from './data.js?v=261111235253';
+import * as db from './db.js?v=261111235253';
+import { media, statusLabel, small, subName } from './views-shop.js?v=261111235253';
 
 const he = () => getLang() === 'he';
 const T = (h, e) => (he() ? h : e);
@@ -533,7 +533,7 @@ export const orderAlertLink = (o) => `https://wa.me/${PHONE_INTL}?text=${encodeU
 
 export function packingSlips(ids) {
   const os = db.orders().filter((o) => ids.includes(o.id));
-  return html`${os.map((o) => html`<section class="slip"><header><img src="assets/img/logo-header.png" alt="" width="90" height="100"><div><h2>${T('תעודת משלוח', 'Packing slip')} #${o.num}</h2><p>${dt(o.date)}</p></div></header>
+  return html`${os.map((o) => html`<section class="slip"><header><img src="assets/img/logo-wide.webp" alt="" width="180" height="68"><div><h2>${T('תעודת משלוח', 'Packing slip')} #${o.num}</h2><p>${dt(o.date)}</p></div></header>
     <p><b>${o.customer.name}</b> · ${o.customer.phone}<br>${o.customer.street}${o.customer.apt ? ', ' + o.customer.apt : ''}, ${o.customer.city}${o.customer.notes ? html`<br>${T('הערה:', 'Note:')} ${o.customer.notes}` : ''}</p>
     <table><thead><tr><th>${T('פריט', 'Item')}</th><th>${T('גודל / פרטים', 'Size / details')}</th><th>${T('כמות', 'Qty')}</th></tr></thead><tbody>${o.items.map((i) => html`<tr><td>${L(i.name)}</td><td>${[i.size, i.opt].filter(Boolean).join(' · ')}</td><td>${i.qty}</td></tr>`)}</tbody></table></section>`)}`;
 }

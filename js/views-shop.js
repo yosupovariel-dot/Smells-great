@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261111235130';
-import { t, L, getLang } from './i18n.js?v=261111235130';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261111235130';
-import * as db from './db.js?v=261111235130';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261111235253';
+import { t, L, getLang } from './i18n.js?v=261111235253';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261111235253';
+import * as db from './db.js?v=261111235253';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -40,13 +40,14 @@ const FAMILY_TONE = { 'בתי מלון ויוקרה': 't-hotel', 'חנויות �
 const plus = raw('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>');
 
 // Oils: a perfume-label card — scene in an arched window, the bottle on hover.
+const INSPIRED = new Set(['בתי מלון ויוקרה', 'השראת בשמים יוקרתיים', 'חנויות ורשתות מובילות']);
 function labelCard(p) {
   return html`<article class="card label ${FAMILY_TONE[p.sub] || ''}" data-pid="${p.id}">
     <a class="lbl" href="#/product/${p.id}">
-      <img class="card-mark" src="assets/img/mark.webp" alt="" width="34" height="30" loading="lazy">
+      <img class="card-logo" src="assets/img/logo-wide.webp" alt="" width="923" height="350" loading="lazy">
       <span class="lbl-fam latin">${(FAMILY_EN_SHORT[p.sub] || '').toUpperCase()}</span>
       <span class="lbl-arch full">${media(p, 'bgfill', false, p.img)}${media(p, 'm1', false, p.img)}</span>
-      <span class="lbl-name">${L(p.name)}</span>
+      <span class="lbl-name">${INSPIRED.has(p.sub) ? html`<small class="insp">${T('בהשראת', 'Inspired by')}</small>` : ''}${L(p.name)}</span>
       <span class="lbl-sub">${subName(p.sub)}</span>
       <span class="lbl-rule" aria-hidden="true"></span>
       <span class="lbl-price">${priceTag(p)}</span>
@@ -480,7 +481,7 @@ export function productPage(id) {
     <div class="pdp-info">
       <div class="crumbs"><a href="#/">${t('home')}</a> / <a href="#/shop/${p.cat}">${catName(p.cat)}</a>${p.sub ? html` / <a href="#/shop/${p.cat}/${encodeURIComponent(p.sub)}">${subName(p.sub)}</a>` : ''}</div>
       <p class="eyebrow">${p.sub ? subName(p.sub) : catName(p.cat)}</p>
-      <h1>${L(p.name)}</h1>
+      <h1>${p.cat === 'oils' && INSPIRED.has(p.sub) ? html`<small class="insp">${T('תמצית בהשראת', 'Oil inspired by')}</small>` : ''}${L(p.name)}</h1>
       ${specBoxes(p)}
       ${p.quote ? html`<p class="price big" id="pdp-price">${T('מחיר בהתאמה אישית', 'Price on request')}</p>` : (() => { const c = cmpPrice(p, p.sizes[0], priceOf); return html`<div class="pp" id="pdp-price" aria-live="polite">${c.was && p.cat !== 'oils' ? html`<span class="pp-sale">${T('מבצע', 'Sale')}</span>` : ''}<strong class="pp-now">${m(priceOf(p.sizes[0]))}</strong><span class="pp-was" ${raw(c.was ? '' : 'hidden')}><s>${c.was ? m(c.was) : ''}</s><em>${c.save ? `−${c.save}%` : ''}</em></span>${ws ? html`<span class="ws">${t('wsPrice')}</span>` : ''}</div>${p.cat === 'oils' ? html`<p class="pp-note" ${raw(c.was ? '' : 'hidden')}>${T('המחיר המחוק: אותה כמות בבקבוקי 10 מ"ל', 'Crossed price: the same amount in 10 ml bottles')}</p>` : ''}`; })()}
       ${p.quote ? html`<p>${he() ? p.desc.he.split('\n')[0] : p.desc.en || p.desc.he.split('\n')[0]}</p>
@@ -919,8 +920,13 @@ export function contact() {
 }
 
 export function about() {
-  return html`<div class="wrap"><section class="block story"><div class="story-art" aria-hidden="true"><img src="assets/img/logo-full.png" alt="" width="360" height="478"></div>
-  <div><p class="eyebrow">${t('storyEyebrow')}</p><h1>${t('storyTitle')}</h1><span class="rule"></span><p>${t('storyText')}</p><a class="btn" href="#/shop">${t('shopNow')}</a></div></section></div>${clubBlock()}`;
+  const pts = [[T('5 שנות פעילות', '5 years in business'), T('ניסיון בהתאמת ריח לבתים ולעסקים.', 'Experience matching scents to homes and businesses.')], [T('מחירי יבואן לצרכן', 'Importer prices'), T('יבוא ישיר של מפיצי ריח בעיצוב אישי.', 'Direct import of designer diffusers.')], [T('מבחר עצום של ניחוחות', 'A huge choice of scents'), T('תמציות שמן לכל אווירה וחלל.', 'Fragrance oils for every space.')], [T('שירות בפריסה ארצית', 'Nationwide service'), T('כולל השכרה חודשית עם מילוי ושירות עד הלקוח.', 'Including monthly rental with refills.')]];
+  return html`<div class="ab"><header class="ab-h"><div class="wrap ab-in"><div><p class="c3-k">${t('storyEyebrow')}</p><h1>${T('ריח הוא הדבר הראשון שמרגישים.', 'Scent is the first thing you feel.')}</h1>
+    <p>${T('כבר 5 שנים שאנחנו ב־SAY BOUTIQUE מביאים פתרונות ריח איכותיים לבית ולעסק, עם מפיצי ריח בעיצוב אישי, מגוון עצום של ניחוחות ומחירי יבואן לצרכן.', 'For 5 years SAY BOUTIQUE has brought quality scent solutions to homes and businesses, with designer diffusers, a huge choice of scents and importer prices.')}</p>
+    <p>${T('אנחנו עוזרים לכל לקוח למצוא את הניחוח שמתאים לאופי החלל שלו, ומציעים גם שירותי השכרה חודשיים הכוללים מילוי ושירות עד הלקוח. לצד עולם הריח תמצאו אצלנו גם מוצרי שיער וטיפוח, ניקיון, כביסה ואווירה לבית.', 'We help every customer find the scent that suits their space, and offer monthly rental with refills and service. Alongside scent you will find hair care, cleaning, laundry and home ambience.')}</p>
+    <div class="hx-cta"><a class="hx-btn" href="#/shop">${T('לגלות את הקולקציה', 'Discover the collection')}</a><a class="u-link" href="#/contact">${t('contact')}</a></div></div>
+    <figure class="ab-art"><img src="assets/img/logo-wide-light.webp" alt="SAY BOUTIQUE" width="923" height="350"></figure></div></header>
+    <div class="wrap"><ul class="ab-pts">${pts.map(([h, d]) => html`<li><b>${h}</b><span>${d}</span></li>`)}</ul></div></div>${clubBlock()}`;
 }
 
 export function wholesalePage() {
