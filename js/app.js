@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL } from './util.js?v=261110113258';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261110113258';
-import { CATEGORIES } from './data.js?v=261110113258';
-import * as db from './db.js?v=261110113258';
-import * as S from './views-shop.js?v=261110113258';
-import * as Lg from './views-legal.js?v=261110113258';
-import * as A from './views-admin.js?v=261110113258';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261111234220';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261111234220';
+import { CATEGORIES } from './data.js?v=261111234220';
+import * as db from './db.js?v=261111234220';
+import * as S from './views-shop.js?v=261111234220';
+import * as Lg from './views-legal.js?v=261111234220';
+import * as A from './views-admin.js?v=261111234220';
 
 // Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
 if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
@@ -36,6 +36,7 @@ function header() {
       <span class="mn-desk">${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}</span>
       ${mobileMenu()}
     </nav>
+    <div class="nav-bg" data-action="menu-close" aria-hidden="true"></div>
     <a class="brand logo" href="#/" aria-label="SAY Boutique — ${t('home')}"><img src="assets/img/logo-wide.webp" alt="SAY Boutique — Luxury Home Fragrances" width="923" height="350" fetchpriority="high"></a>
     <div class="tools">
       ${db.me() ? '' : html`<button class="join-pill" data-action="join-club" type="button">${getLang() === 'he' ? 'מועדון חברים · 15%' : 'Club · 15% off'}</button>`}<a class="tool-link" href="#/rental">${getLang() === 'he' ? 'השכרה' : 'Rental'}</a><a class="tool-link" href="#/reviews">${getLang() === 'he' ? 'ביקורות' : 'Reviews'}</a><a class="tool-link" href="#/contact">${t('contact')}</a>
@@ -69,7 +70,7 @@ function mobileMenu() {
     <div class="mnp-best">${best.map((p) => html`<a href="#/product/${p.id}"><span><img src="${sm(p.img)}" alt="" loading="lazy" width="120" height="120"></span><b>${p.name?.[getLang()] || p.name?.he}</b><em>${T2('רב מכר', 'Bestseller')}</em></a>`)}</div>` : ''}
     <button class="mnp-lang" data-action="lang" type="button">${he ? 'English' : 'עברית'}</button>
     <button class="mnp-join" data-action="join-club" type="button"><span>✦</span>${T2('הצטרפות למועדון החברים — 15% הנחה', 'Join the club — 15% off')}</button>
-    <nav class="mnp-links" aria-label="${T2('עוד', 'More')}"><a href="#/rental">${T2('מסלול שירות חודשי לעסקים', 'Monthly service for business')}</a><a href="#/wholesale">${T2('לעסקים וסיטונאים', 'For business')}</a><a href="#/reviews">${T2('לקוחות ממליצים', 'Reviews')}</a><a href="#/about">${t('about')}</a><a href="#/contact">${t('contact')}</a><a href="#/account" class="mnp-sup">${T2('כניסה לספקים', 'Supplier login')}</a><a href="#/account">${u ? T2('החשבון שלי', 'My account') : T2('התחברות / הצטרפות למועדון', 'Sign in / join the club')}</a></nav>
+    <nav class="mnp-links" aria-label="${T2('עוד', 'More')}"><a href="#/rental">${T2('מסלול שירות חודשי לעסקים', 'Monthly service for business')}</a><a href="#/wholesale">${T2('לעסקים וסיטונאים', 'For business')}</a><a href="#/reviews">${T2('לקוחות ממליצים', 'Reviews')}</a><a href="#/about">${t('about')}</a><a href="#/contact">${t('contact')}</a><a href="#/wholesale" class="mnp-sup">${T2('כניסה לספקים', 'Supplier login')}</a><a href="#/account">${u ? T2('החשבון שלי', 'My account') : T2('התחברות / הצטרפות למועדון', 'Sign in / join the club')}</a></nav>
     <ul class="mnp-trust"><li><b>${T2('משלוח חינם', 'Free shipping')}</b>${T2('מעל 299 ₪', 'over ₪299')}</li><li><b>${T2('14 יום', '14 days')}</b>${T2('להחזרה', 'returns')}</li><li><b>${T2('מחיר יבואן', 'Importer')}</b>${T2('ישר לצרכן', 'prices')}</li></ul>
     <a class="mnp-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer"><span class="mnp-dot" aria-hidden="true"></span><span><b>${T2('צריכים עזרה בבחירה?', 'Need help choosing?')}</b>${T2('כתבו לנו בוואטסאפ, אנחנו עונים מהר', 'WhatsApp us, we reply fast')}</span></a>
   </div>`;
@@ -101,7 +102,9 @@ function footer() {
     <div class="ftr-bottom"><span>© ${y} SAY Boutique · ${t('rights')}</span>
       <a class="credit" href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener noreferrer">${t('builtBy')}</a></div>
   </div></footer>
-  <a class="fab fab-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer" aria-label="${t('whatsapp')} ${PHONE_DISPLAY}">${raw(ICONS.wa)}</a>
+  <button class="fab fab-top" data-action="top" aria-label="${getLang() === 'he' ? 'חזרה לראש העמוד' : 'Back to top'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 14l6-6 6 6"/></svg></button>
+  ${db.me() ? '' : html`<div class="vipf" role="complementary"><button class="vipf-card" data-action="join-club" type="button" aria-label="SAY CLUB — ${getLang() === 'he' ? 'יש הפתעות ששמורות רק לחברים' : 'Surprises for members only'}"><span class="vc back" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M3 13h18M12 9v12M12 9C10 5 6 5 7 8c.5 1.3 3 1 5 1zm0 0c2-4 6-4 5-1-.5 1.3-3 1-5 1z"/></svg></span><span class="vc front"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18l-2-10-5 4-2-6-2 6-5-4z"/></svg><b>SAY CLUB</b><small>${getLang() === 'he' ? 'יש הפתעות ששמורות רק לחברים' : 'Member-only surprises'}</small></span></button><button class="vipf-x" data-action="vipf-x" type="button" aria-label="${t('close')}">×</button></div>`}
+  <a class="fab fab-wa" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(getLang() === 'he' ? 'שלום, הגעתי דרך אתר SAY BOUTIQUE ואשמח לעזרה' : 'Hi, I came from the SAY BOUTIQUE website')}" target="_blank" rel="noopener noreferrer" aria-label="${t('whatsapp')} ${PHONE_DISPLAY}">${raw(ICONS.wa)}</a>
   <button class="fab fab-a11y" data-action="a11y" aria-label="${t('a11yTitle')}" aria-expanded="false" aria-controls="a11y-panel">${raw(ICONS.a11y)}</button>
   ${a11yPanel()}
   <div class="drawer-bg" data-action="cart-close"></div>
@@ -185,6 +188,11 @@ function startCatRail() {
   }, 2200);
 }
 function reelMotion() { const v = $('.rl-vid video'); if (v && (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop'))) { v.pause(); v.removeAttribute('autoplay'); } }
+function floaters() {
+  let hid = false; try { hid = !!sessionStorage.getItem('say_vipf'); } catch {}
+  if (hid || /^#\/(checkout|account|done)/.test(location.hash)) $('.vipf')?.remove();
+  const top = $('.fab-top'); if (top) { const f = () => top.classList.toggle('show', window.scrollY > 900); window.removeEventListener('scroll', window.__topf || f); window.__topf = f; window.addEventListener('scroll', f, { passive: true }); f(); }
+}
 function startSlides() {
   clearInterval(slideTimer); slideIdx = 0;
   if (!$('.slide') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -295,7 +303,7 @@ function route() {
     sw.addEventListener('scroll', () => { if (sw.scrollWidth > sw.clientWidth + 2) mark(Math.round(Math.abs(sw.scrollLeft) / sw.clientWidth)); }, { passive: true });
     if ('IntersectionObserver' in window) { const io = new IntersectionObserver((es) => es.forEach((x) => { if (x.isIntersecting && sw.scrollWidth <= sw.clientWidth + 2) mark(+x.target.dataset.i); }), { rootMargin: '-45% 0px -45% 0px' }); $$('.pg-slide', sw).forEach((f) => io.observe(f)); }
   }
-  applyA11y(); applyStyleAttrs(); startTicker(); bars(); startSlides(); startCatRail(); reelMotion(); observeReveal(); observeBuy(); watchRails(); markCached();
+  applyA11y(); applyStyleAttrs(); startTicker(); bars(); startSlides(); startCatRail(); reelMotion(); floaters(); observeReveal(); observeBuy(); watchRails(); markCached();
 }
 
 // Fade-in on scroll (skipped when reduced motion / a11y "stop animations" is on).
@@ -417,6 +425,24 @@ function closeSearch() {
 }
 const runSearch = debounce((q) => { const r = $('#search-results'); if (r) render(r, S.searchResults(q)); }, 120);
 
+// ---------- Mobile menu drawer: locked page, inner scroll, swipe/backdrop/Esc to close, position restored ----------
+let menuY = 0, menuRelease = null;
+function openMenu() {
+  const nav = $('#nav'); if (!nav || nav.classList.contains('open')) return;
+  menuY = window.scrollY; document.body.style.top = `-${menuY}px`; document.body.classList.add('menu-open');
+  nav.classList.add('open'); nav.scrollTop = 0; $('[data-action="menu"]')?.setAttribute('aria-expanded', 'true');
+  menuRelease = trapFocus(nav, closeMenu);
+}
+function closeMenu() {
+  const nav = $('#nav'); if (!nav || !nav.classList.contains('open')) return;
+  nav.classList.remove('open'); document.body.classList.remove('menu-open'); document.body.style.top = '';
+  window.scrollTo({ top: menuY, behavior: 'instant' }); $('[data-action="menu"]')?.setAttribute('aria-expanded', 'false'); menuRelease?.(); menuRelease = null;
+}
+let swX = null, swY = null;
+document.addEventListener('touchstart', (e) => { if (e.target.closest('#nav.open')) { swX = e.touches[0].clientX; swY = e.touches[0].clientY; } }, { passive: true });
+document.addEventListener('touchend', (e) => { if (swX === null) return; const dx = e.changedTouches[0].clientX - swX, dy = Math.abs(e.changedTouches[0].clientY - swY); swX = null; const toEdge = document.dir === 'rtl' ? dx : -dx; if (toEdge > 70 && dy < 60) closeMenu(); }, { passive: true });
+window.addEventListener('hashchange', () => { if ($('#nav')?.classList.contains('open')) { menuY = 0; closeMenu(); } });
+
 // ---------- Modal ----------
 let releaseModal;
 function modal(tpl) { closeModal(); const w = document.createElement('div'); w.id = 'modal'; render(w, tpl); document.body.append(w); releaseModal = trapFocus(w.firstElementChild, closeModal); }
@@ -429,12 +455,19 @@ document.addEventListener('click', async (e) => {
   if (el.closest('#cmdk') && action !== 'cmdk-close') closePalette();
   switch (action) {
     case 'lang': setLang(getLang() === 'he' ? 'en' : 'he'); rerender(); break;
-    case 'menu': $('#nav').classList.add('open'); el.setAttribute('aria-expanded', 'true'); trapFocus($('#nav'), () => $('[data-action="menu-close"]').click()); break;
-    case 'menu-close': $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); $('[data-action="menu"]').focus(); break;
+    case 'menu': openMenu(); break;
+    case 'menu-close': closeMenu(); break;
     case 'cart-open': openCart(); break;
     case 'search-open': if ($('#nav').classList.contains('open')) { $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); } openSearch(); break;
     case 'filter-open': modal(S.filterSheet(state.f)); break;
     case 'filter-clear': state.f = {}; rerender(); break;
+    case 'pk-fill': { const box = $('.pk-groups'); const max = +box.dataset.max; const all = $$('[data-input="pick"]'); let need = max - all.filter((c) => c.checked).length; if (need <= 0) break;
+      const rank = (c) => (/מלון|hotel/i.test(c.closest('.pk-g')?.textContent || '') ? 0 : 1); const pool = all.filter((c) => !c.checked && !c.disabled).sort((a, b) => rank(a) - rank(b));
+      if (pool.length < need) { toast(getLang() === 'he' ? 'לא הצלחנו להשלים את הערכה כרגע. בחרו ניחוח אחר או נסו שוב.' : 'Could not complete the kit.'); break; }
+      pool.slice(0, need).forEach((c) => { c.checked = true; c.closest('.pk-chip')?.classList.add('auto'); c.closest('.pk-g')?.setAttribute('open', ''); });
+      pool[need - 1].dispatchEvent(new Event('change', { bubbles: true })); toast(getLang() === 'he' ? 'השלמנו לכם את הערכה — אפשר להחליף כל ריח' : 'Kit completed — swap any scent'); break; }
+    case 'vipf-x': try { sessionStorage.setItem('say_vipf', '1'); } catch {} document.querySelector('.vipf')?.remove(); break;
+    case 'top': window.scrollTo({ top: 0, behavior: 'smooth' }); break;
     case 'join-club': e.preventDefault(); if (document.body.classList.contains('cart-open')) $('[data-action="cart-close"]')?.click(); if ($('#nav')?.classList.contains('open')) $('[data-action="menu-close"]')?.click(); if (db.me()) { location.hash = '#/account'; break; } maybePromo(0, true); break;
     case 'gd-jump': e.preventDefault(); document.getElementById(el.dataset.t)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); break;
     case 'oil-add': { db.addToCart(id, el.dataset.size, 1); closeModal(); rerender(); if (!location.hash.startsWith('#/checkout')) openCart(); toast(getLang() === 'he' ? 'התמצית נוספה להזמנה' : 'Oil added'); break; }
@@ -534,7 +567,7 @@ document.addEventListener('input', (e) => {
   const v = clean(el.value, 60);
   if (k === 'search') { state.q = v; searchDeb(); keepFocus('#q'); }
   if (k === 'sq') runSearch(v);
-  if (k === 'oz-q') { const q = v.toLowerCase().replace(/["'׳״\-]/g, ''); let n = 0; $$('.ox-grid > .card').forEach((c) => { const ok = !q || c.textContent.toLowerCase().replace(/["'׳״\-]/g, '').includes(q); c.hidden = !ok; if (ok) n++; }); const cnt = $('#oz-all .count b'); if (cnt) cnt.textContent = n; }
+  if (k === 'oz-q') { let n = 0; $$('.ox-grid > .card').forEach((c) => { const p = db.product(c.dataset.pid); const ok = !v || (p && S.matchProduct(p, v)); c.hidden = !ok; if (ok) n++; }); const cnt = $('#oz-all .count b'); if (cnt) cnt.textContent = n; }
   if (k === 'pq') { state.pq = v; searchDeb(); keepFocus('#pq'); }
   if (k === 'uq') { state.uq = v; searchDeb(); keepFocus('#uq'); }
   if (k === 'oq') { state.oq = v; searchDeb(); keepFocus('#oq'); }
@@ -566,7 +599,7 @@ document.addEventListener('change', (e) => {
     if (picked.length > max) { el.checked = false; toast(getLang() === 'he' ? `אפשר לבחור עד ${max} ניחוחות` : `Up to ${max} scents`); }
     $$('[data-input="pick"]').forEach((c) => (c.disabled = sur));
     $('#pick-count').textContent = sur ? (getLang() === 'he' ? 'נבחר' : 'Set') : `${$$('[data-input="pick"]:checked').length}/${max}`;
-    const n = $$('[data-input="pick"]:checked').length; const fill = $('#pk-fill'); if (fill) fill.style.width = (sur ? 100 : Math.round((n / max) * 100)) + '%';
+    const n = $$('[data-input="pick"]:checked').length; const fill = $('#pk-fill'); const fb = $('.pk-fill'); if (fb) fb.hidden = sur || n === 0 || n >= max; if (fill) fill.style.width = (sur ? 100 : Math.round((n / max) * 100)) + '%';
     $('.pk')?.classList.toggle('done', sur || n === max); $('.pk-groups')?.classList.toggle('off', sur);
     $$('.pk-g-n').forEach((b) => { const c = $$(`[data-input="pick"][data-g="${b.dataset.g}"]:checked`).length; b.textContent = c ? c : ''; });
   }
@@ -607,7 +640,7 @@ document.addEventListener('submit', async (e) => {
   }
   if (kind === 'club-join') {
     const he = getLang() === 'he'; const err = $('.cc-err', f); const v = (n) => clean(f.elements[n].value, 160);
-    const d = { name: v('name'), phone: v('phone'), email: v('email'), password: f.elements.password.value };
+    const d = { name: v('name'), phone: normPhone(v('phone')), email: v('email'), password: f.elements.password.value };
     const bad = !valid.name(d.name) ? (he ? 'נא למלא שם מלא' : 'Please enter your name') : !valid.phone(d.phone) ? (he ? 'מספר טלפון לא תקין' : 'Invalid phone') : !valid.email(d.email) ? (he ? 'כתובת אימייל לא תקינה' : 'Invalid email') : !valid.password(d.password) ? (he ? 'סיסמה: לפחות 8 תווים, אות ומספר' : 'Password: 8+ chars, a letter and a digit') : !f.elements.agree.checked ? (he ? 'יש לאשר את ההצטרפות' : 'Please confirm') : '';
     if (bad) { err.textContent = bad; return; }
     btn.disabled = true;
@@ -653,7 +686,7 @@ document.addEventListener('submit', async (e) => {
     const d = Object.fromEntries(new FormData(f)); const err = $('#cd-err');
     if (!valid.name(d.name)) { err.textContent = t('required'); return; }
     if (d.email && !valid.email(d.email)) { err.textContent = t('badEmail'); return; }
-    db.updateUser(f.dataset.id, { name: clean(d.name, 80), phone: clean(d.phone, 20), email: clean(d.email, 120), biz: clean(d.biz, 80), note: clean(d.note, 400), newsletter: !!d.newsletter });
+    db.updateUser(f.dataset.id, { name: clean(d.name, 80), phone: normPhone(d.phone), email: clean(d.email, 120), biz: clean(d.biz, 80), note: clean(d.note, 400), newsletter: !!d.newsletter });
     closeModal(); toast(getLang() === 'he' ? 'פרטי הלקוח נשמרו' : 'Customer saved'); rerender();
   }
   if (kind === 'staff') {
@@ -662,8 +695,8 @@ document.addEventListener('submit', async (e) => {
     if (!valid.email(d.email)) { err.textContent = t('badEmail'); return; }
     if ((!id || d.password) && !valid.password(d.password)) { err.textContent = t('badPass'); return; }
     try {
-      if (id) { db.updateUser(id, { name: clean(d.name, 80), email: clean(d.email, 120), phone: clean(d.phone, 20), ...(d.role ? { role: d.role } : {}) }); if (d.password) await db.setPassword(id, d.password); }
-      else await db.addStaff({ name: clean(d.name, 80), email: clean(d.email, 120), phone: clean(d.phone, 20), role: d.role, password: d.password });
+      if (id) { db.updateUser(id, { name: clean(d.name, 80), email: clean(d.email, 120), phone: normPhone(d.phone), ...(d.role ? { role: d.role } : {}) }); if (d.password) await db.setPassword(id, d.password); }
+      else await db.addStaff({ name: clean(d.name, 80), email: clean(d.email, 120), phone: normPhone(d.phone), role: d.role, password: d.password });
     } catch (x) { err.textContent = ['exists', 'phoneExists'].includes(x.message) ? t(x.message) : t('required'); return; }
     closeModal(); toast(getLang() === 'he' ? 'המשתמש נשמר' : 'User saved'); rerender();
   }

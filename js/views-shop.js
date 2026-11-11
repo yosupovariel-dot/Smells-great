@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP } from './util.js?v=261110113258';
-import { t, L, getLang } from './i18n.js?v=261110113258';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261110113258';
-import * as db from './db.js?v=261110113258';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261111234220';
+import { t, L, getLang } from './i18n.js?v=261111234220';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261111234220';
+import * as db from './db.js?v=261111234220';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -18,7 +18,7 @@ export const subName = (s) => (he() ? s : db.SITE.site?.subEn?.[s] || s).split(/
 const active = () => db.products().filter((p) => p.active !== false);
 const minPrice = (p, ws) => Math.min(...p.sizes.map((s) => (ws && s.wholesale ? s.wholesale : s.price)));
 // Customer-facing WhatsApp links open an empty chat (no pre-written message).
-const waLink = () => `https://wa.me/${PHONE_INTL}`;
+const waLink = (msg) => `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(msg || T('שלום, הגעתי דרך אתר SAY BOUTIQUE ואשמח לעזרה', 'Hi, I came from the SAY BOUTIQUE website'))}`;
 
 export function priceTag(p) {
   if (p.quote) return html`<span class="price">${T('מחיר בהתאמה אישית', 'Price on request')}</span>`;
@@ -41,7 +41,7 @@ const plus = raw('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M
 
 // Oils: a perfume-label card — scene in an arched window, the bottle on hover.
 function labelCard(p) {
-  return html`<article class="card label ${FAMILY_TONE[p.sub] || ''}">
+  return html`<article class="card label ${FAMILY_TONE[p.sub] || ''}" data-pid="${p.id}">
     <a class="lbl" href="#/product/${p.id}">
       <img class="card-mark" src="assets/img/mark.webp" alt="" width="34" height="30" loading="lazy">
       <span class="lbl-fam latin">${(FAMILY_EN_SHORT[p.sub] || '').toUpperCase()}</span>
@@ -95,7 +95,7 @@ export function card(p, opts = {}) {
   if (p.cat === 'oils' && p.pack) return labelCard(p);
   const { main, alt, studio } = cardImgs(p);
   const direct = !(p.quote || p.picks || p.options?.length || p.sizes.length > 1);
-  return html`<article class="card pc ${studio ? 'studio' : 'photo'}">
+  return html`<article class="card pc ${studio ? 'studio' : 'photo'}" data-pid="${p.id}">
     <img class="card-logo" src="assets/img/logo-wide.webp" alt="" width="923" height="350" loading="lazy">
     <a class="card-media" href="#/product/${p.id}" tabindex="-1" aria-hidden="true">
       ${media(p, 'm1', false, main)}${alt ? media(p, 'm2', false, alt) : ''}
@@ -139,11 +139,10 @@ function dealsSection() {
   return html`<section class="dl" aria-labelledby="dl-t"><div class="wrap">
     <header class="dl-h"><p class="hz-k">${T('הכי משתלם עכשיו', 'Best value now')}</p><h2 id="dl-t">${T('מארזים נבחרים', 'Featured bundles')}</h2><p>${T('מכשיר ותמצית יחד — מוכן לשימוש מהרגע שהחבילה מגיעה.', 'Device and oil together — ready the moment it arrives.')}</p></header>
     <div class="dl-grid">${items.map(({ p, now, sep }) => { const save = now && sep ? Math.round((1 - now / sep) * 100) : 0;
-      return html`<a class="dl-card" href="#/product/${p.id}">
-        <span class="dl-img"><img src="${small(p.img)}" alt="" loading="lazy" width="500" height="500">${save >= 5 ? html`<em class="dl-badge">${T(`חוסכים ${save}%`, `Save ${save}%`)}</em>` : html`<em class="dl-badge soft">${p.picks ? T('מומלץ להתחלה', 'Best to start') : T('מארז', 'Bundle')}</em>`}</span>
-        <span class="dl-body"><b>${L(p.name)}</b>
+      return html`<article class="dl-card" data-pid="${p.id}"><a class="dl-img" href="#/product/${p.id}"><img src="${small(p.img)}" alt="" loading="lazy" width="500" height="500">${save >= 5 ? html`<em class="dl-badge">${T(`חוסכים ${save}%`, `Save ${save}%`)}</em>` : html`<em class="dl-badge soft">${p.picks ? T('מומלץ להתחלה', 'Best to start') : T('מארז', 'Bundle')}</em>`}</a>
+        <div class="dl-body"><a class="dl-name" href="#/product/${p.id}"><b>${L(p.name)}</b></a>
           <span class="dl-price">${sep ? html`<s>${T('בנפרד', 'Separately')} ${m(sep)}</s>` : ''}${now ? html`<strong>${m(now)}</strong>` : html`<strong class="q">${T('מחיר מארז מיוחד', 'Special bundle price')}</strong>`}</span>
-          <span class="dl-go">${now ? T('לפרטים והזמנה', 'View & order') : T('לקבלת המחיר', 'Get the price')} ${arrow()}</span></span></a>`; })}</div>
+          ${buyRow(p)}</div></article>`; })}</div>
   </div></section>`;
 }
 
@@ -164,8 +163,8 @@ export function home() {
     <div class="hx-copy wrap">
       <p class="hx-k"><span class="hx-sale">SALE</span>Luxury Home Fragrances</p>
       <h1 id="hero-t">${T('יוקרה שמרגישים', 'Luxury you can feel')}<br><em>${T('בכל חלל.', 'in every space.')}</em></h1>
-      <p class="hx-lead">${T('מפיצי ריח ותמציות שמן ברמת בתי המלון — לבית ולעסק, במחיר של יבואן.', 'Hotel-grade diffusers and fragrance oils for home and business, at importer prices.')}</p>
-      <div class="hx-cta"><a class="hx-btn" href="#/shop">${T('לקולקציה', 'Shop the collection')}</a><a class="hx-link" href="#/finder">${T('מציאת הריח שלי', 'Find my scent')}</a></div>
+      <p class="hx-lead">${T('מפיצי ריח בעיצוב אישי, מבחר עצום של ניחוחות ותמציות שמן איכותיות – במחירי יבואן לצרכן.', 'Hotel-grade diffusers and fragrance oils for home and business, at importer prices.')}</p>
+      <div class="hx-cta"><a class="hx-btn" href="#/shop">${T('לגלות את הקולקציה', 'Discover the collection')}</a><a class="hx-link" href="#/finder">${T('למצוא את הריח שלי', 'Find my scent')}</a></div>
     </div>
     ${hero.length ? html`<div class="h-offers">${HERO_SLIDES.slice(0, hero.length).map((sl, i) => { const p = db.product(sl.pid); const now = p ? minPrice(p) : 0; const was = p?.was > now ? p.was : 0;
       return html`<a class="h-offer ${i ? '' : 'on'}" href="#/product/${sl.pid}"><small class="h-k">${was ? html`<em class="h-sale">${T('מבצע', 'Sale')}</em>` : T('בחירת הבוטיק ✦', 'Boutique pick ✦')}</small><b>${sl[getLang()]}</b>
@@ -173,6 +172,8 @@ export function home() {
     <div class="h-dots" aria-hidden="true">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>
     <div class="sr-only">${hero.map((_, i) => html`<button data-action="slide" data-i="${i}" aria-label="${T('שקופית', 'Slide')} ${i + 1}" aria-current="${i === 0}"></button>`)}</div>` : ''}
   </section>
+
+  <ul class="usp" aria-label="${T('למה SAY', 'Why SAY')}"><li><b>5</b>${T('שנות פעילות', 'years in business')}</li><li><b>₪</b>${T('מחירי יבואן לצרכן', 'importer prices')}</li><li><b>✦</b>${T('מבחר עצום של ניחוחות', 'a huge choice of scents')}</li><li><b>⌂</b>${T('שירות בפריסה ארצית', 'nationwide service')}</li></ul>
 
   <nav class="hxc" aria-label="${t('categories')}"><div class="wrap"><div class="hxc-row">${CATEGORIES.map((c) => { const n = all.filter((p) => p.cat === c.id).length; return html`<a href="#/shop/${c.id}" class="${n ? '' : 'soon'}"><span class="hxc-img"><img src="${small(c.id === 'diffusers' ? 'assets/products/say-150-3.webp' : c.img || 'assets/img/mark.webp')}" alt="" width="120" height="120" loading="lazy"></span><b>${L(c)}</b>${n ? '' : html`<small>${T('בקרוב', 'soon')}</small>`}</a>`; })}</div></div></nav>
 
@@ -190,20 +191,11 @@ export function home() {
   </div></section>
 
   ${dealsSection()}
-  <section class="hz" aria-labelledby="col-t"><div class="wrap">
-    <header class="hz-head"><p class="hz-k">${T('מפיצי ריח', 'Diffusers')}</p><h2 id="col-t">${T('כמה גדול החלל שלכם?', 'How big is your space?')}</h2>
-      <p>${T('זה כל מה שצריך לדעת כדי לבחור. שאר העבודה עלינו — המכשיר שקט, בלי מים ובלי חום.', 'That is all you need to know to choose. The device is silent, with no water and no heat.')}</p></header>
-    <div class="hz-scale" aria-hidden="true"><i></i><span>30 ${T('מ"ר', 'm²')}</span><span>150 ${T('מ"ר', 'm²')}</span><span>300+ ${T('מ"ר', 'm²')}</span></div>
-    <div class="hz-grid">${(db.SITE.subs?.['מפיצי ריח'] || []).map((s2, i) => { const items = active().filter((p) => p.sub === s2); if (!items.length) return ''; const priced = items.filter((p) => !p.quote && minPrice(p) > 0); const lo = priced.length ? Math.min(...priced.map(minPrice)) : 0; const hero = items[items.length - 1];
-      return html`<a class="hz-card reveal" href="#/shop/diffusers/${encodeURIComponent(s2)}">
-        <span class="hz-n latin">0${i + 1}</span>
-        <span class="hz-img"><img src="${small(hero.img)}" alt="" loading="lazy" width="560" height="560"></span>
-        <b>${[T('חדר, רכב או משרד', 'A room, car or office'), T('בית או חלל בינוני', 'A home or mid-size space'), T('עסק, לובי או אולם', 'A business, lobby or hall')][i] || subName(s2)}</b>
-        <small>${subName(s2)}</small>
-        <span class="hz-models">${items.map((p) => L(p.name)).join(' · ')}</span>
-        <span class="hz-foot"><em>${lo ? html`${T('החל מ־', 'From ')}${m(lo)}` : T('הצעת מחיר אישית', 'Personal quote')}</em><i aria-hidden="true">${he() ? '←' : '→'}</i></span>
-      </a>`; })}</div>
-    <p class="hz-help">${T('עדיין מתלבטים?', 'Still unsure?')} <a href="${waLink(T('שלום, אשמח להמלצה על מפיץ ריח', 'Hi, I would like a diffuser recommendation'))}" target="_blank" rel="noopener noreferrer">${T('ספרו לנו על החלל ונמליץ בוואטסאפ', 'Tell us about your space on WhatsApp')}</a></p>
+  <section class="hz hz-hair" aria-labelledby="hair-t"><div class="wrap">
+    <header class="hz-head"><p class="hz-k">${T('שיער וטיפוח · בקרוב', 'Hair care · Coming soon')}</p><h2 id="hair-t">${T('הטיפוח שלכם, באותה רמה של הריח.', 'Your care, at the level of your scent.')}</h2>
+      <p>${T('קולקציית טיפוח לשיער מגיעה בקרוב לבוטיק. רוצים לשמוע ראשונים?', 'A hair-care collection is coming soon. Want to hear first?')}</p></header>
+    <div class="hz-grid four">${[1, 2, 3, 4].map((i) => html`<a class="hz-card hair" href="#/shop/hair"><span class="hz-img"><img src="assets/products/hair-${i}-sm.webp" alt="" loading="lazy" width="560" height="560"></span><span class="hz-foot"><em>${T('בקרוב בבוטיק', 'Coming soon')}</em><i aria-hidden="true">${he() ? '←' : '→'}</i></span></a>`)}</div>
+    <p class="hz-help"><a href="${waLink(T('שלום, הגעתי דרך אתר SAY BOUTIQUE ואשמח לעדכון כשקולקציית השיער תעלה', 'Hi, please update me when the hair collection launches'))}" target="_blank" rel="noopener noreferrer">${T('עדכנו אותי בוואטסאפ כשהקולקציה עולה', 'Notify me on WhatsApp')}</a></p>
   </div></section>
 
   <section class="hw" aria-labelledby="oil-t"><div class="wrap">
@@ -219,12 +211,7 @@ export function home() {
     </div>
   </div></section>
 
-  <section class="h-hair" aria-labelledby="hair-t"><div class="wrap h-hair-in">
-    <div class="h-hair-copy"><p class="kicker latin">Hair care · Coming soon</p><h2 id="hair-t">${T('טיפוח השיער', 'Hair care')}</h2>
-      <p>${T('קולקציית טיפוח שיער חדשה מגיעה בקרוב לבוטיק — שמפו, מסכות, סרומים ומוצרי עיצוב לכל סוגי השיער.', 'A new hair-care collection is coming soon — shampoos, masks, serums and styling for every hair type.')}</p>
-      <div class="hero-cta"><a class="btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לפרטים בוואטסאפ', 'Ask on WhatsApp')}</a><a class="u-link" href="#/shop/hair">${T('לעמוד הקטגוריה', 'Category page')}</a></div></div>
-    <div class="h-hair-grid">${[1, 2, 3, 4].map((i) => html`<span class="hh hh${i}"><img src="assets/products/hair-${i}-sm.webp" alt="" loading="lazy" width="560" height="560"></span>`)}</div>
-  </div></section>
+
 
 
 
@@ -403,14 +390,9 @@ function dxHead(crumbs) {
     <div class="dx-copy wrap">${crumbs}
       <p class="dx-k">${T('מפיצי ריח · טכנולוגיית אידוי קר', 'Diffusers · cold-air technology')}</p>
       <h1>${T('שקט. בלי מים. בלי חום.', 'Silent. No water. No heat.')}<br><em>${T('רק ריח של מלון.', 'Just a hotel scent.')}</em></h1>
-      <p class="dx-lead">${T('בחרו לפי גודל החלל — כל המכשירים מסודרים מהקטן לגדול. לחצו על מכשיר לפרטים.', 'Choose by the size of your space — smallest to largest. Tap one for details.')}</p>
+      <p class="dx-lead">${T('מבחר מפיצי ריח לבית, למשרד, לעסק ולרכב — בחרו את הפתרון שמתאים לחלל שלכם.', 'Choose by the size of your space — smallest to largest. Tap one for details.')}</p>
     </div>
-    <div class="dx-cards wrap">${items.map(({ p, h, e, k }, i) => html`<a class="dx-card" href="#/product/${p.id}" style-d="${i}">
-      <span class="dx-n latin">0${i + 1}</span>
-      <span class="dx-pic"><img src="assets/products/cut-${p.id}.webp" alt="${L(p.name)}" width="600" height="600"></span>
-      <b>${L(p.name)}</b><small>${T(h, e)}</small>
-      <span class="dx-cov" aria-hidden="true"><i style-w="${Math.round(20 + k * 80)}"></i></span>
-      <span class="dx-foot">${p.quote ? html`<em>${T('הצעת מחיר', 'Quote')}</em>` : html`<em>${m(minPrice(p))}</em>`}<i aria-hidden="true">${he() ? '←' : '→'}</i></span></a>`)}</div>
+    <div class="wrap"><button type="button" class="qs" data-action="search-open"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span><b>${T('יודעים מה אתם מחפשים?', 'Know what you want?')}</b>${T('הקליקו כאן וחפשו לפי דגם, חלל או ריח', 'Tap to search by model, space or scent')}</span><i>${T('חיפוש מהיר', 'Quick search')}</i></button></div>
   </header>`;
 }
 
@@ -508,6 +490,8 @@ export function productPage(id) {
           ${opt.values.map((v, i) => html`<label class="size-opt sw-opt"><input type="radio" name="opt" value="${v.he}" ${raw(i ? '' : 'checked')} data-input="opt" data-img="${v.imgs?.[0] || ''}"><span><i class="sw ${swatch(v.he)}" aria-hidden="true"></i>${L(v)}</span></label>`)}
         </fieldset>` : ''}
         ${p.picks ? html`<fieldset class="picker pk" aria-describedby="pick-count"><legend class="pk-head"><span><b>${T(`בחרו ${p.picks} ניחוחות`, `Choose ${p.picks} scents`)}</b><small>${T('פתחו עולם ריח וסמנו את מה שמסקרן אתכם', 'Open a scent world and tap what intrigues you')}</small></span><span id="pick-count" class="pk-count" aria-live="polite">0/${p.picks}</span></legend>
+          <p class="pk-hint">${T('בחרו את הריחות שאתם כבר מכירים, ואנחנו נעזור לכם להשלים את הערכה.', 'Pick the scents you know; we will help complete the kit.')}</p>
+          <button type="button" class="pk-fill" data-action="pk-fill" hidden>✦ ${T('השלימו לי את השאר', 'Complete the rest for me')}</button>
           <span class="pk-bar" aria-hidden="true"><i id="pk-fill"></i></span>
           <label class="pk-surprise"><input type="checkbox" name="surprise" data-input="surprise"><span><b>${T('הפתיעו אותי', 'Surprise me')}</b>${T('נבחר בשבילכם את 14 הניחוחות הכי אהובים', 'We pick our 14 most-loved scents')}</span></label>
           <div class="pick-groups pk-groups" data-max="${p.picks}">${groups.map((g, gi) => { const xs = pickList.filter((x) => x.sub === g); return html`<details class="pk-g" ${raw(gi ? '' : 'open')}><summary><span class="pk-g-img"><img src="${small(subImg('oils', g))}" alt="" loading="lazy" width="80" height="80"></span><span class="pk-g-t"><b>${subName(g)}</b><small>${xs.length} ${T('ריחות', 'scents')}</small></span><em class="pk-g-n" data-g="${gi}"></em><i aria-hidden="true"></i></summary>
@@ -542,20 +526,39 @@ export function searchPanel() {
       </form></div></div>
     <div class="wrap so-body" id="search-results" aria-live="polite">${searchResults('', popular)}</div>`;
 }
+// ---------- Smart search: typos, final letters, quotes/hyphens, synonyms, model numbers ----------
+const FINAL = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
+const SYN = [[/מפזר(י|ים)?/g, 'מפיצ'], [/מבשמ(ים)?/g, 'מפיצ'], [/דיפיוזר(ים)?/g, 'מפיצ'], [/diffusers?/g, 'מפיצ'], [/שמנ(י|ים)? ריח/g, 'תמצית'], [/\boils?\b/g, 'תמצית'], [/סייי|ספ /g, 'say ']];
+export const snorm = (x) => String(x || '').toLowerCase().normalize('NFKD').replace(/[֑-ׇ]/g, '').replace(/[ךםןףץ]/g, (c) => FINAL[c]).replace(/["'׳״`´’\-–_.,/()]/g, ' ').replace(/([a-z])(\d)/g, '$1 $2').replace(/(\d)([a-z])/g, '$1 $2').replace(/\s+/g, ' ').trim();
+const qnorm = (q) => { let n = snorm(q); for (const [r, w] of SYN) n = n.replace(r, w); return n.replace(/\s+/g, ' ').trim(); };
+const lev = (a, b) => { if (Math.abs(a.length - b.length) > 2) return 9; const d = Array.from({ length: b.length + 1 }, (_, i) => i); for (let i = 1; i <= a.length; i++) { let prev = d[0]; d[0] = i; for (let j = 1; j <= b.length; j++) { const t2 = d[j]; d[j] = Math.min(d[j] + 1, d[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = t2; } } return d[b.length]; };
+const hayOf = (p) => snorm(`${p.name.he} ${p.name.en} ${p.sub || ''} ${catName(p.cat)} ${p.cat === 'diffusers' ? 'מפיצ מפיצי ריח' : p.cat === 'oils' ? 'תמצית תמציות שמנ' : ''} ${(p.options?.[0]?.values || []).map((v) => v.he).join(' ')}`);
+// score: 0 = no match, 2 = exact words, 1 = fuzzy
+export function matchProduct(p, q) {
+  const n = qnorm(q); if (!n) return 2; const hay = hayOf(p); const hw = hay.split(' ');
+  let fuzzy = false;
+  for (const w of n.split(' ')) {
+    if (hay.includes(w)) continue;
+    const tol = w.length >= 6 ? 2 : w.length >= 3 ? 1 : 0;
+    if (tol && hw.some((h) => lev(w, h.slice(0, w.length + 1)) <= tol || lev(w, h) <= tol)) { fuzzy = true; continue; }
+    return 0;
+  }
+  return fuzzy ? 1 : 2;
+}
 export function searchResults(q, popular = ['קינג דיוד', 'SAY 150', 'ערכת התנסות', 'וניל', 'בלו שאנל', 'SAY Car']) {
-  const n = norm(q);
+  const n = qnorm(q);
   if (!n) return html`<p class="so-label">${T('חיפושים פופולריים', 'Popular searches')}</p>
     <div class="so-chips">${popular.map((p) => html`<button type="button" data-action="search-term" data-q="${p}">${p}</button>`)}</div>
     <p class="so-label">${t('categories')}</p>
     <div class="so-cats">${CATEGORIES.filter((c) => c.img).map((c) => html`<a href="#/shop/${c.id}"><img src="${small(c.img)}" alt="" loading="lazy" width="320" height="240"><span>${L(c)}</span></a>`)}</div>`;
-  const words = n.split(' ');
-  const hay = (p) => norm(`${p.name.he} ${p.name.en} ${p.sub || ''} ${catName(p.cat)} ${(p.options?.[0]?.values || []).map((v) => v.he).join(' ')}`);
-  const res = active().filter((p) => words.every((w) => hay(p).includes(w)))
-    .sort((a, b) => (norm(L(b.name)).startsWith(n) ? 1 : 0) - (norm(L(a.name)).startsWith(n) ? 1 : 0));
-  if (!res.length) return html`<p class="so-empty">${T('לא מצאנו תוצאות עבור', 'No results for')} “${q}”. ${T('נסו מילה אחרת, או', 'Try another word, or')} <a href="#/contact">${T('דברו איתנו', 'talk to us')}</a>.</p>`;
-  return html`<p class="so-label">${res.length} ${T('תוצאות', 'results')}</p>
-    <div class="so-grid">${res.slice(0, 12).map((p) => html`<a class="so-item" href="#/product/${p.id}"><span class="so-img ${p.fit === 'contain' ? 'contain' : ''}">${media(p)}</span>
-      <span class="so-t"><small>${p.sub ? subName(p.sub) : catName(p.cat)}</small><b>${L(p.name)}</b>${priceTag(p)}</span></a>`)}</div>
+  const scored = active().map((p) => [p, matchProduct(p, q)]).filter(([, sc]) => sc);
+  const exact = scored.filter(([, sc]) => sc === 2).map(([p]) => p);
+  const res = (exact.length ? exact : scored.map(([p]) => p)).sort((a, b) => (snorm(L(b.name)).startsWith(n) ? 1 : 0) - (snorm(L(a.name)).startsWith(n) ? 1 : 0));
+  const item = (p) => html`<a class="so-item" href="#/product/${p.id}"><span class="so-img ${p.fit === 'contain' ? 'contain' : ''}">${media(p)}</span><span class="so-t"><small>${p.sub ? subName(p.sub) : catName(p.cat)}</small><b>${L(p.name)}</b>${priceTag(p)}</span></a>`;
+  if (!res.length) { const alt = active().filter((p) => p.tag === 'best').slice(0, 6);
+    return html`<p class="so-empty">${T('לא מצאנו התאמה מדויקת. אולי אחד מהמוצרים האלה יתאים לכם?', 'No exact match. Maybe one of these?')}</p><div class="so-grid">${alt.map(item)}</div>`; }
+  return html`<p class="so-label">${exact.length ? html`${res.length} ${T('תוצאות', 'results')}` : html`${T('אולי התכוונת:', 'Did you mean:')} <b>${L(res[0].name)}</b>`}</p>
+    <div class="so-grid">${res.slice(0, 12).map(item)}</div>
     ${res.length > 12 ? html`<p><a class="u-link" href="#/shop">${T('לכל התוצאות בחנות', 'See all in the shop')}</a></p>` : ''}`;
 }
 
@@ -735,14 +738,19 @@ export function checkoutSubmit(form) {
     keys.forEach((k) => { form.querySelector(`#${k}-e`).textContent = errs[k]; form.elements[k]?.setAttribute('aria-invalid', 'true'); });
     form.elements[keys[0]]?.focus(); return null;
   }
-  const customer = { name: clean(d.name, 80), phone: clean(d.phone, 20), email: clean(d.email, 120), city: clean(d.city, 60), street: clean(d.street, 120), apt: clean(d.apt, 40), notes: clean(d.notes, 300) };
+  const customer = { name: clean(d.name, 80), phone: normPhone(d.phone), email: clean(d.email, 120), city: clean(d.city, 60), street: clean(d.street, 120), apt: clean(d.apt, 40), notes: clean(d.notes, 300) };
   return db.placeOrder(customer);
 }
 
 export function orderDone(o) {
-  const wa = waLink();
-  return html`<div class="wrap legal" tabindex="-1" id="done"><p class="eyebrow">SAY Boutique</p><h1>${t('orderOk')}</h1><p>${t('orderNum')}: <b>#${o.num}</b></p><p>${t('orderOkText')}</p>
-  <div class="hero-cta"><a class="btn" href="#/shop">${t('continueShop')}</a><a class="btn ghost" href="${wa}" target="_blank" rel="noopener noreferrer">${t('whatsapp')}</a></div></div>`;
+  return html`<div class="wrap od" tabindex="-1" id="done"><span class="od-ok" aria-hidden="true">✓</span><h1>${T('תודה על ההזמנה!', 'Thank you for your order!')}</h1>
+    <p class="od-sub">${T('ההזמנה התקבלה. את פרטי ההזמנה והעדכונים תוכלו למצוא באזור האישי.', 'Your order was received. Details and updates are in your account.')}</p>
+    <div class="od-card"><div class="od-row"><span>${t('orderNum')}</span><b dir="ltr">#${o.num}</b></div><div class="od-row"><span>${T('סטטוס', 'Status')}</span><b>${T('התקבלה', 'Received')}</b></div>
+      <ul class="od-items">${o.items.map((x) => html`<li><span>${L(x.name)}${x.size && x.size !== 'יחידה' && x.size !== 'מארז' ? ` · ${x.size}` : ''}${x.opt ? ` · ${x.opt}` : ''} × ${x.qty}</span><b>${m(x.price * x.qty)}</b></li>`)}</ul>
+      <div class="od-row tot"><span>${t('total')}</span><b>${m(o.total)}</b></div>
+      <p class="od-addr">${o.customer.name} · ${o.customer.street}, ${o.customer.city}</p></div>
+    <div class="od-cta"><a class="btn" href="#/account">${T('ההזמנות שלי', 'My orders')}</a><a class="btn ghost" href="#/">${T('חזרה לדף הבית', 'Back home')}</a></div>
+    <p class="od-help"><a href="${waLink(T(`שלום, הגעתי דרך אתר SAY BOUTIQUE ויש לי שאלה על הזמנה #${o.num}`, `Hi, a question about order #${o.num}`))}" target="_blank" rel="noopener noreferrer">${T('שאלה על ההזמנה? כתבו לנו בוואטסאפ', 'Question? WhatsApp us')}</a></p></div><div class="block"></div>`;
 }
 
 export function account(tab = 'login', aud = 'retail') {
@@ -798,7 +806,7 @@ export async function authSubmit(form, kind) {
       if (!valid.email(d.email)) throw new Error('email');
       if (!valid.password(d.password)) throw new Error('pass');
       if (!d.agree) throw new Error('agree');
-      await db.register({ name: clean(d.name, 80), phone: clean(d.phone, 20), email: clean(d.email, 120), password: d.password, wholesale: !!d.wholesale, biz: clean(d.biz, 80), newsletter: !!d.newsletter });
+      await db.register({ name: clean(d.name, 80), phone: normPhone(d.phone), email: clean(d.email, 120), password: d.password, wholesale: !!d.wholesale, biz: clean(d.biz, 80), newsletter: !!d.newsletter });
     }
     return true;
   } catch (e) {
@@ -859,7 +867,7 @@ export function wholesalePage() {
         <p class="wsx-lead">${T('לקוחות שוכחים מה אמרתם להם, אבל זוכרים איך הרגישו אצלכם. ריח חתימה הופך כניסה רגילה לחוויה של מלון יוקרה — ואנחנו דואגים לכל השאר.', 'Customers forget what you said, but remember how they felt. A signature scent turns an ordinary entrance into a luxury-hotel moment — we handle the rest.')}</p>
         <div class="wsx-cta">
           <a class="wsx-btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לקבלת הצעה בוואטסאפ', 'Get a quote on WhatsApp')}</a>
-          <a class="wsx-link" href="#ws-gal">${T('ראו סטנדים בשטח', 'See stands in action')}</a>
+          <a class="wsx-link" href="#/wholesale" data-action="gd-jump" data-t="ws-gal">${T('ראו סטנדים בשטח', 'See stands in action')}</a>
         </div>
         <p class="wsx-note2">${T('שיחה קצרה, בלי התחייבות. אתם מריחים קודם — מחליטים אחר כך.', 'A short chat, no commitment. You smell first, decide later.')}</p>
         <ul class="wsx-facts">

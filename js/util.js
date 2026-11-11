@@ -24,10 +24,12 @@ export const uid = (p = '') => p + crypto.getRandomValues(new Uint32Array(2)).re
 
 export const debounce = (fn, ms = 200) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 
+// Israeli phone in any common form (050-1234567, +972 50 123 4567, 972501234567) -> 0501234567
+export const normPhone = (s) => { let d = String(s ?? '').replace(/\D/g, ''); if (d.startsWith('972')) d = '0' + d.slice(3); if (d.length === 9 && !d.startsWith('0')) d = '0' + d; return d; };
 // Validation
 export const valid = {
   email: (s) => /^[^\s@<>]{1,64}@[^\s@<>]{1,255}\.[a-z]{2,}$/i.test(String(s).trim()),
-  phone: (s) => /^0\d{8,9}$/.test(String(s).replace(/[\s-]/g, '')),
+  phone: (s) => /^0\d{8,9}$/.test(normPhone(s)),
   name: (s) => String(s).trim().length >= 2 && String(s).length <= 80,
   password: (s) => String(s).length >= 8 && /[A-Za-z]/.test(s) && /\d/.test(s),
 };
