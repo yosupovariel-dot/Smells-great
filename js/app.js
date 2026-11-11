@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261111234220';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261111234220';
-import { CATEGORIES } from './data.js?v=261111234220';
-import * as db from './db.js?v=261111234220';
-import * as S from './views-shop.js?v=261111234220';
-import * as Lg from './views-legal.js?v=261111234220';
-import * as A from './views-admin.js?v=261111234220';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261111235130';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261111235130';
+import { CATEGORIES } from './data.js?v=261111235130';
+import * as db from './db.js?v=261111235130';
+import * as S from './views-shop.js?v=261111235130';
+import * as Lg from './views-legal.js?v=261111235130';
+import * as A from './views-admin.js?v=261111235130';
 
 // Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
 if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
@@ -70,7 +70,7 @@ function mobileMenu() {
     <div class="mnp-best">${best.map((p) => html`<a href="#/product/${p.id}"><span><img src="${sm(p.img)}" alt="" loading="lazy" width="120" height="120"></span><b>${p.name?.[getLang()] || p.name?.he}</b><em>${T2('רב מכר', 'Bestseller')}</em></a>`)}</div>` : ''}
     <button class="mnp-lang" data-action="lang" type="button">${he ? 'English' : 'עברית'}</button>
     <button class="mnp-join" data-action="join-club" type="button"><span>✦</span>${T2('הצטרפות למועדון החברים — 15% הנחה', 'Join the club — 15% off')}</button>
-    <nav class="mnp-links" aria-label="${T2('עוד', 'More')}"><a href="#/rental">${T2('מסלול שירות חודשי לעסקים', 'Monthly service for business')}</a><a href="#/wholesale">${T2('לעסקים וסיטונאים', 'For business')}</a><a href="#/reviews">${T2('לקוחות ממליצים', 'Reviews')}</a><a href="#/about">${t('about')}</a><a href="#/contact">${t('contact')}</a><a href="#/wholesale" class="mnp-sup">${T2('כניסה לספקים', 'Supplier login')}</a><a href="#/account">${u ? T2('החשבון שלי', 'My account') : T2('התחברות / הצטרפות למועדון', 'Sign in / join the club')}</a></nav>
+    <nav class="mnp-links" aria-label="${T2('עוד', 'More')}"><a href="#/club">SAY CLUB</a><a href="#/business">SAY BUSINESS · ${T2('לעסקים', 'for business')}</a><a href="#/rental">${T2('מסלול שירות חודשי לעסקים', 'Monthly service for business')}</a><a href="#/wholesale">${T2('לעסקים וסיטונאים', 'For business')}</a><a href="#/reviews">${T2('לקוחות ממליצים', 'Reviews')}</a><a href="#/about">${t('about')}</a><a href="#/contact">${t('contact')}</a><a href="#/wholesale" class="mnp-sup">${T2('כניסה לספקים', 'Supplier login')}</a><a href="#/account">${u ? T2('החשבון שלי', 'My account') : T2('התחברות / הצטרפות למועדון', 'Sign in / join the club')}</a></nav>
     <ul class="mnp-trust"><li><b>${T2('משלוח חינם', 'Free shipping')}</b>${T2('מעל 299 ₪', 'over ₪299')}</li><li><b>${T2('14 יום', '14 days')}</b>${T2('להחזרה', 'returns')}</li><li><b>${T2('מחיר יבואן', 'Importer')}</b>${T2('ישר לצרכן', 'prices')}</li></ul>
     <a class="mnp-wa" href="https://wa.me/${PHONE_INTL}" target="_blank" rel="noopener noreferrer"><span class="mnp-dot" aria-hidden="true"></span><span><b>${T2('צריכים עזרה בבחירה?', 'Need help choosing?')}</b>${T2('כתבו לנו בוואטסאפ, אנחנו עונים מהר', 'WhatsApp us, we reply fast')}</span></a>
   </div>`;
@@ -86,7 +86,7 @@ function footNav() {
     <div class="fn-col fn-shop"><h2>${t('shop')}</h2>
       <ul class="fn-cats">${live.map((c) => html`<li><a href="#/shop/${c.id}">${c.img ? html`<img src="${c.img.replace(/\.webp$/, '-sm.webp')}" alt="" width="40" height="40" loading="lazy">` : ''}<span>${c[getLang()]}</span></a></li>`)}</ul>
       ${soon.length ? html`<p class="fn-soon"><b>${T2('בקרוב', 'Coming soon')}</b>${soon.map((c) => c[getLang()]).join(' · ')}</p>` : ''}</div>
-    ${col(t('service'), [['#/contact', t('contact')], ['#/account', t('club')], ['#/wholesale', t('wholesale')], ['#/finder', T2('מציאת הריח שלי', 'Scent finder')]])}
+    ${col(t('service'), [['#/contact', t('contact')], ['#/account', T2('האזור האישי שלי', 'My account')], ['#/club', 'SAY CLUB'], ['#/business', 'SAY BUSINESS'], ['#/wholesale', t('wholesale')], ['#/rental', T2('השכרה', 'Rental')], ['#/finder', T2('מציאת הריח שלי', 'Scent finder')]])}
     ${col(t('info'), [['#/about', t('about')], ['#/returns', t('returns')], ['#/terms', t('terms')], ['#/privacy', t('privacy')], ['#/accessibility', t('accessibility')]])}
   </nav>`;
 }
@@ -103,7 +103,7 @@ function footer() {
       <a class="credit" href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener noreferrer">${t('builtBy')}</a></div>
   </div></footer>
   <button class="fab fab-top" data-action="top" aria-label="${getLang() === 'he' ? 'חזרה לראש העמוד' : 'Back to top'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 14l6-6 6 6"/></svg></button>
-  ${db.me() ? '' : html`<div class="vipf" role="complementary"><button class="vipf-card" data-action="join-club" type="button" aria-label="SAY CLUB — ${getLang() === 'he' ? 'יש הפתעות ששמורות רק לחברים' : 'Surprises for members only'}"><span class="vc back" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M3 13h18M12 9v12M12 9C10 5 6 5 7 8c.5 1.3 3 1 5 1zm0 0c2-4 6-4 5-1-.5 1.3-3 1-5 1z"/></svg></span><span class="vc front"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18l-2-10-5 4-2-6-2 6-5-4z"/></svg><b>SAY CLUB</b><small>${getLang() === 'he' ? 'יש הפתעות ששמורות רק לחברים' : 'Member-only surprises'}</small></span></button><button class="vipf-x" data-action="vipf-x" type="button" aria-label="${t('close')}">×</button></div>`}
+  ${db.me()?.role && db.me().role !== 'customer' ? '' : html`<div class="vipf" role="complementary"><button class="vipf-card" data-action="join-club" type="button" aria-label="SAY CLUB — ${getLang() === 'he' ? 'יש הפתעות ששמורות רק לחברים' : 'Surprises for members only'}"><span class="vc back" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M3 13h18M12 9v12M12 9C10 5 6 5 7 8c.5 1.3 3 1 5 1zm0 0c2-4 6-4 5-1-.5 1.3-3 1-5 1z"/></svg></span><span class="vc front"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18l-2-10-5 4-2-6-2 6-5-4z"/></svg><b>SAY CLUB</b><small>${getLang() === 'he' ? 'יש הפתעות ששמורות רק לחברים' : 'Member-only surprises'}</small></span></button><button class="vipf-x" data-action="vipf-x" type="button" aria-label="${t('close')}">×</button></div>`}
   <a class="fab fab-wa" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(getLang() === 'he' ? 'שלום, הגעתי דרך אתר SAY BOUTIQUE ואשמח לעזרה' : 'Hi, I came from the SAY BOUTIQUE website')}" target="_blank" rel="noopener noreferrer" aria-label="${t('whatsapp')} ${PHONE_DISPLAY}">${raw(ICONS.wa)}</a>
   <button class="fab fab-a11y" data-action="a11y" aria-label="${t('a11yTitle')}" aria-expanded="false" aria-controls="a11y-panel">${raw(ICONS.a11y)}</button>
   ${a11yPanel()}
@@ -190,7 +190,7 @@ function startCatRail() {
 function reelMotion() { const v = $('.rl-vid video'); if (v && (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop'))) { v.pause(); v.removeAttribute('autoplay'); } }
 function floaters() {
   let hid = false; try { hid = !!sessionStorage.getItem('say_vipf'); } catch {}
-  if (hid || /^#\/(checkout|account|done)/.test(location.hash)) $('.vipf')?.remove();
+  if (hid || /^#\/(checkout|account|done|club)/.test(location.hash)) $('.vipf')?.remove();
   const top = $('.fab-top'); if (top) { const f = () => top.classList.toggle('show', window.scrollY > 900); window.removeEventListener('scroll', window.__topf || f); window.__topf = f; window.addEventListener('scroll', f, { passive: true }); f(); }
 }
 function startSlides() {
@@ -280,7 +280,9 @@ function route() {
     case 'product': v = S.productPage(b); if (v) title = `${(db.product(b).name[getLang()])} | SAY Boutique`; break;
     case 'checkout': v = S.checkout(); break;
     case 'done': v = state.lastOrder ? S.orderDone(state.lastOrder) : S.home(); break;
-    case 'account': if (b === 'register') state.authTab = 'register'; v = S.account(state.authTab, b === 'ws' ? 'ws' : 'retail'); break;
+    case 'account': if (b === 'register') state.authTab = 'register'; v = S.account(db.me() && ['orders', 'addresses', 'profile'].includes(b) ? b : state.authTab, b === 'ws' ? 'ws' : 'retail'); break;
+    case 'club': v = S.clubPage(); break;
+    case 'business': v = S.businessPage(b || ''); break;
     case 'contact': v = S.contact(); break;
     case 'about': v = S.about(); break;
     case 'wholesale': v = S.wholesalePage(); break;
@@ -459,7 +461,7 @@ document.addEventListener('click', async (e) => {
     case 'menu-close': closeMenu(); break;
     case 'cart-open': openCart(); break;
     case 'search-open': if ($('#nav').classList.contains('open')) { $('#nav').classList.remove('open'); $('[data-action="menu"]').setAttribute('aria-expanded', 'false'); } openSearch(); break;
-    case 'filter-open': modal(S.filterSheet(state.f)); break;
+    case 'filter-open': modal(S.filterSheet(state.f, location.hash.split('/')[2] || '')); break;
     case 'filter-clear': state.f = {}; rerender(); break;
     case 'pk-fill': { const box = $('.pk-groups'); const max = +box.dataset.max; const all = $$('[data-input="pick"]'); let need = max - all.filter((c) => c.checked).length; if (need <= 0) break;
       const rank = (c) => (/מלון|hotel/i.test(c.closest('.pk-g')?.textContent || '') ? 0 : 1); const pool = all.filter((c) => !c.checked && !c.disabled).sort((a, b) => rank(a) - rank(b));
@@ -467,8 +469,12 @@ document.addEventListener('click', async (e) => {
       pool.slice(0, need).forEach((c) => { c.checked = true; c.closest('.pk-chip')?.classList.add('auto'); c.closest('.pk-g')?.setAttribute('open', ''); });
       pool[need - 1].dispatchEvent(new Event('change', { bubbles: true })); toast(getLang() === 'he' ? 'השלמנו לכם את הערכה — אפשר להחליף כל ריח' : 'Kit completed — swap any scent'); break; }
     case 'vipf-x': try { sessionStorage.setItem('say_vipf', '1'); } catch {} document.querySelector('.vipf')?.remove(); break;
+    case 'ad-def': case 'ad-del': { const cur = (db.profileOf().full.addresses || []).slice(); const i = +el.dataset.i; if (action === 'ad-del') cur.splice(i, 1); else cur.forEach((x, k) => (x.def = k === i)); if (cur.length && !cur.some((x) => x.def)) cur[0].def = true; db.updateMe({ addresses: cur }); rerender(); break; }
+    case 'zoom': { const src = el.getAttribute('src').replace(/-sm\.webp$/, '.webp'); const w = document.createElement('div'); w.className = 'lbx'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true'); w.setAttribute('aria-label', el.alt || 'image');
+      render(w, html`<button class="lbx-x" data-action="lbx-close" aria-label="${t('close')}">×</button><div class="lbx-in"><img src="${src}" alt="${el.alt}"></div>`); document.body.append(w); document.body.classList.add('no-scroll'); const rel = trapFocus(w, () => $('.lbx-x')?.click()); w._rel = rel; break; }
+    case 'lbx-close': { const w = $('.lbx'); w?._rel?.(); w?.remove(); document.body.classList.remove('no-scroll'); break; }
     case 'top': window.scrollTo({ top: 0, behavior: 'smooth' }); break;
-    case 'join-club': e.preventDefault(); if (document.body.classList.contains('cart-open')) $('[data-action="cart-close"]')?.click(); if ($('#nav')?.classList.contains('open')) $('[data-action="menu-close"]')?.click(); if (db.me()) { location.hash = '#/account'; break; } maybePromo(0, true); break;
+    case 'join-club': e.preventDefault(); if (document.body.classList.contains('cart-open')) $('[data-action="cart-close"]')?.click(); if ($('#nav')?.classList.contains('open')) $('[data-action="menu-close"]')?.click(); if (db.me()) { location.hash = '#/club'; break; } maybePromo(0, true); break;
     case 'gd-jump': e.preventDefault(); document.getElementById(el.dataset.t)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); break;
     case 'oil-add': { db.addToCart(id, el.dataset.size, 1); closeModal(); rerender(); if (!location.hash.startsWith('#/checkout')) openCart(); toast(getLang() === 'he' ? 'התמצית נוספה להזמנה' : 'Oil added'); break; }
     case 'oil-skip': { closeModal(); const f = $('form[data-form="checkout"]'); f?.requestSubmit(); break; }
@@ -674,14 +680,36 @@ document.addEventListener('submit', async (e) => {
     const ok = await S.authSubmit(f, kind); btn.disabled = false;
     if (ok) { const u = db.me(); location.hash = { admin: '#/admin', products: '#/admin/products', orders: '#/orders', courier: '#/courier' }[u.role] || '#/account'; rerender(); }
   }
+  if (kind === 'profile') {
+    const d = Object.fromEntries(new FormData(f)); const err = $('#pf-err'); const he = getLang() === 'he';
+    if (d.name && !valid.name(d.name)) { err.textContent = he ? 'נא למלא שם תקין' : 'Invalid name'; $('#pf-n').focus(); return; }
+    if (d.phone && !valid.phone(d.phone)) { err.textContent = t('badPhone'); $('#pf-p').focus(); return; }
+    const bd = /^\d{4}-\d{2}-\d{2}$/.test(d.birthday || '') ? d.birthday : '';
+    db.updateMe({ name: clean(d.name, 80), phone: d.phone ? normPhone(d.phone) : '', ...(bd ? { birthday: bd } : {}), newsletter: !!d.newsletter });
+    toast(he ? 'הפרטים נשמרו' : 'Saved'); location.hash = '#/account'; return;
+  }
+  if (kind === 'address') {
+    const d = Object.fromEntries(new FormData(f)); const err = $('#ad-err');
+    if (!clean(d.city) || !clean(d.street)) { err.textContent = t('required'); return; }
+    const cur = db.profileOf().full.addresses || []; const a2 = { label: clean(d.label, 30), city: clean(d.city, 60), street: clean(d.street, 120), apt: clean(d.apt, 40), notes: clean(d.notes, 120), def: !cur.length };
+    db.updateMe({ addresses: [...cur, a2].slice(0, 8) }); toast(getLang() === 'he' ? 'הכתובת נשמרה' : 'Saved'); rerender(); return;
+  }
+  if (kind === 'biz') {
+    const d = Object.fromEntries(new FormData(f)); const err = $('#bz-err'); const he = getLang() === 'he';
+    if (!clean(d.type) || !clean(d.city) || !valid.name(d.name) || !valid.phone(d.phone)) { err.textContent = `${t('required')} / ${t('badPhone')}`; return; }
+    if (!d.agree) { err.textContent = t('mustAgree'); return; }
+    const kinds = { wholesale: 'סיטונאות', branding: 'מיתוג אישי', stands: 'סטנד לחנות', rental: 'השכרת מפיצים' };
+    const txt = `שלום, הגעתי דרך אתר SAY BOUTIQUE ואני מתעניין/ת ב${kinds[d.kind] || 'שיתוף פעולה עסקי'}\nסוג העסק: ${clean(d.type, 60)}\nעיר: ${clean(d.city, 60)}\nאיש קשר: ${clean(d.name, 80)}\nטלפון: ${normPhone(d.phone)}${clean(d.msg) ? `\n${clean(d.msg, 600)}` : ''}`;
+    window.open(`https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(txt)}`, '_blank', 'noopener'); err.textContent = ''; toast(he ? 'ההודעה מוכנה בוואטסאפ' : 'Message ready in WhatsApp'); return;
+  }
   if (kind === 'contact') {
     const d = Object.fromEntries(new FormData(f)); const err = $('#c-err');
     if (!valid.name(d.name) || !valid.phone(d.phone) || !clean(d.msg)) { err.textContent = `${t('required')} / ${t('badPhone')}`; return; }
-    const txt = `פנייה מהאתר\nשם: ${clean(d.name, 80)}\nטלפון: ${clean(d.phone, 20)}\n${clean(d.msg, 1000)}`;
-    window.open(`https://wa.me/${PHONE_INTL}`, '_blank', 'noopener');
+    const txt = `שלום, הגעתי דרך אתר SAY BOUTIQUE\nשם: ${clean(d.name, 80)}\nטלפון: ${clean(d.phone, 20)}\n${clean(d.msg, 1000)}`;
+    window.open(`https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(txt)}`, '_blank', 'noopener');
     f.reset(); err.textContent = ''; toast(t('sent'));
   }
-  if (kind === 'filter') { const d = new FormData(f); state.f = { str: ['strong', 'soft'].includes(d.get('str')) ? d.get('str') : '', notes: d.getAll('notes').filter((x) => ['sweet', 'fresh', 'floral', 'rich'].includes(x)), stock: !!d.get('stock') }; closeModal(); rerender(); return; }
+  if (kind === 'filter') { const d = new FormData(f); const sp = String(d.get('space') || '').slice(0, 80), co = String(d.get('color') || ''); state.f = { str: ['strong', 'soft'].includes(d.get('str')) ? d.get('str') : '', notes: d.getAll('notes').filter((x) => ['sweet', 'fresh', 'floral', 'rich'].includes(x)), stock: !!d.get('stock'), space: (db.SITE.subs?.['מפיצי ריח'] || []).includes(sp) ? sp : '', color: ['לבן', 'שחור', 'ברונזה', 'כסף'].includes(co) ? co : '' }; closeModal(); rerender(); return; }
   if (kind === 'customer') {
     const d = Object.fromEntries(new FormData(f)); const err = $('#cd-err');
     if (!valid.name(d.name)) { err.textContent = t('required'); return; }

@@ -1,8 +1,8 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261111234220';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261111234220';
+import { SEED_PRODUCTS } from './data.js?v=261111235130';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261111235130';
 
 const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -311,3 +311,20 @@ export function seedReviewDrafts() {
   write('reviews', l); write('rvDrafts', true);
 }
 export function updateReview(id, patch) { const l = reviews(); const r = l.find((x) => x.id === id); if (r) { Object.assign(r, patch); write('reviews', l); } }
+
+// ---------- Customer self-service (own profile only) ----------
+export function updateMe(patch) {
+  const cur = me(); if (!cur) return null;
+  const l = users(); const u = l.find((x) => x.id === cur.id); if (!u) return null;
+  const ok = ['name', 'phone', 'birthday', 'newsletter', 'addresses'];
+  for (const k of ok) if (k in patch) u[k] = patch[k];
+  if (patch.birthday && u.birthdaySetAt && Date.now() - u.birthdaySetAt < 300 * 864e5 && u.birthday !== patch.birthday) u.birthday = u.birthday; // guard frequent changes
+  if ('birthday' in patch && !u.birthdaySetAt) u.birthdaySetAt = Date.now();
+  saveUsers(l); return publicUser(u);
+}
+export const myOrders = () => { const u = me(); return u ? orders().filter((o) => o.userId === u.id) : []; };
+export function profileOf(u = me()) {
+  const full = u && users().find((x) => x.id === u.id) || {};
+  const fields = [['name', !!full.name], ['phone', !!full.phone], ['email', !!full.email], ['birthday', !!full.birthday], ['address', (full.addresses || []).length > 0]];
+  return { full, pct: Math.round((fields.filter(([, v]) => v).length / fields.length) * 100), missing: fields.filter(([, v]) => !v).map(([k]) => k) };
+}

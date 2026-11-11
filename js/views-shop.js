@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261111234220';
-import { t, L, getLang } from './i18n.js?v=261111234220';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261111234220';
-import * as db from './db.js?v=261111234220';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261111235130';
+import { t, L, getLang } from './i18n.js?v=261111235130';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261111235130';
+import * as db from './db.js?v=261111235130';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -264,7 +264,7 @@ const CAT_LEAD = {
   bundles: ['מכשיר ומילוי במארז אחד, במחיר שמשתלם יותר.', 'A device and refill in one box, for less.'],
 };
 const PRICE_BANDS = [['', T('הכל', 'All')], ['0-100', T('עד 100₪', 'Up to ₪100')], ['100-300', '100–300₪'], ['300-9999', T('מעל 300₪', 'Over ₪300')]];
-const sortBar = (q, sort, n, f = {}, scent = true) => { const active_ = (f.str ? 1 : 0) + (f.notes?.length || 0) + (f.stock ? 1 : 0); return html`<div class="toolbar2">
+const sortBar = (q, sort, n, f = {}, scent = true) => { const active_ = (f.str ? 1 : 0) + (f.notes?.length || 0) + (f.stock ? 1 : 0) + (f.space ? 1 : 0) + (f.color ? 1 : 0); return html`<div class="toolbar2">
   <div class="tb-btns">
     ${scent ? '' : raw('<!--')}<button class="tb-btn" data-action="filter-open" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg><span>${T('סינון', 'Filter')}</span>${active_ ? html`<em>${active_}</em>` : ''}</button>${scent ? '' : raw('-->')}
     <label class="tb-btn sel"><span class="sr-only">${t('sortBy')}</span><select id="sort" data-input="sort">
@@ -273,12 +273,14 @@ const sortBar = (q, sort, n, f = {}, scent = true) => { const active_ = (f.str ?
   </div>
   <p class="count" aria-live="polite"><b>${n}</b> ${t('results')}${active_ ? html` · <button class="link-btn" data-action="filter-clear">${T('ניקוי סינון', 'Clear filters')}</button>` : ''}</p></div>`; };
 
-export function filterSheet(f = {}) {
+export function filterSheet(f = {}, cat = '') {
   return html`<div class="modal-bg sheet-bg"><aside class="sheet" role="dialog" aria-modal="true" aria-labelledby="fs-t">
     <header><h2 id="fs-t">${T('סינון', 'Filter')}</h2><button class="icon-x" data-action="modal-close" aria-label="${t('close')}">×</button></header>
     <form data-form="filter">
+      ${cat === 'diffusers' ? html`<fieldset><legend>${T('גודל החלל', 'Space size')}</legend><div class="fs-opts">${[['', T('הכל', 'All')], ...(db.SITE.subs?.['מפיצי ריח'] || []).map((x) => [x, subName(x)])].map(([v, l2]) => html`<label><input type="radio" name="space" value="${v}" ${raw((f.space || '') === v ? 'checked' : '')}><span>${l2}</span></label>`)}</div></fieldset>
+      <fieldset><legend>${T('צבע', 'Colour')}</legend><div class="fs-opts">${[['', T('הכל', 'All')], ['לבן', T('לבן', 'White')], ['שחור', T('שחור', 'Black')], ['ברונזה', T('ברונזה', 'Bronze')], ['כסף', T('כסוף / אפור', 'Silver / grey')]].map(([v, l2]) => html`<label><input type="radio" name="color" value="${v}" ${raw((f.color || '') === v ? 'checked' : '')}><span>${l2}</span></label>`)}</div></fieldset>` : html`
       <fieldset><legend>${T('עוצמת הריח', 'Scent strength')}</legend><div class="fs-opts">${[['', 'הכל', 'All'], ...STRENGTHS].map(([v, h, e]) => html`<label><input type="radio" name="str" value="${v}" ${raw((f.str || '') === v ? 'checked' : '')}><span>${T(h, e)}</span></label>`)}</div></fieldset>
-      <fieldset><legend>${T('אופי הריח', 'Scent character')} <small>${T('אפשר לבחור כמה', 'pick any')}</small></legend><div class="fs-opts">${NOTES.map(([v, h, e]) => html`<label><input type="checkbox" name="notes" value="${v}" ${raw(f.notes?.includes(v) ? 'checked' : '')}><span>${T(h, e)}</span></label>`)}</div></fieldset>
+      <fieldset><legend>${T('אופי הריח', 'Scent character')} <small>${T('אפשר לבחור כמה', 'pick any')}</small></legend><div class="fs-opts">${NOTES.map(([v, h, e]) => html`<label><input type="checkbox" name="notes" value="${v}" ${raw(f.notes?.includes(v) ? 'checked' : '')}><span>${T(h, e)}</span></label>`)}</div></fieldset>`}
       <label class="switch big"><input type="checkbox" name="stock" ${raw(f.stock ? 'checked' : '')}><span></span>${T('במלאי בלבד', 'In stock only')}</label>
       <button class="btn block" type="submit">${T('הצגת תוצאות', 'Show results')}</button>
     </form></aside></div>`;
@@ -291,6 +293,8 @@ const catTabs = (cat) => html`<nav class="cat-pills" aria-label="${t('categories
 
 export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
   let list = active();
+  if (f.space) list = list.filter((p) => p.cat !== 'diffusers' || p.sub === f.space);
+  if (f.color) list = list.filter((p) => p.cat !== 'diffusers' || (p.options?.[0]?.values || []).some((v) => (f.color === 'כסף' ? /כסף|כסוף|אפור|silver|grey/i : new RegExp(f.color)).test(v.he)));
   if (f.str) list = list.filter((p) => p.cat !== 'oils' || scentOf(p).strength === f.str);
   if (f.notes?.length) list = list.filter((p) => p.cat !== 'oils' || scentOf(p).notes.some((n) => f.notes.includes(n)));
   if (f.stock) list = list.filter((p) => p.quote || p.stock > 0);
@@ -377,8 +381,8 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
         ${subs.map((s2) => html`<a href="#/shop/${cat}/${encodeURIComponent(s2)}" aria-current="${s2 === sub}"><span class="st-img ${cat === 'diffusers' ? 'studio' : ''}"><img src="${small(subImg(cat, s2))}" alt="" width="160" height="160" loading="lazy"></span><b>${subName(s2)}</b></a>`)}
       </nav>` : ''}
       ${soon ? html`<div class="soon-box"><p class="eyebrow latin">Coming soon</p><h2>${T('הקולקציה תעלה בקרוב', 'The collection is coming soon')}</h2><p>${T('אנחנו מכינים עבורכם קולקציה חדשה. רוצים לשמוע ראשונים או להזמין כבר עכשיו?', 'A new collection is on its way. Want to hear first or order now?')}</p><a class="btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לפרטים בוואטסאפ', 'Ask on WhatsApp')}</a></div>` : html`
-      ${sortBar(q, sort, list.length, f, cat === 'oils' || !!q)}
-      ${list.length ? html`<div class="grid shop-grid">${list.map((p) => card(p, { feature: !q && !sub && (p.picks || p.id === 'say-300') }))}</div>` : html`<p class="empty">${t('noResults')}</p>`}`}
+      ${sortBar(q, sort, list.length, f, cat === 'oils' || cat === 'diffusers' || !!q)}
+      ${list.length ? html`<div class="grid shop-grid">${list.map((p) => card(p, { feature: !q && !sub && (p.picks || p.id === 'say-300') }))}</div>` : html`<div class="empty"><p>${T('לא נמצאו מוצרים בסינון הנוכחי. אפשר לשנות או לאפס את המסננים.', 'No products match these filters.')}</p><button class="btn ghost" data-action="filter-clear">${T('איפוס המסננים', 'Reset filters')}</button></div>`}`}
     </div></div><div class="block"></div>`;
 }
 
@@ -470,7 +474,7 @@ export function productPage(id) {
   return html`<div class="wrap"><div class="pdp">
     <div class="pdp-gallery">
       ${gallery.length > 1 ? html`<div class="pg-rail" role="group" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<button data-action="thumb" data-i="${i}" aria-label="${T('תמונה', 'Image')} ${i + 1}" aria-pressed="${i === 0}"><img src="${small(g)}" alt="" loading="lazy" width="120" height="120"></button>`)}</div>` : ''}
-      <div class="swipe ${p.fit === 'contain' ? 'contain' : ''}" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<figure class="pg-slide" data-i="${i}"><img src="${g}" alt="${L(p.name)} ${i + 1}" width="1000" height="1250" ${raw(i ? 'loading="lazy"' : 'fetchpriority="high"')} decoding="async"></figure>`)}</div>
+      <div class="swipe ${p.fit === 'contain' ? 'contain' : ''}" aria-label="${T('תמונות המוצר', 'Product images')}">${gallery.map((g, i) => html`<figure class="pg-slide" data-i="${i}"><img data-action="zoom" tabindex="0" src="${g}" alt="${L(p.name)} ${i + 1}" width="1000" height="1250" ${raw(i ? 'loading="lazy"' : 'fetchpriority="high"')} decoding="async"></figure>`)}</div>
       ${gallery.length > 1 ? html`<div class="pg-count" dir="ltr" aria-hidden="true"><b id="pg-n">1</b> / ${gallery.length}</div><div class="swipe-dots" aria-hidden="true">${gallery.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>` : ''}
     </div>
     <div class="pdp-info">
@@ -706,7 +710,7 @@ export function checkout() {
         <div class="row2">${f('name', t('fullName'), 'text', 'name', true, u?.name || '')}${f('phone', t('phone'), 'tel', 'tel', true, u?.phone || '', '050-0000000')}</div>
         ${f('email', t('email'), 'email', 'email', true, u?.email || '', T('לשליחת אישור ההזמנה', 'For your order confirmation'))}</section>
       <section class="co-box"><h2><span>2</span>${T('לאן לשלוח?', 'Where to deliver?')}</h2>
-        <div class="row2">${f('city', t('city'), 'text', 'address-level2')}${f('street', t('street'), 'text', 'street-address')}</div>
+        ${(() => { const ad = u ? (db.profileOf(u).full.addresses || []).find((a2) => a2.def) : null; return html`<div class="row2">${f('city', t('city'), 'text', 'address-level2', true, ad?.city || '')}${f('street', t('street'), 'text', 'street-address', true, ad?.street || '')}</div>`; })()}
         ${f('apt', t('apt'), 'text', 'off', false)}
         <details class="co-notes"><summary>${T('הוספת הערה לשליח', 'Add a note for the courier')}</summary><textarea class="input" id="notes" name="notes" rows="2" maxlength="300"></textarea></details>
         <p class="co-eta">${T('משלוח עד הבית תוך 7-10 ימים', 'Home delivery in 7–10 days')}${left ? '' : html` · <b>${T('חינם', 'free')}</b>`}</p></section>
@@ -755,18 +759,7 @@ export function orderDone(o) {
 
 export function account(tab = 'login', aud = 'retail') {
   const u = db.me();
-  if (u) {
-    const mine = db.orders().filter((o) => o.userId === u.id);
-    const staff = { admin: '#/admin', products: '#/admin/products', orders: '#/orders', courier: '#/courier' }[u.role];
-    return html`<div class="wrap legal"><p class="eyebrow">${t('clubMember')}</p><h1>${t('hello')}, ${u.name}</h1>
-      ${u.firstOrderDiscount && u.role === 'customer' ? html`<p class="note-gold">${t('tick3')}</p>` : ''}
-      ${u.role === 'customer' ? html`<div class="acc-pts"><span>✨</span><p><b>${db.pointsOf(u)} ${T('נקודות מועדון', 'club points')}</b>${T(`שווים ${m(Math.floor(db.pointsOf(u) / 100) * 10)} בהזמנה הבאה · כל ₪1 = נקודה, כל 100 נקודות = 10 ₪`, `Worth ${m(Math.floor(db.pointsOf(u) / 100) * 10)} on your next order`)}</p></div>` : ''}
-      ${staff ? html`<p><a class="btn gold" href="${staff}">${t('backoffice')}</a></p>` : ''}
-      <h2>${t('myOrders')}</h2>
-      ${mine.length ? html`<div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>${getLang() === 'he' ? 'תאריך' : 'Date'}</th><th>${t('total')}</th><th>${getLang() === 'he' ? 'סטטוס' : 'Status'}</th></tr></thead><tbody>
-        ${mine.map((o) => html`<tr><td>${o.num}</td><td>${new Date(o.date).toLocaleDateString(getLang())}</td><td>${m(o.total)}</td><td><span class="pill st-${o.status}">${statusLabel(o.status)}</span></td></tr>`)}</tbody></table></div>` : html`<p class="muted">${t('noOrders')}</p>`}
-      <p><button class="btn ghost" data-action="logout">${t('logout')}</button></p></div>`;
-  }
+  if (u) return accountArea(u, tab);
   const isLogin = tab === 'login';
   return html`<div class="auth-page"><div class="auth glass">
     <h1 class="auth-h">${T('כניסת לקוחות', 'Customer sign-in')}</h1>
@@ -784,6 +777,99 @@ export function account(tab = 'login', aud = 'retail') {
       <p class="err" id="auth-err" role="alert"></p>
       <button class="btn block" type="submit">${isLogin ? t('login') : t('register')}</button>
     </form></div></div>`;
+}
+
+// ---------- My account: dashboard, orders, addresses, profile ----------
+const STEPS = ['new', 'processing', 'shipped', 'delivered'];
+const track = (o) => { if (o.status === 'cancelled') return html`<p class="trk-x">${statusLabel('cancelled')}</p>`; const i = Math.max(0, STEPS.indexOf(o.status === 'ready' ? 'processing' : o.status));
+  return html`<ol class="trk">${STEPS.map((st, k) => html`<li class="${k <= i ? 'on' : ''}"><i></i><span>${({ new: T('התקבלה', 'Received'), processing: T('בטיפול', 'Processing'), shipped: T('נשלחה', 'Shipped'), delivered: T('נמסרה', 'Delivered') })[st]}</span></li>`)}</ol>${o.tracking ? html`<p class="trk-no">${T('מספר מעקב', 'Tracking')}: <b dir="ltr">${o.tracking}</b></p>` : ''}`; };
+const orderCard = (o, open = false) => html`<details class="oc" ${raw(open ? 'open' : '')}><summary><span><b dir="ltr">#${o.num}</b><small>${new Date(o.date).toLocaleDateString(getLang() === 'he' ? 'he-IL' : 'en-GB')}</small></span><span class="pill st-${o.status}">${statusLabel(o.status)}</span><strong>${m(o.total)}</strong></summary>
+  ${track(o)}<ul class="oc-items">${o.items.map((x) => html`<li><span>${L(x.name)}${x.size && x.size !== 'יחידה' && x.size !== 'מארז' ? ` · ${x.size}` : ''}${x.opt ? ` · ${x.opt}` : ''} × ${x.qty}</span><b>${m(x.price * x.qty)}</b></li>`)}</ul>
+  <p class="oc-addr">${o.customer.street}, ${o.customer.city}</p></details>`;
+function accountArea(u, tab) {
+  const back = html`<a class="acc-back" href="#/account">${he() ? '→' : '←'} ${T('האזור האישי שלי', 'My account')}</a>`;
+  const { full, pct, missing } = db.profileOf(u);
+  const mine = db.myOrders();
+  const staff = { admin: '#/admin', products: '#/admin/products', orders: '#/orders', courier: '#/courier' }[u.role];
+  if (tab === 'orders') return html`<div class="wrap acc">${back}<h1>${T('ההזמנות שלי', 'My orders')}</h1>${mine.length ? html`<div class="oc-list">${mine.map((o, i) => orderCard(o, !i))}</div>` : html`<p class="acc-empty">${T('עדיין אין כאן הזמנות. אפשר להתחיל לגלות את הקולקציה שלנו.', 'No orders yet.')} <a href="#/shop">${T('לחנות', 'Shop')}</a></p>`}</div>`;
+  if (tab === 'addresses') { const ad = full.addresses || [];
+    return html`<div class="wrap acc">${back}<h1>${T('הכתובות שלי', 'My addresses')}</h1>
+      <div class="ad-list">${ad.map((a2, i) => html`<div class="ad ${a2.def ? 'def' : ''}"><p><b>${a2.label || T('כתובת', 'Address')}</b>${a2.def ? html`<em>${T('ברירת מחדל', 'Default')}</em>` : ''}</p><p>${a2.street}${a2.apt ? `, ${a2.apt}` : ''}, ${a2.city}</p>${a2.notes ? html`<p class="muted">${a2.notes}</p>` : ''}
+        <div class="ad-acts">${a2.def ? '' : html`<button class="link-btn" data-action="ad-def" data-i="${i}">${T('הגדרה כברירת מחדל', 'Make default')}</button>`}<button class="link-btn danger" data-action="ad-del" data-i="${i}">${T('מחיקה', 'Delete')}</button></div></div>`)}</div>
+      <form class="acc-form" data-form="address" novalidate><h2>${T('הוספת כתובת', 'Add an address')}</h2>
+        <div class="row2"><div class="field"><label for="ad-l">${T('שם לכתובת', 'Label')}</label><input class="input" id="ad-l" name="label" maxlength="30" placeholder="${T('בית / עבודה', 'Home / Work')}"></div><div class="field"><label for="ad-c">${t('city')} *</label><input class="input" id="ad-c" name="city" maxlength="60" autocomplete="address-level2"></div></div>
+        <div class="row2"><div class="field"><label for="ad-s">${t('street')} *</label><input class="input" id="ad-s" name="street" maxlength="120" autocomplete="street-address"></div><div class="field"><label for="ad-a">${T('דירה / קומה', 'Apt / floor')}</label><input class="input" id="ad-a" name="apt" maxlength="40"></div></div>
+        <div class="field"><label for="ad-n">${T('הערות לשליח', 'Notes for the courier')}</label><input class="input" id="ad-n" name="notes" maxlength="120"></div>
+        <p class="err" id="ad-err" role="alert"></p><button class="btn" type="submit">${T('שמירת הכתובת', 'Save address')}</button></form></div>`; }
+  if (tab === 'profile') return html`<div class="wrap acc">${back}<h1>${T('הפרטים שלי', 'My details')}</h1>
+      <form class="acc-form" data-form="profile" novalidate>
+        <div class="field"><label for="pf-n">${t('fullName')}</label><input class="input" id="pf-n" name="name" value="${full.name || ''}" maxlength="80" autocomplete="name" placeholder="${T('כדי שנדע איך לפנות אליך', 'So we know how to address you')}"></div>
+        <div class="field"><label for="pf-p">${t('phone')}</label><input class="input" id="pf-p" name="phone" type="tel" value="${full.phone || ''}" maxlength="20" autocomplete="tel" placeholder="${T('לעדכוני הזמנות ואימות החשבון', 'For order updates')}"></div>
+        <div class="field"><label for="pf-e">${t('email')}</label><input class="input" id="pf-e" value="${full.email || ''}" disabled><small class="muted">${T('לקבלות ולהודעות חשבון. לשינוי אימייל פנו אלינו.', 'For receipts. Contact us to change it.')}</small></div>
+        <div class="field"><label for="pf-b">${T('תאריך לידה (רשות)', 'Birthday (optional)')}</label><input class="input" id="pf-b" name="birthday" type="date" value="${full.birthday || ''}"><small class="muted">${T('כדי שנוכל לפנק אותך ביום ההולדת. לא חובה לרכישה.', 'So we can treat you on your birthday. Never required.')}</small></div>
+        <label class="check"><input type="checkbox" name="newsletter" ${raw(full.newsletter ? 'checked' : '')}><span>${T('אשמח לקבל הטבות ועדכונים בוואטסאפ ובמייל', 'Send me offers by WhatsApp and email')}</span></label>
+        <p class="acc-priv">${T('הפרטים משמשים רק לטיפול בהזמנות ולהטבות המועדון, ולא מועברים לגורם אחר.', 'Your details are used only for orders and club perks.')}</p>
+        <p class="err" id="pf-err" role="alert"></p><button class="btn" type="submit">${T('שמירת הפרטים שלי', 'Save my details')}</button></form></div>`;
+  const last = mine[0]; const first = (u.name || '').split(' ')[0];
+  const miss = { name: T('שם', 'name'), phone: T('טלפון', 'phone'), email: T('אימייל', 'email'), birthday: T('תאריך לידה', 'birthday'), address: T('כתובת', 'address') };
+  const tile = (href, ic, h, d) => html`<a class="acc-tile" href="${href}">${raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg>`)}<b>${h}</b><small>${d}</small></a>`;
+  return html`<div class="wrap acc">
+    <header class="acc-h"><p class="c3-k">SAY CLUB · ${T('האזור האישי שלי', 'My account')}</p><h1>${T('שלום', 'Hello')}, ${first}</h1>${staff ? html`<a class="btn gold sm" href="${staff}">${t('backoffice')}</a>` : ''}</header>
+    ${pct < 100 && u.role === 'customer' ? html`<div class="acc-prof"><div><b>${T(`הפרופיל שלך הושלם ${pct}%`, `Profile ${pct}% complete`)}</b><small>${T('נותרו כמה פרטים להשלמה', 'A few details left')}: ${missing.map((k) => miss[k]).join(', ')}</small><span class="acc-bar"><i style-w="${pct}"></i></span></div><a class="btn sm" href="${missing.includes('address') && missing.length === 1 ? '#/account/addresses' : '#/account/profile'}">${T('השלמת הפרופיל שלי', 'Complete my profile')}</a></div>` : ''}
+    ${last ? html`<section class="acc-last"><h2>${T('ההזמנה האחרונה', 'Latest order')}</h2>${orderCard(last, true)}</section>` : ''}
+    <div class="acc-tiles">
+      ${tile('#/account/orders', '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>', T('ההזמנות שלי', 'My orders'), mine.length ? `${mine.length} ${T('הזמנות', 'orders')}` : T('עדיין אין הזמנות', 'No orders yet'))}
+      ${tile('#/account/addresses', '<path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>', T('הכתובות שלי', 'My addresses'), `${(full.addresses || []).length} ${T('שמורות', 'saved')}`)}
+      ${tile('#/account/profile', '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.2-6.5 8-6.5s7 2 8 6.5"/>', T('הפרטים שלי', 'My details'), T('שם, טלפון ויום הולדת', 'Name, phone, birthday'))}
+      ${tile('#/club', '<path d="M3 18h18l-2-10-5 4-2-6-2 6-5-4z"/>', 'SAY CLUB', `${db.pointsOf(u)} ${T('נקודות', 'points')}`)}
+    </div>
+    <p class="acc-foot"><a href="${waLink(T('שלום, הגעתי דרך אתר SAY BOUTIQUE ואשמח לעזרה עם החשבון שלי', 'Hi, I need help with my account'))}" target="_blank" rel="noopener noreferrer">${T('צריכים עזרה? כתבו לנו', 'Need help?')}</a><button class="link-btn" data-action="logout">${t('logout')}</button></p>
+  </div>`;
+}
+
+// ---------- SAY CLUB page ----------
+export function clubPage() {
+  const u = db.me(); const full = u ? db.profileOf(u).full : {};
+  const perks = [['<rect x="3" y="9" width="18" height="12" rx="1"/><path d="M3 13h18M12 9v12M12 9C10 5 6 5 7 8c.5 1.3 3 1 5 1zm0 0c2-4 6-4 5-1-.5 1.3-3 1-5 1z"/>', T('15% הנחה לקנייה הראשונה', '15% off your first order'), T('מופעלת אוטומטית בקופה למצטרפים חדשים.', 'Applied automatically at checkout.')],
+    ['<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5l1.4 2.9 3.1.4-2.3 2.2.6 3.1-2.8-1.5-2.8 1.5.6-3.1-2.3-2.2 3.1-.4z"/>', T('צבירת נקודות', 'Earn points'), T('נקודה על כל שקל ששילמתם; כל 100 נקודות = 10 ₪ בקנייה הבאה.', 'A point per shekel; 100 points = ₪10.')],
+    ['<path d="M4 21h16M5 21v-7h14v7M8 14v-3h8v3M12 11V8M12 4.5c.8.9.8 1.8 0 2.5-.8-.7-.8-1.6 0-2.5z"/>', T('יום ההולדת שלך, הפינוק שלנו', 'Your birthday, our treat'), T('הטבה מיוחדת לחברים שעדכנו תאריך לידה, בהתאם לתנאי המועדון.', 'A special treat for members, per club terms.')]];
+  return html`<div class="club-pg">
+    <header class="cp-hero"><div class="wrap cp-in"><div class="cp-copy"><p class="c3-k">SAY CLUB</p><h1>${T('היוקרה משתלמת', 'Luxury pays off')}<br><em>${T('יותר מבפנים.', 'more on the inside.')}</em></h1>
+      <p>${T('הצטרפו למועדון ותיהנו מהטבות מיוחדות ומתנת יום הולדת, בהתאם לתנאי המועדון.', 'Join for special perks and a birthday gift, per club terms.')}</p>
+      ${u ? html`<p class="cp-pts"><b>${db.pointsOf(u)}</b> ${T('נקודות בחשבון', 'points')} · ${T(`שוות ${m(Math.floor(db.pointsOf(u) / 100) * 10)}`, `worth ${m(Math.floor(db.pointsOf(u) / 100) * 10)}`)}</p>` : html`<button class="hx-btn" data-action="join-club" type="button">${T('להצטרפות ל־SAY CLUB', 'Join SAY CLUB')}</button>`}</div>
+      <div class="cp-card"><div class="mcard"><span class="mc-shine"></span><img class="mc-logo" src="assets/img/logo-wide-light.webp" alt="" width="923" height="350"><span class="mc-chip"></span><span class="mc-label">${u ? (full.name || '').toUpperCase().slice(0, 22) || 'MEMBER' : 'MEMBER'}</span><span class="mc-no" dir="ltr">SAY · CLUB · ${u ? String(1000 + (parseInt(u.id.replace(/\D/g, '').slice(-4)) || 15)).slice(-4) : '0015'}</span><span class="mc-pct"><b>${u ? 'VIP' : '15%'}</b><small>${u ? T('חבר/ה', 'MEMBER') : T('הנחה', 'OFF')}</small></span></div></div></div></header>
+    <div class="wrap">
+      <section class="cp-perks">${perks.map(([ic, h, d]) => html`<article>${raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg>`)}<b>${h}</b><p>${d}</p></article>`)}</section>
+      ${u ? html`<section class="cp-mine"><h2>${T('ההטבות שלי', 'My perks')}</h2><ul>
+        ${full.firstOrderDiscount ? html`<li><b>${T('15% הנחה על ההזמנה הראשונה', '15% off your first order')}</b><small>${T('פעילה — תופעל אוטומטית בקופה', 'Active — applied at checkout')}</small></li>` : ''}
+        <li><b>${db.pointsOf(u)} ${T('נקודות', 'points')}</b><small>${T('ניתן לממש בקופה מ־100 נקודות', 'Redeem at checkout from 100 points')}</small></li>
+        <li><b>${T('הטבת יום הולדת', 'Birthday treat')}</b><small>${full.birthday ? T('נשלח אליך סמוך ליום ההולדת', 'Coming around your birthday') : html`${T('הוסיפו תאריך לידה כדי לקבל', 'Add your birthday to receive it')} — <a href="#/account/profile">${T('לעדכון', 'Update')}</a>`}</small></li></ul></section>` : ''}
+      <section class="cp-new"><h2>${T('חדש ב־SAY CLUB', 'New in SAY CLUB')}</h2><p>${T('השקות ריחות, מארזים מיוחדים והטבות לחברים בלבד — יופיעו כאן ובהודעות למי שאישר קבלת עדכונים.', 'New scents, special bundles and member offers appear here.')}</p></section>
+      <p class="cp-terms">${T('ההטבות כפופות לתנאי המועדון שבתקנון. הנחת ההצטרפות חד־פעמית ותקפה להזמנה הראשונה בלבד.', 'Perks are subject to the club terms. The welcome discount applies once, to the first order.')} <a href="#/terms">${t('terms')}</a></p>
+    </div></div><div class="block"></div>`;
+}
+
+// ---------- SAY BUSINESS: four paths + inquiry form ----------
+export function businessPage(path = '') {
+  const PATHS = [['wholesale', T('סיטונאות', 'Wholesale'), T('לחברות ניהול, חברות ניקיון, חנויות ועסקים.', 'For management companies, cleaning firms and shops.'), 'assets/products/say-300-3.webp'],
+    ['branding', T('מיתוג אישי', 'Private label'), T('מוצרים במיתוג העסק שלכם — פרטים לאחר פנייה.', 'Products with your branding — details on request.'), 'assets/products/kit-4.webp'],
+    ['stands', T('סטנדים בנקודות מכירה', 'Point-of-sale stands'), T('סטנד עם מוצרי דוגמה בחנות, ואספקת מוצרים למכירה במחיר סיטונאי.', 'A stand with samples, and stock at wholesale prices.'), 'assets/products/hero-3.webp'],
+    ['rental', T('השכרת מפיצים', 'Diffuser rental'), T('השכרה חודשית הכוללת מילוי ושירות עד העסק.', 'Monthly rental with refills and service.'), 'assets/products/say-400-5.webp']];
+  return html`<div class="biz">
+    <header class="biz-h wrap"><p class="c3-k">SAY BUSINESS</p><h1>${T('צומחים יחד עם SAY BOUTIQUE', 'Grow with SAY BOUTIQUE')}</h1>
+      <p>${T('מחירי סיטונאות לחברות ניהול, חברות ניקיון וחנויות, אפשרויות מיתוג אישי וסטנדים עם מוצרי דוגמה לנקודות מכירה.', 'Wholesale prices, private label and point-of-sale stands.')}</p></header>
+    <div class="wrap biz-paths">${PATHS.map(([k, h, d, img]) => html`<a class="biz-p ${path === k ? 'on' : ''}" href="#/business/${k}"><span class="biz-img"><img src="${small(img)}" alt="" loading="lazy" width="500" height="400"></span><b>${h}</b><small>${d}</small></a>`)}</div>
+    <section class="wrap biz-form-w" id="biz-form"><h2>${T('השאירו פרטים ונחזור אליכם', 'Leave your details')}</h2>
+      <form class="acc-form" data-form="biz" novalidate>
+        <div class="field"><label for="bz-k">${T('תחום עניין', 'Interest')} *</label><select class="input" id="bz-k" name="kind">${PATHS.map(([k, h]) => html`<option value="${k}" ${raw(path === k ? 'selected' : '')}>${h}</option>`)}</select></div>
+        <div class="row2"><div class="field"><label for="bz-t">${T('סוג העסק', 'Business type')} *</label><input class="input" id="bz-t" name="type" maxlength="60" placeholder="${T('חנות, חברת ניהול, משרד…', 'Shop, management company…')}"></div><div class="field"><label for="bz-c">${t('city')} *</label><input class="input" id="bz-c" name="city" maxlength="60"></div></div>
+        <div class="row2"><div class="field"><label for="bz-n">${T('איש קשר', 'Contact name')} *</label><input class="input" id="bz-n" name="name" maxlength="80" autocomplete="name"></div><div class="field"><label for="bz-p">${t('phone')} *</label><input class="input" id="bz-p" name="phone" type="tel" maxlength="20" autocomplete="tel"></div></div>
+        <div class="field"><label for="bz-m">${T('ספרו לנו על הצורך', 'Tell us what you need')}</label><textarea class="input" id="bz-m" name="msg" rows="3" maxlength="600"></textarea></div>
+        <label class="check"><input type="checkbox" name="agree"><span>${t('agree')}<a href="#/privacy">${t('privacy')}</a> *</span></label>
+        <p class="err" id="bz-err" role="alert"></p>
+        <button class="btn" type="submit">${T('שליחה בוואטסאפ', 'Send via WhatsApp')}</button>
+        <small class="muted">${T('ההודעה תיפתח בוואטסאפ מוכנה לשליחה — אתם מחליטים אם לשלוח.', 'The message opens ready in WhatsApp — you decide to send.')}</small></form></section>
+  </div><div class="block"></div>`;
 }
 
 export const statusLabel = (s) => ({
