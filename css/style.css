@@ -3780,3 +3780,5 @@ body:has(.cc3) .vipf,body:has(.oln) .vipf{opacity:0;pointer-events:none}
 .slip header img{height:60px;width:auto}
 .lbl-name:has(.insp){display:flex!important;flex-direction:column;align-items:center}
 .lbl-name .insp{font-size:.55em;margin:0 0 .1rem}
+@media (max-width:380px){.sx-t span{flex-direction:column;align-items:flex-start}.sx-t small{white-space:normal}}
+.mcard{contain:paint}
