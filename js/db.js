@@ -1,8 +1,8 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261112192006';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261112192006';
+import { SEED_PRODUCTS } from './data.js?v=261112192551';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261112192551';
 
 const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -26,7 +26,7 @@ export async function loadCatalog() {
   let fresh = null;
   try { const r = await fetch('data/products.json', { cache: 'no-cache' }); if (r.ok) { const j = await r.json(); if (Array.isArray(j) && j.length) fresh = j; } } catch {}
   const stored = read('products', null);
-  if (!stored) { write('products', fresh || SEED_PRODUCTS); return; }
+  if (!stored) { write('products', fresh || SEED_PRODUCTS); applyDemoPrices(); return; }
   if (!fresh) return;
   // Keep admin edits (prices, stock, visibility…) but always take image paths from the server,
   // so a browser holding an older copy never shows missing pictures. New catalog items are added.
@@ -34,6 +34,14 @@ export async function loadCatalog() {
   const merged = stored.map((p) => (byId[p.id] ? { ...p, img: byId[p.id].img, gallery: byId[p.id].gallery, pack: byId[p.id].pack, options: byId[p.id].options || p.options } : p));
   for (const p of fresh) if (!stored.some((x) => x.id === p.id)) merged.push(p);
   write('products', merged);
+  applyDemoPrices();
+}
+// Placeholder prices + "before" prices until the owner sets real ones (applied once per browser; back-office edits win afterwards).
+const DEMO_PRICES = {"say-car": [199, 249], "say-room-office": [229, 279], "say-100": [299, 379], "say-150": [329, 429], "say-300": [699, 899], "say-400": [1490, 1890], "bundle-say100-1l": [649, 798], "bundle-say150-1l": [679, 828], "bundle-say300-1l": [999, 1198], "bundle-car-kit": [249, 298], "bundle-5x100": [379, 445], "kit-14": [99, 129], "kit-4": [99, 129]};
+function applyDemoPrices() {
+  if (read('pricesV1', false)) return;
+  const l = products().map((p) => { const d = DEMO_PRICES[p.id]; if (!d) return p; const sizes = p.sizes.map((s, i) => (i ? s : { ...s, price: d[0], wholesale: s.wholesale || Math.round(d[0] * 0.75) })); return { ...p, sizes, was: d[1], quote: false }; });
+  write('products', l); write('pricesV1', true);
 }
 export const products = () => read('products', SEED_PRODUCTS);
 export const product = (id) => products().find((p) => p.id === id);

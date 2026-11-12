@@ -3831,3 +3831,7 @@ html,body{overflow-x:clip!important;max-width:100%}
 /* ===== One card template: quote products use the same button ===== */
 .qa.qa-q1{grid-template-columns:1fr}
 .qa.qa-q1 .qa-add{display:flex;align-items:center;justify-content:center;text-decoration:none}
+.pt-sale{font-style:normal;font-size:.68rem;font-weight:800;letter-spacing:.04em;color:#E2C88F;background:#16130F;padding:.15rem .5rem;border-radius:999px;align-self:center}
+.pt-was{color:#a33a2c!important;text-decoration-color:#a33a2c}
+.pdp-specs li{min-width:0;overflow:hidden}
+.pdp-specs b{white-space:normal!important;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2;max-width:100%;word-break:break-word}

@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261112192006';
-import { t, L, getLang } from './i18n.js?v=261112192006';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261112192006';
-import * as db from './db.js?v=261112192006';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261112192551';
+import { t, L, getLang } from './i18n.js?v=261112192551';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261112192551';
+import * as db from './db.js?v=261112192551';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -25,7 +25,7 @@ export function priceTag(p) {
   const ws = db.me()?.role === 'wholesale';
   const from = p.sizes.length > 1 ? T('החל מ־', 'From ') : '';
   const now = minPrice(p, ws); const was = !ws && p.was > now ? p.was : 0;
-  return html`<span class="price">${was ? html`<s class="pt-was">${m(was)}</s>` : ''}<b class="pt-now">${from}${m(now)}</b>${ws ? html`<s>${m(minPrice(p, false))}</s>` : ''}</span>`;
+  return html`<span class="price">${was ? html`<em class="pt-sale">${T('מבצע', 'Sale')}</em><s class="pt-was">${m(was)}</s>` : ''}<b class="pt-now">${from}${m(now)}</b>${ws ? html`<s>${m(minPrice(p, false))}</s>` : ''}</span>`;
 }
 
 // Card image: a consistent "packshot" (oil bottle / clean device front), with a second look on hover.

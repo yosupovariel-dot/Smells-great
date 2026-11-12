@@ -99,7 +99,8 @@
   "upsellKit": true,
   "active": true,
   "stock": 25,
-  "tag": ""
+  "tag": "",
+  "was": 279
  },
  {
   "id": "say-car",
@@ -208,7 +209,8 @@
   "upsellKit": true,
   "active": true,
   "stock": 25,
-  "tag": "best"
+  "tag": "best",
+  "was": 249
  },
  {
   "id": "say-100",
@@ -315,7 +317,8 @@
   "active": true,
   "stock": 25,
   "tag": "",
-  "pack": "assets/products/say-100-6.webp"
+  "pack": "assets/products/say-100-6.webp",
+  "was": 379
  },
  {
   "id": "say-150",
@@ -424,7 +427,8 @@
   "upsellKit": true,
   "active": true,
   "stock": 25,
-  "tag": "best"
+  "tag": "best",
+  "was": 429
  },
  {
   "id": "say-300",
@@ -550,7 +554,8 @@
   "upsellKit": true,
   "active": true,
   "stock": 25,
-  "tag": ""
+  "tag": "",
+  "was": 899
  },
  {
   "id": "say-400",
@@ -617,12 +622,12 @@
   "sizes": [
    {
     "label": "יחידה",
-    "price": 0,
-    "wholesale": 0,
+    "price": 1490,
+    "wholesale": 1118,
     "cost": 0
    }
   ],
-  "quote": true,
+  "quote": false,
   "options": [],
   "img": "assets/products/say-400-0.webp",
   "gallery": [
@@ -639,7 +644,8 @@
   "upsellKit": true,
   "active": true,
   "stock": 25,
-  "tag": "new"
+  "tag": "new",
+  "was": 1890
  },
  {
   "id": "kit-14",
@@ -725,7 +731,9 @@
    "oil-zanzibar",
    "oil-bubbles",
    "oil-pure-rain"
-  ]
+  ],
+  "was": 129,
+  "quote": false
  },
  {
   "id": "kit-4",
@@ -811,7 +819,9 @@
    "oil-zanzibar",
    "oil-bubbles",
    "oil-pure-rain"
-  ]
+  ],
+  "was": 129,
+  "quote": false
  },
  {
   "id": "oil-bereshit",
@@ -4339,18 +4349,19 @@
   "sizes": [
    {
     "label": "מארז",
-    "price": 0,
-    "wholesale": 0,
+    "price": 649,
+    "wholesale": 487,
     "cost": 0
    }
   ],
-  "quote": true,
+  "quote": false,
   "img": "assets/products/bundle-1.webp",
   "gallery": [],
   "fit": "cover",
   "wide": true,
   "active": true,
-  "stock": 20
+  "stock": 20,
+  "was": 798
  },
  {
   "id": "bundle-say150-1l",
@@ -4368,18 +4379,19 @@
   "sizes": [
    {
     "label": "מארז",
-    "price": 0,
-    "wholesale": 0,
+    "price": 679,
+    "wholesale": 509,
     "cost": 0
    }
   ],
-  "quote": true,
+  "quote": false,
   "img": "assets/products/hero-1.webp",
   "gallery": [],
   "fit": "cover",
   "wide": true,
   "active": true,
-  "stock": 20
+  "stock": 20,
+  "was": 828
  },
  {
   "id": "bundle-say300-1l",
@@ -4397,18 +4409,19 @@
   "sizes": [
    {
     "label": "מארז",
-    "price": 0,
-    "wholesale": 0,
+    "price": 999,
+    "wholesale": 749,
     "cost": 0
    }
   ],
-  "quote": true,
+  "quote": false,
   "img": "assets/products/hero-0.webp",
   "gallery": [],
   "fit": "cover",
   "wide": true,
   "active": true,
-  "stock": 20
+  "stock": 20,
+  "was": 1198
  },
  {
   "id": "bundle-5x100",
@@ -4426,18 +4439,19 @@
   "sizes": [
    {
     "label": "מארז",
-    "price": 0,
-    "wholesale": 0,
+    "price": 379,
+    "wholesale": 284,
     "cost": 0
    }
   ],
-  "quote": true,
+  "quote": false,
   "img": "assets/products/bundle-2.webp",
   "gallery": [],
   "fit": "cover",
   "wide": true,
   "active": true,
-  "stock": 20
+  "stock": 20,
+  "was": 445
  },
  {
   "id": "bundle-car-kit",
@@ -4455,17 +4469,18 @@
   "sizes": [
    {
     "label": "מארז",
-    "price": 0,
-    "wholesale": 0,
+    "price": 249,
+    "wholesale": 187,
     "cost": 0
    }
   ],
-  "quote": true,
+  "quote": false,
   "img": "assets/products/bundle-3.webp",
   "gallery": [],
   "fit": "cover",
   "wide": true,
   "active": true,
-  "stock": 20
+  "stock": 20,
+  "was": 298
  }
 ]
