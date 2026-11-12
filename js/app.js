@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261112120359';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261112120359';
-import { CATEGORIES } from './data.js?v=261112120359';
-import * as db from './db.js?v=261112120359';
-import * as S from './views-shop.js?v=261112120359';
-import * as Lg from './views-legal.js?v=261112120359';
-import * as A from './views-admin.js?v=261112120359';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261112192006';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261112192006';
+import { CATEGORIES } from './data.js?v=261112192006';
+import * as db from './db.js?v=261112192006';
+import * as S from './views-shop.js?v=261112192006';
+import * as Lg from './views-legal.js?v=261112192006';
+import * as A from './views-admin.js?v=261112192006';
 
 // Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
 if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
@@ -103,7 +103,7 @@ function footer() {
       <a class="credit" href="https://arielyosupov-webdesign.com" target="_blank" rel="noopener noreferrer">${t('builtBy')}</a></div>
   </div></footer>
   <button class="fab fab-top" data-action="top" aria-label="${getLang() === 'he' ? 'חזרה לראש העמוד' : 'Back to top'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 14l6-6 6 6"/></svg></button>
-  ${db.me()?.role && db.me().role !== 'customer' ? '' : html`<div class="vipf" role="complementary"><button class="vipf-card" data-action="join-club" type="button" aria-label="SAY CLUB — ${getLang() === 'he' ? 'יש הפתעות ששמורות רק לחברים' : 'Surprises for members only'}"><span class="vc back" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M3 13h18M12 9v12M12 9C10 5 6 5 7 8c.5 1.3 3 1 5 1zm0 0c2-4 6-4 5-1-.5 1.3-3 1-5 1z"/></svg></span><span class="vc front"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18l-2-10-5 4-2-6-2 6-5-4z"/></svg><b>SAY CLUB</b><small>${getLang() === 'he' ? 'יש הפתעות ששמורות רק לחברים' : 'Member-only surprises'}</small></span></button><button class="vipf-x" data-action="vipf-x" type="button" aria-label="${t('close')}">×</button></div>`}
+  ${db.me()?.role && db.me().role !== 'customer' ? '' : html`<button class="vipf" data-action="join-club" type="button" aria-label="SAY CLUB — ${getLang() === 'he' ? 'יש הפתעות ששמורות רק לחברים' : 'Surprises for members only'}"><span class="vc v1" aria-hidden="true"></span><span class="vc v2" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 18h18l-2-10-5 4-2-6-2 6-5-4z"/></svg><b>CLUB</b></span></button>`}
   <a class="fab fab-wa" href="https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(getLang() === 'he' ? 'שלום, הגעתי דרך אתר SAY BOUTIQUE ואשמח לעזרה' : 'Hi, I came from the SAY BOUTIQUE website')}" target="_blank" rel="noopener noreferrer" aria-label="${t('whatsapp')} ${PHONE_DISPLAY}">${raw(ICONS.wa)}</a>
   <button class="fab fab-a11y" data-action="a11y" aria-label="${t('a11yTitle')}" aria-expanded="false" aria-controls="a11y-panel">${raw(ICONS.a11y)}</button>
   ${a11yPanel()}
@@ -440,9 +440,28 @@ function closeMenu() {
   nav.classList.remove('open'); document.body.classList.remove('menu-open'); document.body.style.top = '';
   window.scrollTo({ top: menuY, behavior: 'instant' }); $('[data-action="menu"]')?.setAttribute('aria-expanded', 'false'); menuRelease?.(); menuRelease = null;
 }
-let swX = null, swY = null;
-document.addEventListener('touchstart', (e) => { if (e.target.closest('#nav.open')) { swX = e.touches[0].clientX; swY = e.touches[0].clientY; } }, { passive: true });
-document.addEventListener('touchend', (e) => { if (swX === null) return; const dx = e.changedTouches[0].clientX - swX, dy = Math.abs(e.changedTouches[0].clientY - swY); swX = null; const toEdge = document.dir === 'rtl' ? dx : -dx; if (toEdge > 70 && dy < 60) closeMenu(); }, { passive: true });
+// Drag-to-close: the drawer follows the finger from anywhere on screen; release past 30% (or a quick flick) closes it.
+let drag = null;
+document.addEventListener('touchstart', (e) => {
+  const nav = $('#nav'); if (!nav?.classList.contains('open') || e.touches.length !== 1) return;
+  drag = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now(), dx: 0, axis: null, w: nav.offsetWidth };
+}, { passive: true });
+document.addEventListener('touchmove', (e) => {
+  if (!drag) return; const nav = $('#nav'); const bg = $('.nav-bg');
+  const dx = e.touches[0].clientX - drag.x, dy = e.touches[0].clientY - drag.y;
+  if (!drag.axis) { if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; drag.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; if (drag.axis === 'x') { nav.classList.add('dragging'); bg?.classList.add('dragging'); } }
+  if (drag.axis !== 'x') { if (!e.target.closest('#nav')) e.preventDefault(); return; }
+  e.preventDefault();
+  const dir = document.dir === 'rtl' ? 1 : -1; const off = Math.max(0, dx * dir); drag.dx = off;
+  nav.style.setProperty('transform', `translateX(${off * dir}px)`, 'important'); if (bg) bg.style.setProperty('opacity', String(Math.max(0, 1 - off / drag.w)), 'important');
+}, { passive: false });
+document.addEventListener('touchend', () => {
+  if (!drag) return; const nav = $('#nav'); const bg = $('.nav-bg'); const d = drag; drag = null;
+  if (d.axis !== 'x') return;
+  nav.classList.remove('dragging'); bg?.classList.remove('dragging'); nav.style.removeProperty('transform'); bg?.style.removeProperty('opacity');
+  const fast = d.dx / Math.max(1, Date.now() - d.t) > 0.5;
+  if (d.dx > d.w * 0.3 || (fast && d.dx > 40)) closeMenu();
+}, { passive: true });
 window.addEventListener('hashchange', () => { if ($('#nav')?.classList.contains('open')) { menuY = 0; closeMenu(); } });
 
 // ---------- Modal ----------

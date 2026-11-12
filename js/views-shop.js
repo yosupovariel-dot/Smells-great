@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261112120359';
-import { t, L, getLang } from './i18n.js?v=261112120359';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261112120359';
-import * as db from './db.js?v=261112120359';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261112192006';
+import { t, L, getLang } from './i18n.js?v=261112192006';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261112192006';
+import * as db from './db.js?v=261112192006';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -83,7 +83,7 @@ const BENEFIT = {
 };
 // Quantity + add-to-cart right on the card.
 function buyRow(p) {
-  if (p.quote) return html`<a class="qa-wa" href="${waLink(T('שלום, אשמח להצעת מחיר עבור ', 'Hi, a quote for ') + L(p.name))}" target="_blank" rel="noopener noreferrer">${T('הצעת מחיר בוואטסאפ', 'Quote on WhatsApp')}</a>`;
+  if (p.quote) return html`<div class="qa qa-q1"><a class="qa-add" href="#/product/${p.id}">${T('לפרטים ומחיר', 'Details & price')}</a></div>`;
   if (p.picks) return html`<a class="qa-go" href="#/product/${p.id}">${T('לבחירת הריחות', 'Choose scents')}</a>`;
   return html`<div class="qa" data-id="${p.id}"><div class="qa-q" role="group" aria-label="${t('qty')}"><button type="button" data-action="qa-step" data-d="1" aria-label="${t('increase')}">+</button><output class="qa-n" aria-live="polite">1</output><button type="button" data-action="qa-step" data-d="-1" aria-label="${t('decrease')}">−</button></div>
     <button type="button" class="qa-add" data-action="quick-add" data-id="${p.id}">${T('הוספה לסל', 'Add to bag')}</button></div>
@@ -383,7 +383,7 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
       </nav>` : ''}
       ${soon ? html`<div class="soon-box"><p class="eyebrow latin">Coming soon</p><h2>${T('הקולקציה תעלה בקרוב', 'The collection is coming soon')}</h2><p>${T('אנחנו מכינים עבורכם קולקציה חדשה. רוצים לשמוע ראשונים או להזמין כבר עכשיו?', 'A new collection is on its way. Want to hear first or order now?')}</p><a class="btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לפרטים בוואטסאפ', 'Ask on WhatsApp')}</a></div>` : html`
       ${sortBar(q, sort, list.length, f, cat === 'oils' || cat === 'diffusers' || !!q)}
-      ${list.length ? html`<div class="grid shop-grid">${list.map((p) => card(p, { feature: !q && !sub && (p.picks || p.id === 'say-300') }))}</div>` : html`<div class="empty"><p>${T('לא נמצאו מוצרים בסינון הנוכחי. אפשר לשנות או לאפס את המסננים.', 'No products match these filters.')}</p><button class="btn ghost" data-action="filter-clear">${T('איפוס המסננים', 'Reset filters')}</button></div>`}`}
+      ${list.length ? html`<div class="grid shop-grid">${list.map((p) => card(p))}</div>` : html`<div class="empty"><p>${T('לא נמצאו מוצרים בסינון הנוכחי. אפשר לשנות או לאפס את המסננים.', 'No products match these filters.')}</p><button class="btn ghost" data-action="filter-clear">${T('איפוס המסננים', 'Reset filters')}</button></div>`}`}
     </div></div><div class="block"></div>`;
 }
 

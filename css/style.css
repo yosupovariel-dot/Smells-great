@@ -3786,3 +3786,48 @@ body:has(.cc3) .vipf,body:has(.oln) .vipf{opacity:0;pointer-events:none}
 [dir="rtl"] input[type="tel"],[dir="rtl"] input[type="email"],[dir="rtl"] input[type="password"],[dir="rtl"] input[dir="ltr"]{text-align:right}
 [dir="rtl"] input:placeholder-shown{direction:rtl;text-align:right}
 [dir="rtl"] .c3-in input{padding:0 2.4rem 0 .4rem!important}
+
+/* ===== Header: constant size while scrolling (no content jump); rounded look drawn without layout change ===== */
+.hdr,body.scrolled .hdr{margin:0!important;top:0!important;border-radius:0!important;transition:background .3s,box-shadow .3s!important}
+.hdr .wrap,body.scrolled .hdr .wrap{min-height:96px!important;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,background .35s,border-radius .35s}
+.hdr .brand.logo img,body.scrolled .hdr .brand.logo img{height:60px!important}
+body.scrolled .hdr{background:transparent!important;border-color:transparent!important;box-shadow:none!important;backdrop-filter:none!important}
+body.scrolled .hdr .wrap{background:rgba(251,248,243,.97)!important;border-radius:999px!important;box-shadow:0 18px 40px -18px rgba(0,0,0,.45),0 0 0 1px rgba(201,173,122,.3)!important;transform:translateY(8px) scale(.97)}
+@media (max-width:900px){
+  .hdr .wrap,body.scrolled .hdr .wrap{min-height:72px!important}
+  .hdr .brand.logo img,body.scrolled .hdr .brand.logo img{height:44px!important}
+  body.scrolled .hdr .wrap{border-radius:22px!important;transform:translateY(6px) scale(.965)}
+}
+@media (max-width:400px){.hdr .brand.logo img,body.scrolled .hdr .brand.logo img{height:40px!important}}
+@media (max-width:350px){.hdr .brand.logo img,body.scrolled .hdr .brand.logo img{height:32px!important}}
+/* never let the page pan sideways */
+html,body{overflow-x:clip!important;max-width:100%}
+.hdr,body.scrolled .hdr{border-style:solid!important;border-width:0 0 1px 0!important}
+/* drawer drag */
+#nav.nav.dragging{transition:none!important}
+.nav-bg.dragging{transition:none!important}
+.nav-bg{touch-action:none}
+#nav.nav{touch-action:pan-y}
+
+/* ===== Floating SAY CLUB tab: small, tucked on the right edge, no close button ===== */
+.vipf{position:fixed!important;z-index:69;right:-14px!important;left:auto!important;bottom:auto!important;top:58%!important;width:62px;height:76px;border:0;padding:0;background:none;cursor:pointer;transition:right .25s}
+.vipf:hover,.vipf:focus-visible{right:-4px!important}
+.vipf .vc{position:absolute;inset:0;border-radius:10px;box-shadow:0 10px 24px -10px rgba(0,0,0,.6),inset 0 0 0 1px rgba(226,200,143,.55)}
+.vipf .v1{background:linear-gradient(160deg,#E2C88F,#8a6a36);transform:rotate(10deg) translate(-6px,-10px);animation:vcUp 10s 3s ease-in-out infinite}
+.vipf .v2{background:linear-gradient(160deg,#2b241c,#16130F);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding-left:12px;color:#E2C88F}
+.vipf .v2 svg{width:18px;height:18px;fill:#E2C88F}
+.vipf .v2 b{font:700 .62rem Rubik,sans-serif;letter-spacing:.18em;color:#F0DDB3}
+.vipf .v2::after{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(110deg,transparent 40%,rgba(255,240,210,.28) 50%,transparent 60%);background-size:250% 100%;animation:offerShine 10s 3s ease-in-out infinite}
+@keyframes vcUp{0%,84%,100%{transform:rotate(10deg) translate(-6px,-10px)}90%{transform:rotate(16deg) translate(-10px,-18px)}}
+[dir="ltr"] .vipf{right:auto!important;left:-14px!important}
+@media (max-width:600px){.vipf{width:54px;height:66px;top:62%!important}}
+@media (prefers-reduced-motion:reduce){.vipf .v1,.vipf .v2::after{animation:none}}
+.vipf-x,.vipf-card{display:none!important}
+
+/* ===== Back-to-top: clear and above the accessibility button ===== */
+.fab-top{width:46px!important;height:46px!important;background:#16130F!important;color:#E2C88F!important;border:1px solid rgba(201,173,122,.6)!important;box-shadow:0 12px 24px -12px rgba(0,0,0,.55)!important}
+.fab-top svg{stroke:#E2C88F}
+
+/* ===== One card template: quote products use the same button ===== */
+.qa.qa-q1{grid-template-columns:1fr}
+.qa.qa-q1 .qa-add{display:flex;align-items:center;justify-content:center;text-decoration:none}

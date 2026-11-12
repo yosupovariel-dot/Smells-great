@@ -1,6 +1,6 @@
-import { html } from './util.js?v=261112120359';
-import { getLang } from './i18n.js?v=261112120359';
-import { PHONE_DISPLAY } from './util.js?v=261112120359';
+import { html } from './util.js?v=261112192006';
+import { getLang } from './i18n.js?v=261112192006';
+import { PHONE_DISPLAY } from './util.js?v=261112192006';
 
 const BIZ = 'SAY Boutique';
 const EMAIL = 'info@say-boutique.co.il';
