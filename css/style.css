@@ -3851,3 +3851,6 @@ body.scrolled .hdr .icon-btn,body.scrolled .hdr .nav a,body.scrolled .hdr .tool-
 /* scrolled pill sits closer to the top edge (transform only: no layout jump) */
 body.scrolled .hdr .wrap{transform:translateY(-12px)!important}
 @media (max-width:900px){body.scrolled .hdr .wrap{transform:translateY(-6px)!important}}
+/* slightly wider scrolled pill */
+@media (min-width:1100px){body.scrolled .hdr .wrap::before{left:-28px;right:-28px}}
+@media (max-width:900px){body.scrolled .hdr .wrap::before{left:3px;right:3px}}
