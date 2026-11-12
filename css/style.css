@@ -3854,3 +3854,10 @@ body.scrolled .hdr .wrap{transform:translateY(-12px)!important}
 /* slightly wider scrolled pill */
 @media (min-width:1100px){body.scrolled .hdr .wrap::before{left:-28px;right:-28px}}
 @media (max-width:900px){body.scrolled .hdr .wrap::before{left:3px;right:3px}}
+/* club tab: back above the WhatsApp button, label fully visible */
+.vipf{top:auto!important;bottom:94px!important}
+.vipf .v2{padding-left:0;padding-right:14px}
+.vipf .v2 b{letter-spacing:.12em;margin-right:-.12em}
+[dir="ltr"] .vipf .v2{padding-right:0;padding-left:14px}
+@media (max-width:600px){.vipf{top:auto!important;bottom:74px!important}}
+@media (max-width:760px){body:has(.consent:not(.out)) .vipf{bottom:calc(var(--cs-h,150px) + 78px)!important}}
