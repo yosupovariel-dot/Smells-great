@@ -3848,3 +3848,6 @@ body.scrolled .hdr .icon-btn,body.scrolled .hdr .nav a,body.scrolled .hdr .tool-
   body.scrolled .hdr .brand.logo img{transform:scale(.78)}
   body.scrolled .hdr .tools .m-lab small{display:none}
 }
+/* scrolled pill sits closer to the top edge (transform only: no layout jump) */
+body.scrolled .hdr .wrap{transform:translateY(-12px)!important}
+@media (max-width:900px){body.scrolled .hdr .wrap{transform:translateY(-6px)!important}}
