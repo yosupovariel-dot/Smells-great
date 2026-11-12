@@ -3835,3 +3835,16 @@ html,body{overflow-x:clip!important;max-width:100%}
 .pt-was{color:#a33a2c!important;text-decoration-color:#a33a2c}
 .pdp-specs li{min-width:0;overflow:hidden}
 .pdp-specs b{white-space:normal!important;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2;max-width:100%;word-break:break-word}
+/* Scrolled header: slim pill drawn inside the (unchanged) header box — no layout jump */
+.hdr .wrap{position:relative;isolation:isolate}
+.hdr .wrap::before{content:"";position:absolute;z-index:-1;inset:0;border-radius:0;background:transparent;transition:inset .35s cubic-bezier(.2,.8,.2,1),background .3s,box-shadow .3s,border-radius .35s;pointer-events:none}
+body.scrolled .hdr .wrap{background:transparent!important;box-shadow:none!important;transform:none!important;border-radius:0!important}
+body.scrolled .hdr .wrap::before{inset:22px 0;border-radius:999px;background:rgba(251,248,243,.97);box-shadow:0 12px 28px -16px rgba(0,0,0,.4),0 0 0 1px rgba(201,173,122,.3)}
+.hdr .brand.logo img{transition:transform .35s cubic-bezier(.2,.8,.2,1)!important;transform-origin:center}
+body.scrolled .hdr .brand.logo img{transform:scale(.68)}
+body.scrolled .hdr .icon-btn,body.scrolled .hdr .nav a,body.scrolled .hdr .tool-link{transform:scale(.94)}
+@media (max-width:900px){
+  body.scrolled .hdr .wrap::before{inset:13px 8px;border-radius:999px}
+  body.scrolled .hdr .brand.logo img{transform:scale(.78)}
+  body.scrolled .hdr .tools .m-lab small{display:none}
+}
