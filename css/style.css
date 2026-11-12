@@ -3782,3 +3782,7 @@ body:has(.cc3) .vipf,body:has(.oln) .vipf{opacity:0;pointer-events:none}
 .lbl-name .insp{font-size:.55em;margin:0 0 .1rem}
 @media (max-width:380px){.sx-t span{flex-direction:column;align-items:flex-start}.sx-t small{white-space:normal}}
 .mcard{contain:paint}
+/* RTL: placeholders of phone/email/password fields sit on the right */
+[dir="rtl"] input[type="tel"],[dir="rtl"] input[type="email"],[dir="rtl"] input[type="password"],[dir="rtl"] input[dir="ltr"]{text-align:right}
+[dir="rtl"] input:placeholder-shown{direction:rtl;text-align:right}
+[dir="rtl"] .c3-in input{padding:0 2.4rem 0 .4rem!important}
