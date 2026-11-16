@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261116122007';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261116122007';
-import { CATEGORIES } from './data.js?v=261116122007';
-import * as db from './db.js?v=261116122007';
-import * as S from './views-shop.js?v=261116122007';
-import * as Lg from './views-legal.js?v=261116122007';
-import * as A from './views-admin.js?v=261116122007';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261116223030';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261116223030';
+import { CATEGORIES } from './data.js?v=261116223030';
+import * as db from './db.js?v=261116223030';
+import * as S from './views-shop.js?v=261116223030';
+import * as Lg from './views-legal.js?v=261116223030';
+import * as A from './views-admin.js?v=261116223030';
 
 // Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
 if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
@@ -170,16 +170,49 @@ function showSlide(i) {
   const cap = $('#slide-cap'); const sl = S.HERO_SLIDES?.[slideIdx];
   if (cap && sl) { cap.textContent = sl[getLang()]; cap.href = '#/product/' + sl.pid; }
 }
+// Lightbox zoom: pinch (two fingers), double-tap / double-click, mouse wheel; drag to pan while zoomed.
+function pinchZoom(box) {
+  const img = $('img', box); let k = 1, x = 0, y = 0, start = null, lastTap = 0;
+  const clamp = () => { k = Math.min(4, Math.max(1, k)); const r = img.getBoundingClientRect(); const bw = (r.width / (k || 1)) * (k - 1) / 2, bh = (r.height / (k || 1)) * (k - 1) / 2; x = Math.max(-bw, Math.min(bw, x)); y = Math.max(-bh, Math.min(bh, y)); if (k === 1) { x = 0; y = 0; } };
+  const apply = (anim) => { img.style.transition = anim ? 'transform .25s ease' : 'none'; img.style.transform = `translate(${x}px,${y}px) scale(${k})`; box.classList.toggle('zoomed', k > 1); };
+  const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  box.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) start = { d: dist(e.touches), k, x, y };
+    else if (e.touches.length === 1) { const now = Date.now(); if (now - lastTap < 280) { k = k > 1 ? 1 : 2.5; x = 0; y = 0; apply(true); lastTap = 0; start = null; return; } lastTap = now; start = { px: e.touches[0].clientX, py: e.touches[0].clientY, x, y }; }
+  }, { passive: true });
+  box.addEventListener('touchmove', (e) => {
+    if (!start) return; e.preventDefault();
+    if (e.touches.length === 2 && start.d) { k = start.k * dist(e.touches) / start.d; clamp(); apply(false); }
+    else if (e.touches.length === 1 && start.px !== undefined && k > 1) { x = start.x + e.touches[0].clientX - start.px; y = start.y + e.touches[0].clientY - start.py; clamp(); apply(false); }
+  }, { passive: false });
+  box.addEventListener('touchend', () => { start = null; clamp(); apply(true); }, { passive: true });
+  box.addEventListener('dblclick', (e) => { if (e.target.closest('.lbx-x')) return; k = k > 1 ? 1 : 2.5; x = 0; y = 0; apply(true); });
+  box.addEventListener('wheel', (e) => { e.preventDefault(); k *= e.deltaY < 0 ? 1.15 : 0.87; clamp(); apply(false); }, { passive: false });
+  let drag = null;
+  box.addEventListener('mousedown', (e) => { if (k > 1 && e.target === img) { drag = { px: e.clientX, py: e.clientY, x, y }; e.preventDefault(); } });
+  window.addEventListener('mousemove', (e) => { if (!drag) return; x = drag.x + e.clientX - drag.px; y = drag.y + e.clientY - drag.py; clamp(); apply(false); });
+  window.addEventListener('mouseup', () => { drag = null; });
+}
+// Product photos shot on white: detect them and lift the product onto the boutique's cream "stage".
+function studioShots() {
+  $$('.pdp .pg-slide img').forEach((img) => {
+    const test = () => { try { const c = document.createElement('canvas'); c.width = c.height = 24; const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(img, 0, 0, 24, 24); const px = (a, b) => g.getImageData(a, b, 1, 1).data; const white = [[0, 0], [23, 0], [0, 23], [23, 23], [12, 0], [0, 12]].every(([a, b]) => { const d = px(a, b); return d[0] > 236 && d[1] > 236 && d[2] > 236; }); if (white) img.closest('.pg-slide').classList.add('studio'); } catch {} };
+    if (img.complete && img.naturalWidth) test(); else img.addEventListener('load', test, { once: true });
+  });
+}
 // Swipe on the hero image (touch + mouse drag).
 let mx = null;
 document.addEventListener('mousedown', (e) => { if (e.target.closest('.h-slides')) { mx = e.clientX; e.preventDefault(); } });
 document.addEventListener('mouseup', (e) => { if (mx === null) return; const dx = e.clientX - mx; mx = null; if (Math.abs(dx) < 40) return; showSlide(slideIdx + (dx < 0 ? 1 : -1)); clearInterval(slideTimer); });
-let tx = null;
-document.addEventListener('touchstart', (e) => { if (e.target.closest('.h-slides')) tx = e.touches[0].clientX; }, { passive: true });
+let tx = null, ty = 0;
+document.addEventListener('touchstart', (e) => { if (e.target.closest('.hx') && e.touches.length === 1) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; } }, { passive: true });
 document.addEventListener('touchend', (e) => {
-  if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null;
-  if (Math.abs(dx) < 40) return; showSlide(slideIdx + (dx < 0 ? 1 : -1)); clearInterval(slideTimer);
+  if (tx === null) return; const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; tx = null;
+  if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
+  const fwd = document.dir === 'rtl' ? dx > 0 : dx < 0; showSlide(slideIdx + (fwd ? 1 : -1)); clearInterval(slideTimer);
+  if (e.target.closest('.h-offer')) { const a = e.target.closest('.h-offer'); a.dataset.swiped = '1'; setTimeout(() => delete a.dataset.swiped, 400); }
 }, { passive: true });
+document.addEventListener('click', (e) => { const a = e.target.closest('.h-offer[data-swiped]'); if (a) e.preventDefault(); }, true);
 // Category circles row: gentle auto-scroll on phones, pauses when touched.
 let catTimer, catHold = 0;
 function startCatRail() {
@@ -312,7 +345,7 @@ function route() {
     sw.addEventListener('scroll', () => { if (sw.scrollWidth > sw.clientWidth + 2) mark(Math.round(Math.abs(sw.scrollLeft) / sw.clientWidth)); }, { passive: true });
     if ('IntersectionObserver' in window) { const io = new IntersectionObserver((es) => es.forEach((x) => { if (x.isIntersecting && sw.scrollWidth <= sw.clientWidth + 2) mark(+x.target.dataset.i); }), { rootMargin: '-45% 0px -45% 0px' }); $$('.pg-slide', sw).forEach((f) => io.observe(f)); }
   }
-  applyA11y(); applyStyleAttrs(); startTicker(); bars(); startSlides(); startCatRail(); reelMotion(); floaters(); observeReveal(); observeBuy(); watchRails(); markCached();
+  applyA11y(); applyStyleAttrs(); startTicker(); bars(); startSlides(); startCatRail(); reelMotion(); floaters(); studioShots(); observeReveal(); observeBuy(); watchRails(); markCached();
 }
 
 // Fade-in on scroll (skipped when reduced motion / a11y "stop animations" is on).
@@ -497,7 +530,7 @@ document.addEventListener('click', async (e) => {
     case 'vipf-x': try { sessionStorage.setItem('say_vipf', '1'); } catch {} document.querySelector('.vipf')?.remove(); break;
     case 'ad-def': case 'ad-del': { const cur = (db.profileOf().full.addresses || []).slice(); const i = +el.dataset.i; if (action === 'ad-del') cur.splice(i, 1); else cur.forEach((x, k) => (x.def = k === i)); if (cur.length && !cur.some((x) => x.def)) cur[0].def = true; db.updateMe({ addresses: cur }); rerender(); break; }
     case 'zoom': { const src = el.getAttribute('src').replace(/-sm\.webp$/, '.webp'); const w = document.createElement('div'); w.className = 'lbx'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true'); w.setAttribute('aria-label', el.alt || 'image');
-      render(w, html`<button class="lbx-x" data-action="lbx-close" aria-label="${t('close')}">×</button><div class="lbx-in"><img src="${src}" alt="${el.alt}"></div>`); document.body.append(w); document.body.classList.add('no-scroll'); const rel = trapFocus(w, () => $('.lbx-x')?.click()); w._rel = rel; break; }
+      render(w, html`<button class="lbx-x" data-action="lbx-close" aria-label="${t('close')}">×</button><div class="lbx-in"><img src="${src}" alt="${el.alt}" draggable="false"></div><p class="lbx-hint">${getLang() === 'he' ? 'צביטה עם שתי אצבעות או הקשה כפולה להגדלה' : 'Pinch or double-tap to zoom'}</p>`); document.body.append(w); pinchZoom(w); document.body.classList.add('no-scroll'); const rel = trapFocus(w, () => $('.lbx-x')?.click()); w._rel = rel; break; }
     case 'lbx-close': { const w = $('.lbx'); w?._rel?.(); w?.remove(); document.body.classList.remove('no-scroll'); break; }
     case 'top': window.scrollTo({ top: 0, behavior: 'smooth' }); break;
     case 'join-club': e.preventDefault(); if (document.body.classList.contains('cart-open')) $('[data-action="cart-close"]')?.click(); if ($('#nav')?.classList.contains('open')) $('[data-action="menu-close"]')?.click(); if (db.me()) { location.hash = '#/club'; break; } maybePromo(0, true); break;

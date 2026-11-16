@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261116122007';
-import { t, L, getLang } from './i18n.js?v=261116122007';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261116122007';
-import * as db from './db.js?v=261116122007';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261116223030';
+import { t, L, getLang } from './i18n.js?v=261116223030';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261116223030';
+import * as db from './db.js?v=261116223030';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -1082,11 +1082,12 @@ export function oilNudge(ctx = 'checkout') {
   const sz = (p) => p.sizes.find((x) => x.label === '100 מ"ל') || p.sizes[0];
   return html`<div class="modal-bg on-bg"><div class="oln" role="dialog" aria-modal="true" aria-labelledby="on-t">
     <button class="on-x" data-action="modal-close" aria-label="${t('close')}">×</button>
-    <p class="c3-k">${ctx === 'add' ? T('נוסף לסל ✓ · מוצר משלים', 'Added ✓ · goes well with') : T('רגע לפני שמסיימים', 'One moment')}</p>
-    <h2 id="on-t">${T('המכשיר מגיע בלי תמצית', 'The device comes without oil')}</h2>
-    <p class="on-sub">${T('כדי שתוכלו להפעיל אותו כבר ביום שהחבילה מגיעה — הוסיפו שמן למילוי:', 'So you can use it the day it arrives — add an oil:')}</p>
+    <p class="c3-k">${ctx === 'add' ? T('✓ המפיץ נוסף לסל', '✓ Added to your bag') : T('רגע לפני שמסיימים', 'One moment')}</p>
+    <h2 id="on-t">${T('ומה יריח אצלכם בבית?', 'And what will your home smell like?')}</h2>
+    <p class="on-sub">${T('המפיץ מגיע בלי תמצית ריח. בחרו תמצית עכשיו — ותוכלו להפעיל אותו כבר ביום שהחבילה מגיעה. הכי אהובות אצלנו:', 'The diffuser ships without oil. Pick one now and switch it on the day it arrives. Our most-loved:')}</p>
     <div class="on-list">${pick.map((p) => html`<div class="on-it"><span class="on-img">${media(p, '', false, p.img)}</span><span class="on-t"><b>${L(p.name)}</b><small>${sz(p).label} · ${m(sz(p).price)}</small></span><button class="on-add" data-action="oil-add" data-id="${p.id}" data-size="${sz(p).label}">${T('הוספה', 'Add')} +</button></div>`)}
       ${kit ? html`<div class="on-it kit"><span class="on-img">${media(kit, '', false, kit.img)}</span><span class="on-t"><b>${T('לא בטוחים איזה ריח?', 'Not sure which scent?')}</b><small>${T('ערכת 14 ריחות', '14-scent kit')} · ${m(minPrice(kit))}</small></span><a class="on-add" href="#/product/${kit.id}" data-action="modal-close">${T('לבחירה', 'Choose')}</a></div>` : ''}</div>
+    <a class="on-more" href="#/shop/oils" data-action="modal-close"><span><b>${T('מחפשים ריח אחר?', 'Looking for another scent?')}</b><small>${T(`לכל ${active().filter((p) => p.cat === 'oils' && !p.picks).length} התמציות — מלונות, בשמים, טבע ומתוקים`, 'All our oils — hotels, perfumes, nature and sweet')}</small></span><i aria-hidden="true">${arrow()}</i></a>
     <button class="on-skip" data-action="${ctx === 'add' ? 'oil-later' : 'oil-skip'}">${ctx === 'add' ? T('אולי אחר כך — להמשיך לקנות', 'Maybe later — keep shopping') : T('להמשיך בלי תמצית', 'Continue without oil')}</button>
   </div></div>`;
 }
