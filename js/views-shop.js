@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261112194423';
-import { t, L, getLang } from './i18n.js?v=261112194423';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261112194423';
-import * as db from './db.js?v=261112194423';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261116121041';
+import { t, L, getLang } from './i18n.js?v=261116121041';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261116121041';
+import * as db from './db.js?v=261116121041';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -427,6 +427,7 @@ const ml = (label) => { const n = parseFloat(String(label).replace(/[^\d.]/g, ''
 // Honest compare price: oils vs the same amount in the smallest bottle; others only with a real before-sale price.
 function cmpPrice(p, s, priceOf) {
   const now = priceOf(s);
+  if (p.was > now && s === p.sizes[0]) return { was: p.was, save: Math.round((1 - now / p.was) * 100), sale: true };
   if (p.cat === 'oils') { const base = p.sizes.find((x) => ml(x.label)); const v = ml(s.label); if (base && v && s !== base) { const was = Math.round((priceOf(base) / ml(base.label)) * v); if (was > now) return { was, save: Math.round((1 - now / was) * 100) }; } return { was: 0, save: 0 }; }
   return p.was > now ? { was: p.was, save: Math.round((1 - now / p.was) * 100) } : { was: 0, save: 0 };
 }
@@ -483,22 +484,23 @@ export function productPage(id) {
       <p class="eyebrow">${p.sub ? subName(p.sub) : catName(p.cat)}</p>
       <h1>${p.cat === 'oils' && INSPIRED.has(p.sub) ? html`<small class="insp">${T('תמצית בהשראת', 'Oil inspired by')}</small>` : ''}${L(p.name)}</h1>
       ${specBoxes(p)}
-      ${p.quote ? html`<p class="price big" id="pdp-price">${T('מחיר בהתאמה אישית', 'Price on request')}</p>` : (() => { const c = cmpPrice(p, p.sizes[0], priceOf); return html`<div class="pp" id="pdp-price" aria-live="polite">${c.was && p.cat !== 'oils' ? html`<span class="pp-sale">${T('מבצע', 'Sale')}</span>` : ''}<strong class="pp-now">${m(priceOf(p.sizes[0]))}</strong><span class="pp-was" ${raw(c.was ? '' : 'hidden')}><s>${c.was ? m(c.was) : ''}</s><em>${c.save ? `−${c.save}%` : ''}</em></span>${ws ? html`<span class="ws">${t('wsPrice')}</span>` : ''}</div>${p.cat === 'oils' ? html`<p class="pp-note" ${raw(c.was ? '' : 'hidden')}>${T('המחיר המחוק: אותה כמות בבקבוקי 10 מ"ל', 'Crossed price: the same amount in 10 ml bottles')}</p>` : ''}`; })()}
+      ${p.quote ? html`<p class="price big" id="pdp-price">${T('מחיר בהתאמה אישית', 'Price on request')}</p>` : (() => { const c = cmpPrice(p, p.sizes[0], priceOf); return html`<div class="pp" id="pdp-price" aria-live="polite"><span class="pp-sale" ${raw(c.sale ? '' : 'hidden')}>${T('מבצע', 'Sale')}</span><span class="pp-was" ${raw(c.was ? '' : 'hidden')}><s>${c.was ? m(c.was) : ''}</s></span><strong class="pp-now">${m(priceOf(p.sizes[0]))}</strong>${ws ? html`<span class="ws">${t('wsPrice')}</span>` : ''}</div>${p.cat === 'oils' ? html`<p class="pp-note" ${raw(c.was && !c.sale ? '' : 'hidden')}>${T('המחיר המחוק: אותה כמות בבקבוקי 10 מ"ל', 'Crossed price: the same amount in 10 ml bottles')}</p>` : ''}`; })()}
       ${p.quote ? html`<p>${he() ? p.desc.he.split('\n')[0] : p.desc.en || p.desc.he.split('\n')[0]}</p>
         <div class="q-row"><a class="q-wa" href="${waLink(T('שלום, אשמח להצעת מחיר עבור ', 'Hello, I would like a quote for ') + L(p.name))}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1a15 15 0 01-5.6-4.9c-.7-1-1.2-2.1-1.2-3.2 0-1 .5-1.6.8-1.9.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.1z" fill="currentColor"/></svg>${T('לקבלת הצעת מחיר בוואטסאפ', 'Get a quote on WhatsApp')}</a>
           <a class="q-tel" href="tel:+${PHONE_INTL}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 006 6L16 13l5 2v4a2 2 0 01-2 2A16 16 0 013 5a2 2 0 012-2"/></svg>${T('או התקשרו', 'Or call')} <b dir="ltr">${PHONE_DISPLAY}</b></a></div>` : html`
       <form data-form="add" data-id="${p.id}" novalidate>
         ${p.sizes.length > 1 ? html`<fieldset class="sizes"><legend>${p.cat === 'oils' ? T('נפח', 'Volume') : t('size')}</legend>
-          ${p.sizes.map((s, i) => { const v = perUnit(p, s, priceOf); return html`<label class="size-opt"><input type="radio" name="size" value="${s.label}" ${raw(i ? '' : 'checked')} data-input="size" data-price="${priceOf(s)}" data-was="${cmpPrice(p, s, priceOf).was}" data-save="${cmpPrice(p, s, priceOf).save}"><span>${s.label}${v.save ? html`<em>−${v.save}%</em>` : ''}</span></label>`; })}
+          ${p.sizes.map((s, i) => { const v = perUnit(p, s, priceOf); return html`<label class="size-opt"><input type="radio" name="size" value="${s.label}" ${raw(i ? '' : 'checked')} data-input="size" data-price="${priceOf(s)}" data-was="${cmpPrice(p, s, priceOf).was}" data-save="${cmpPrice(p, s, priceOf).save}" data-sale="${cmpPrice(p, s, priceOf).sale ? 1 : ''}"><span>${s.label}${v.save ? html`<em>−${v.save}%</em>` : ''}</span></label>`; })}
         </fieldset>` : html`<input type="hidden" name="size" value="${p.sizes[0].label}">`}
         ${opt ? html`<fieldset class="sizes"><legend>${L(opt.name)}</legend>
           ${opt.values.map((v, i) => html`<label class="size-opt sw-opt"><input type="radio" name="opt" value="${v.he}" ${raw(i ? '' : 'checked')} data-input="opt" data-img="${v.imgs?.[0] || ''}"><span><i class="sw ${swatch(v.he)}" aria-hidden="true"></i>${L(v)}</span></label>`)}
         </fieldset>` : ''}
         ${p.picks ? html`<fieldset class="picker pk" aria-describedby="pick-count"><legend class="pk-head"><span><b>${T(`בחרו ${p.picks} ניחוחות`, `Choose ${p.picks} scents`)}</b><small>${T('פתחו עולם ריח וסמנו את מה שמסקרן אתכם', 'Open a scent world and tap what intrigues you')}</small></span><span id="pick-count" class="pk-count" aria-live="polite">0/${p.picks}</span></legend>
           <p class="pk-hint">${T('בחרו את הריחות שאתם כבר מכירים, ואנחנו נעזור לכם להשלים את הערכה.', 'Pick the scents you know; we will help complete the kit.')}</p>
-          <button type="button" class="pk-fill" data-action="pk-fill" hidden>✦ ${T('השלימו לי את השאר', 'Complete the rest for me')}</button>
+          
           <span class="pk-bar" aria-hidden="true"><i id="pk-fill"></i></span>
-          <label class="pk-surprise"><input type="checkbox" name="surprise" data-input="surprise"><span><b>${T('הפתיעו אותי', 'Surprise me')}</b>${T('נבחר בשבילכם את 14 הניחוחות הכי אהובים', 'We pick our 14 most-loved scents')}</span></label>
+          <button type="button" class="pk-surprise pk-fill" data-action="pk-fill" hidden><i class="pk-fill-ic" aria-hidden="true">+</i><span><b>${T('השלימו לי את השאר', 'Complete the rest for me')}</b><small id="pk-fill-t"></small></span></button>
+          <label class="pk-surprise pk-sur"><input type="checkbox" name="surprise" data-input="surprise"><span><b>${T('הפתיעו אותי', 'Surprise me')}</b>${T('נבחר בשבילכם את 14 הניחוחות הכי אהובים', 'We pick our 14 most-loved scents')}</span></label>
           <div class="pick-groups pk-groups" data-max="${p.picks}">${groups.map((g, gi) => { const xs = pickList.filter((x) => x.sub === g); return html`<details class="pk-g" ${raw(gi ? '' : 'open')}><summary><span class="pk-g-img"><img src="${small(subImg('oils', g))}" alt="" loading="lazy" width="80" height="80"></span><span class="pk-g-t"><b>${subName(g)}</b><small>${xs.length} ${T('ריחות', 'scents')}</small></span><em class="pk-g-n" data-g="${gi}"></em><i aria-hidden="true"></i></summary>
             <div class="pk-chips">${xs.map((x) => html`<label class="pick pk-chip"><input type="checkbox" name="pick" value="${x.name.he}" data-input="pick" data-g="${gi}"><span>${L(x.name)}</span></label>`)}</div></details>`; })}</div>
         </fieldset>` : ''}

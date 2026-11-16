@@ -3861,3 +3861,16 @@ body.scrolled .hdr .wrap{transform:translateY(-12px)!important}
 [dir="ltr"] .vipf .v2{padding-right:0;padding-left:14px}
 @media (max-width:600px){.vipf{top:auto!important;bottom:74px!important}}
 @media (max-width:760px){body:has(.consent:not(.out)) .vipf{bottom:calc(var(--cs-h,150px) + 78px)!important}}
+
+/* PDP price = same language as the cards: SALE pill · crossed price · black price */
+.pp-now{color:#16130F!important}
+.pp-was s{color:#a33a2c!important;text-decoration-color:#a33a2c;font-size:1.2rem}
+.pp-sale{border-radius:999px!important;background:#16130F!important;color:#E2C88F!important;font-size:.82rem!important;padding:.3rem .8rem!important}
+.pp-sale[hidden]{display:none}
+/* kit picker: "complete the rest" row takes the place of "surprise me" */
+.pk-sur[hidden],.pk-fill[hidden]{display:none!important}
+button.pk-fill{width:100%;min-height:0;font:inherit;text-align:start;justify-content:flex-start;cursor:pointer;animation:pkIn .35s ease}
+.pk-fill-ic{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:#16130F;color:#E2C88F;font:700 1.2rem/1 Rubik,sans-serif;font-style:normal}
+@keyframes pkIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){button.pk-fill{animation:none}}
+button.pk-fill{border:1px dashed #A9874F;background:#fff;color:inherit;font-weight:400;margin:0 0 .7rem;padding:.85rem 1rem;border-radius:14px;gap:.7rem}

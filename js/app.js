@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261112194423';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261112194423';
-import { CATEGORIES } from './data.js?v=261112194423';
-import * as db from './db.js?v=261112194423';
-import * as S from './views-shop.js?v=261112194423';
-import * as Lg from './views-legal.js?v=261112194423';
-import * as A from './views-admin.js?v=261112194423';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261116121041';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261116121041';
+import { CATEGORIES } from './data.js?v=261116121041';
+import * as db from './db.js?v=261116121041';
+import * as S from './views-shop.js?v=261116121041';
+import * as Lg from './views-legal.js?v=261116121041';
+import * as A from './views-admin.js?v=261116121041';
 
 // Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
 if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
@@ -608,8 +608,9 @@ document.addEventListener('change', (e) => {
     const fmt = (n) => new Intl.NumberFormat(getLang() === 'he' ? 'he-IL' : 'en-IL', { style: 'currency', currency: 'ILS', maximumFractionDigits: 0 }).format(n);
     const now = $('.pp-now'), was = $('.pp-was'), note = $('.pp-note'), w = +el.dataset.was || 0;
     if (now) now.textContent = fmt(+el.dataset.price);
-    if (was) { was.hidden = !w; $('s', was).textContent = w ? fmt(w) : ''; $('em', was).textContent = w ? `−${el.dataset.save}%` : ''; }
-    if (note) note.hidden = !w;
+    if (was) { was.hidden = !w; $('s', was).textContent = w ? fmt(w) : ''; }
+    const sl = $('.pp-sale'); if (sl) sl.hidden = !el.dataset.sale;
+    if (note) note.hidden = !w || !!el.dataset.sale;
     const k = $('.ml10'); if (k) k.hidden = !/^10\s*מ"ל$|^10\s*ml$/i.test(el.value.trim());
   }
   if (k === 'opt' && el.dataset.img) {
@@ -624,7 +625,8 @@ document.addEventListener('change', (e) => {
     if (picked.length > max) { el.checked = false; toast(getLang() === 'he' ? `אפשר לבחור עד ${max} ניחוחות` : `Up to ${max} scents`); }
     $$('[data-input="pick"]').forEach((c) => (c.disabled = sur));
     $('#pick-count').textContent = sur ? (getLang() === 'he' ? 'נבחר' : 'Set') : `${$$('[data-input="pick"]:checked').length}/${max}`;
-    const n = $$('[data-input="pick"]:checked').length; const fill = $('#pk-fill'); const fb = $('.pk-fill'); if (fb) fb.hidden = sur || n === 0 || n >= max; if (fill) fill.style.width = (sur ? 100 : Math.round((n / max) * 100)) + '%';
+    const n = $$('[data-input="pick"]:checked').length; const fill = $('#pk-fill'); const fb = $('.pk-fill'); if (fb) { fb.hidden = sur || n === 0 || n >= max; const ft = $('#pk-fill-t'); if (ft) ft.textContent = getLang() === 'he' ? `בחרתם ${n} — נשלים לכם עוד ${max - n} מהניחוחות הכי אהובים` : `You picked ${n} — we'll add ${max - n} of our most-loved scents`; }
+    const sb = $('.pk-sur'); if (sb) sb.hidden = !sur && n > 0; if (fill) fill.style.width = (sur ? 100 : Math.round((n / max) * 100)) + '%';
     $('.pk')?.classList.toggle('done', sur || n === max); $('.pk-groups')?.classList.toggle('off', sur);
     $$('.pk-g-n').forEach((b) => { const c = $$(`[data-input="pick"][data-g="${b.dataset.g}"]:checked`).length; b.textContent = c ? c : ''; });
   }
