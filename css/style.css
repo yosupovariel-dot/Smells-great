@@ -3874,3 +3874,45 @@ button.pk-fill{width:100%;min-height:0;font:inherit;text-align:start;justify-con
 @keyframes pkIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){button.pk-fill{animation:none}}
 button.pk-fill{border:1px dashed #A9874F;background:#fff;color:inherit;font-weight:400;margin:0 0 .7rem;padding:.85rem 1rem;border-radius:14px;gap:.7rem}
+
+/* back-to-top: always above the accessibility button, also while the consent bar is open */
+.fab-top{left:20px!important;bottom:88px!important}
+@media (max-width:600px){.fab-top{left:14px!important;bottom:72px!important}}
+@media (max-width:760px){body:has(.consent:not(.out)) .fab-top{bottom:calc(var(--cs-h,150px) + 76px)!important}}
+/* drawer top bar: brand + rotating promises beside the X (stays put while scrolling) */
+.mn-bar{display:none}
+@media (max-width:900px){
+  #nav .mn-bar{position:sticky;top:0;z-index:5;flex:0 0 auto;display:flex;align-items:center;gap:12px;height:58px;padding:0 18px 0 10px;background:rgba(251,248,243,.97);backdrop-filter:blur(6px);box-shadow:0 1px 0 #ece4d6}
+  [dir="ltr"] #nav .mn-bar{padding:0 10px 0 18px}
+  #nav .mn-bar .nav-close{position:static!important;flex:0 0 40px;width:40px!important;height:40px!important;padding:0!important;justify-content:center;box-shadow:none;background:transparent!important;backdrop-filter:none}
+  .mn-tick{position:relative;flex:1;height:40px;overflow:hidden}
+  .mn-tick small{display:block;font:700 .6rem/1 Rubik,sans-serif;letter-spacing:.28em;color:#A9874F;margin-top:3px}
+  .mn-tick p{position:absolute;inset-inline:0;top:17px;margin:0;font-size:.86rem;font-weight:600;color:#16130F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(8px);transition:opacity .45s,transform .45s}
+  .mn-tick p.on{opacity:1;transform:none}
+}
+@media (prefers-reduced-motion:reduce){.mn-tick p{transition:none}}
+/* category free-text search */
+.cat-search{margin:.4rem 0 1.2rem}
+.cat-none{text-align:center;color:var(--muted);padding:1.5rem 0}
+.cat-none[hidden]{display:none}
+.cat-none a{color:#7E6236;font-weight:700}
+.shop-grid > .card[hidden]{display:none!important}
+/* sign-up: why we ask */
+.fld-why{display:block;margin-top:.35rem;font-size:.76rem;line-height:1.45}
+.auth .opt{font-style:normal;font-weight:400;font-size:.74rem;color:var(--muted);margin-inline-start:.3rem}
+.reg-addr{border:1px dashed #cdb88f;border-radius:14px;padding:.9rem 1rem .8rem;margin:0 0 1rem}
+.reg-addr legend{padding:0 .4rem;font-weight:700;font-size:.9rem}
+.reg-addr .row2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.reg-addr .field{margin-bottom:.6rem}
+@media (max-width:420px){.reg-addr .row2{grid-template-columns:1fr;gap:0}}
+.auth .acc-priv{font-size:.74rem;color:var(--muted);margin:.4rem 0 .6rem}
+/* forgot password / username */
+.fg-link{background:none;border:0;padding:0;font:inherit;font-size:.85rem;color:#7E6236;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+form[data-form="login"] .fg-link{display:block;margin:-.3rem 0 1rem;margin-inline-start:auto}
+.fg-back{background:none;border:0;padding:0;margin:0 0 .8rem;font:inherit;font-size:.84rem;color:var(--muted);cursor:pointer}
+.fg-demo{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem .6rem;padding:.7rem .9rem;margin:0 0 1rem;border-radius:12px;background:#FBF3E2;border:1px solid #e3cfa4;font-size:.82rem}
+.fg-demo b{width:100%;font-size:.72rem;letter-spacing:.08em;color:#7E6236}
+.fg-demo code{font:700 1.1rem/1 'IBM Plex Mono',monospace;letter-spacing:.2em;color:#16130F}
+.fg-code{text-align:center;font:600 1.4rem/1 'IBM Plex Mono',monospace!important;letter-spacing:.5em}
+.fg-alt{text-align:center;margin:1rem 0 0;color:var(--muted);font-size:.85rem}
+.fg-or{text-align:center;margin:1.1rem 0 .6rem;color:var(--muted);font-size:.84rem}

@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261116121041';
-import { t, L, getLang } from './i18n.js?v=261116121041';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261116121041';
-import * as db from './db.js?v=261116121041';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261116122007';
+import { t, L, getLang } from './i18n.js?v=261116122007';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261116122007';
+import * as db from './db.js?v=261116122007';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -301,7 +301,7 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
   if (f.stock) list = list.filter((p) => p.quote || p.stock > 0);
   if (cat) list = list.filter((p) => p.cat === cat);
   if (sub) list = list.filter((p) => p.sub === sub);
-  if (q) { const s = q.toLowerCase(); list = list.filter((p) => (p.name.he + ' ' + p.name.en + ' ' + (p.sub || '')).toLowerCase().includes(s)); }
+  if (q) list = list.filter((p) => matchProduct(p, q));
   if (sort === 'low') list.sort((a, b) => minPrice(a) - minPrice(b));
   if (sort === 'high') list.sort((a, b) => minPrice(b) - minPrice(a));
   if (sort === 'name') list.sort((a, b) => L(a.name).localeCompare(L(b.name), getLang()));
@@ -381,9 +381,11 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
         <a href="#/shop/${cat}" aria-current="${!sub}"><span class="st-img all">${T('הכל', 'All')}</span><b>${T('הכל', 'All')}</b></a>
         ${subs.map((s2) => html`<a href="#/shop/${cat}/${encodeURIComponent(s2)}" aria-current="${s2 === sub}"><span class="st-img ${cat === 'diffusers' ? 'studio' : ''}"><img src="${small(subImg(cat, s2))}" alt="" width="160" height="160" loading="lazy"></span><b>${subName(s2)}</b></a>`)}
       </nav>` : ''}
+      ${!soon && cat && cat !== 'diffusers' ? html`<form class="oz-search cat-search" role="search" data-form="cat-search"><label for="cq"><b>${T('מחפשים משהו מסוים?', 'Looking for something specific?')}</b>${T(`הקלידו מה שבא לכם — גם עם שגיאת כתיב נמצא`, 'Type anything — typos are fine')}</label>
+        <div class="oz-sbox"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="cq" name="q" type="search" data-input="cat-q" maxlength="60" autocomplete="off" placeholder="${cat === 'bundles' ? T('למשל: מארז רכב, SAY 150, ליטר, ניקיון…', 'e.g. car kit, SAY 150, litre…') : T('חפשו לפי שם או סוג', 'Search by name or type')}"><button type="submit">${T('חיפוש', 'Search')}</button></div></form>` : ''}
       ${soon ? html`<div class="soon-box"><p class="eyebrow latin">Coming soon</p><h2>${T('הקולקציה תעלה בקרוב', 'The collection is coming soon')}</h2><p>${T('אנחנו מכינים עבורכם קולקציה חדשה. רוצים לשמוע ראשונים או להזמין כבר עכשיו?', 'A new collection is on its way. Want to hear first or order now?')}</p><a class="btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לפרטים בוואטסאפ', 'Ask on WhatsApp')}</a></div>` : html`
       ${sortBar(q, sort, list.length, f, cat === 'oils' || cat === 'diffusers' || !!q)}
-      ${list.length ? html`<div class="grid shop-grid">${list.map((p) => card(p))}</div>` : html`<div class="empty"><p>${T('לא נמצאו מוצרים בסינון הנוכחי. אפשר לשנות או לאפס את המסננים.', 'No products match these filters.')}</p><button class="btn ghost" data-action="filter-clear">${T('איפוס המסננים', 'Reset filters')}</button></div>`}`}
+      ${list.length ? html`<div class="grid shop-grid">${list.map((p) => card(p))}</div><p class="cat-none" hidden>${T('לא מצאנו התאמה. נסו מילה אחרת — או ', 'No match. Try another word — or ')}<a href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('שאלו אותנו בוואטסאפ', 'ask us on WhatsApp')}</a></p>` : html`<div class="empty"><p>${T('לא נמצאו מוצרים בסינון הנוכחי. אפשר לשנות או לאפס את המסננים.', 'No products match these filters.')}</p><button class="btn ghost" data-action="filter-clear">${T('איפוס המסננים', 'Reset filters')}</button></div>`}`}
     </div></div><div class="block"></div>`;
 }
 
@@ -535,11 +537,11 @@ export function searchPanel() {
 }
 // ---------- Smart search: typos, final letters, quotes/hyphens, synonyms, model numbers ----------
 const FINAL = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
-const SYN = [[/מפזר(י|ים)?/g, 'מפיצ'], [/מבשמ(ים)?/g, 'מפיצ'], [/דיפיוזר(ים)?/g, 'מפיצ'], [/diffusers?/g, 'מפיצ'], [/שמנ(י|ים)? ריח/g, 'תמצית'], [/\boils?\b/g, 'תמצית'], [/סייי|ספ /g, 'say ']];
+const SYN = [[/מפזר(י|ים)?/g, 'מפיצ'], [/מבשמ(ים)?/g, 'מפיצ'], [/דיפיוזר(ים)?/g, 'מפיצ'], [/diffusers?/g, 'מפיצ'], [/שמנ(י|ים)? ריח/g, 'תמצית'], [/\boils?\b/g, 'תמצית'], [/סייי|ספ /g, 'say '], [/(ל|ב)?(רכב|אוטו|מכונית)/g, 'car']];
 export const snorm = (x) => String(x || '').toLowerCase().normalize('NFKD').replace(/[֑-ׇ]/g, '').replace(/[ךםןףץ]/g, (c) => FINAL[c]).replace(/["'׳״`´’\-–_.,/()]/g, ' ').replace(/([a-z])(\d)/g, '$1 $2').replace(/(\d)([a-z])/g, '$1 $2').replace(/\s+/g, ' ').trim();
 const qnorm = (q) => { let n = snorm(q); for (const [r, w] of SYN) n = n.replace(r, w); return n.replace(/\s+/g, ' ').trim(); };
 const lev = (a, b) => { if (Math.abs(a.length - b.length) > 2) return 9; const d = Array.from({ length: b.length + 1 }, (_, i) => i); for (let i = 1; i <= a.length; i++) { let prev = d[0]; d[0] = i; for (let j = 1; j <= b.length; j++) { const t2 = d[j]; d[j] = Math.min(d[j] + 1, d[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = t2; } } return d[b.length]; };
-const hayOf = (p) => snorm(`${p.name.he} ${p.name.en} ${p.sub || ''} ${catName(p.cat)} ${p.cat === 'diffusers' ? 'מפיצ מפיצי ריח' : p.cat === 'oils' ? 'תמצית תמציות שמנ' : ''} ${(p.options?.[0]?.values || []).map((v) => v.he).join(' ')}`);
+const hayOf = (p) => snorm(`${p.name.he} ${p.name.en} ${p.sub || ''} ${catName(p.cat)} ${p.cat === 'diffusers' ? 'מפיצ מפיצי ריח' : p.cat === 'oils' ? 'תמצית תמציות שמנ' : p.cat === 'bundles' ? 'מארז מארזים חבילה' : ''} ${p.desc?.he ? String(p.desc.he).split('\n')[0].slice(0, 160) : ''} ${(p.options?.[0]?.values || []).map((v) => v.he).join(' ')}`);
 // score: 0 = no match, 2 = exact words, 1 = fuzzy
 export function matchProduct(p, q) {
   const n = qnorm(q); if (!n) return 2; const hay = hayOf(p); const hw = hay.split(' ');
@@ -763,23 +765,51 @@ export function orderDone(o) {
 export function account(tab = 'login', aud = 'retail') {
   const u = db.me();
   if (u) return accountArea(u, tab);
+  if (tab === 'forgot') return html`<div class="auth-page"><div class="auth glass"><div id="fg">${forgotStep(1)}</div></div></div>`;
   const isLogin = tab === 'login';
+  const why = (id, he2, en2) => html`<small id="${id}" class="muted fld-why">${T(he2, en2)}</small>`;
   return html`<div class="auth-page"><div class="auth glass">
     <h1 class="auth-h">${T('כניסת לקוחות', 'Customer sign-in')}</h1>
     <p class="auth-sub">${T('חברי מועדון: התחברו כדי לראות הזמנות והטבות. הצטרפות חינם עם 15% הנחה לקנייה הראשונה.', 'Club members: sign in for orders and perks. Free to join, 15% off your first order.')}</p>
     <div class="tabs" role="tablist"><button role="tab" aria-selected="${isLogin}" data-action="auth-tab" data-tab="login">${t('login')}</button><button role="tab" aria-selected="${!isLogin}" data-action="auth-tab" data-tab="register">${t('register')}</button></div>
     <form data-form="${isLogin ? 'login' : 'register'}" novalidate>
-      ${isLogin ? '' : html`<div class="field"><label for="r-name">${t('fullName')} *</label><input class="input" id="r-name" name="name" autocomplete="name" required maxlength="80"></div>
-        
-        <div class="field"><label for="r-phone">${t('phone')} *</label><input class="input" id="r-phone" name="phone" type="tel" autocomplete="tel" required maxlength="20"></div>`}
-      <div class="field"><label for="a-email">${isLogin ? T('אימייל או שם משתמש', 'Email or username') : t('email')} *</label><input class="input" id="a-email" name="email" type="${isLogin ? 'text' : 'email'}" autocomplete="${isLogin ? 'username' : 'email'}" autocapitalize="none" spellcheck="false" required maxlength="120"></div>
-      <div class="field"><label for="a-pass">${t('password')} *</label><input class="input" id="a-pass" name="password" type="password" autocomplete="${isLogin ? 'current-password' : 'new-password'}" required minlength="${isLogin ? 1 : 8}" maxlength="128" aria-describedby="a-pass-h"><small id="a-pass-h" class="muted">${isLogin ? '' : t('badPass')}</small></div>
-      ${isLogin ? '' : html`
+      ${isLogin ? '' : html`<div class="field"><label for="r-name">${t('fullName')} *</label><input class="input" id="r-name" name="name" autocomplete="name" required maxlength="80" aria-describedby="w-n">${why('w-n', 'כדי שנדע איך לפנות אליכם', 'So we know how to address you')}</div>
+        <div class="field"><label for="r-phone">${t('phone')} *</label><input class="input" id="r-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="20" aria-describedby="w-p">${why('w-p', 'לעדכוני משלוח — ולשחזור החשבון בקוד SMS אם תשכחו סיסמה', 'For delivery updates and SMS account recovery')}</div>`}
+      <div class="field"><label for="a-email">${isLogin ? T('אימייל או שם משתמש', 'Email or username') : t('email')} *</label><input class="input" id="a-email" name="email" type="${isLogin ? 'text' : 'email'}" autocomplete="${isLogin ? 'username' : 'email'}" autocapitalize="none" spellcheck="false" required maxlength="120" ${raw(isLogin ? '' : 'aria-describedby="w-e"')}>${isLogin ? '' : why('w-e', 'זה גם שם המשתמש שלכם. לשם נשלח אישור הזמנה וקבלה', 'This is also your username; receipts go here')}</div>
+      <div class="field"><label for="a-pass">${t('password')} *</label><input class="input" id="a-pass" name="password" type="password" autocomplete="${isLogin ? 'current-password' : 'new-password'}" required minlength="${isLogin ? 1 : 8}" maxlength="128" aria-describedby="a-pass-h"><small id="a-pass-h" class="muted fld-why">${isLogin ? '' : t('badPass')}</small></div>
+      ${isLogin ? html`<button type="button" class="fg-link" data-action="auth-tab" data-tab="forgot">${T('שכחתי סיסמה או שם משתמש', 'Forgot password or username')}</button>` : html`
+        <div class="field"><label for="r-bd">${T('תאריך לידה', 'Birthday')} <em class="opt">${T('רשות', 'optional')}</em></label><input class="input" id="r-bd" name="birthday" type="date" aria-describedby="w-b">${why('w-b', 'כדי שנוכל לפנק אתכם ביום ההולדת', 'So we can treat you on your birthday')}</div>
+        <fieldset class="reg-addr"><legend>${T('כתובת למשלוח', 'Delivery address')} <em class="opt">${T('רשות', 'optional')}</em></legend>
+          <div class="row2"><div class="field"><label for="r-city">${t('city')}</label><input class="input" id="r-city" name="city" maxlength="60" autocomplete="address-level2"></div>
+          <div class="field"><label for="r-street">${t('street')}</label><input class="input" id="r-street" name="street" maxlength="120" autocomplete="street-address"></div></div>
+          <div class="field"><label for="r-apt">${T('דירה / קומה', 'Apt / floor')}</label><input class="input" id="r-apt" name="apt" maxlength="40"></div>
+          ${why('w-a', 'כדי שבקופה הכול ימולא לבד — והזמנה תיקח פחות מדקה. אפשר גם להוסיף אחר כך', 'So checkout fills itself in — you can also add it later')}</fieldset>
         <label class="check"><input type="checkbox" name="newsletter"><span>${t('newsletter')}</span></label>
-        <label class="check"><input type="checkbox" name="agree" required><span>${t('agree')}<a href="#/terms">${t('terms')}</a>${t('and')}<a href="#/privacy">${t('privacy')}</a> *</span></label>`}
+        <label class="check"><input type="checkbox" name="agree" required><span>${t('agree')}<a href="#/terms">${t('terms')}</a>${t('and')}<a href="#/privacy">${t('privacy')}</a> *</span></label>
+        <p class="acc-priv">${T('הפרטים משמשים רק לטיפול בהזמנות ולהטבות המועדון, ולא מועברים לגורם אחר.', 'Your details are used only for orders and club perks.')}</p>`}
       <p class="err" id="auth-err" role="alert"></p>
       <button class="btn block" type="submit">${isLogin ? t('login') : t('register')}</button>
     </form></div></div>`;
+}
+
+// Recovery: phone → SMS code → signed in, with an option to set a new password.
+const maskPhone = (ph) => { const d = String(ph || '').replace(/\D/g, ''); return d.length >= 7 ? `${d.slice(0, 3)}-•••-${d.slice(-4)}` : ph; };
+export function forgotStep(n, x = {}) {
+  const head = (h, p2) => html`<button type="button" class="fg-back" data-action="auth-tab" data-tab="login">${he() ? '→' : '←'} ${T('חזרה לכניסה', 'Back to sign-in')}</button><h1 class="auth-h">${h}</h1><p class="auth-sub">${p2}</p>`;
+  if (n === 1) return html`${head(T('שכחתם סיסמה או שם משתמש?', 'Forgot your password or username?'), T('קורה לכולם. הקלידו את מספר הטלפון שאיתו נרשמתם — נשלח אליו קוד אימות בן 6 ספרות.', 'It happens. Enter the phone you registered with — we will text you a 6-digit code.'))}
+    <form data-form="fg-phone" novalidate><div class="field"><label for="fg-ph">${t('phone')}</label><input class="input" id="fg-ph" name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="20" placeholder="05X-XXXXXXX"></div>
+      <p class="err" id="fg-err" role="alert"></p><button class="btn block" type="submit">${T('שלחו לי קוד אימות', 'Text me a code')}</button></form>`;
+  if (n === 2) return html`${head(T('הזינו את הקוד', 'Enter the code'), html`${T('אם המספר', 'If')} <bdi dir="ltr">${maskPhone(x.phone)}</bdi> ${T('רשום אצלנו, נשלח אליו עכשיו קוד בן 6 ספרות. הקוד תקף ל־10 דקות.', 'is registered, a 6-digit code is on its way. Valid for 10 minutes.')}`)}
+    ${x.demoCode ? html`<p class="fg-demo"><b>${T('מצב הדגמה', 'Demo mode')}</b>${T('שירות ה־SMS עוד לא מחובר, לכן הקוד מוצג כאן:', 'SMS is not connected yet, so the code is shown here:')} <code dir="ltr">${x.demoCode}</code></p>` : ''}
+    <form data-form="fg-code" novalidate><div class="field"><label for="fg-c">${T('קוד אימות', 'Verification code')}</label><input class="input fg-code" id="fg-c" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6" required dir="ltr"></div>
+      <p class="err" id="fg-err" role="alert"></p><button class="btn block" type="submit">${T('אימות', 'Verify')}</button></form>
+    <p class="fg-alt"><button type="button" class="fg-link" data-action="fg-resend">${T('לא קיבלתם? שליחה מחדש', 'Didn’t get it? Resend')}</button> · <button type="button" class="fg-link" data-action="auth-tab" data-tab="forgot">${T('מספר אחר', 'Another number')}</button></p>`;
+  return html`${head(T('אומתתם בהצלחה', 'You’re verified'), html`${T('שם המשתמש שלכם:', 'Your username:')} <b dir="ltr">${x.username}</b>`)}
+    <button class="btn block gold" type="button" data-action="fg-login">${T('כניסה לחשבון עכשיו', 'Sign me in now')}</button>
+    <p class="fg-or">${T('או קבעו סיסמה חדשה', 'or set a new password')}</p>
+    <form data-form="fg-pass" novalidate><div class="field"><label for="fg-p1">${T('סיסמה חדשה', 'New password')}</label><input class="input" id="fg-p1" name="p1" type="password" autocomplete="new-password" required minlength="8" maxlength="128"><small class="muted fld-why">${t('badPass')}</small></div>
+      <div class="field"><label for="fg-p2">${T('אימות סיסמה', 'Confirm password')}</label><input class="input" id="fg-p2" name="p2" type="password" autocomplete="new-password" required maxlength="128"></div>
+      <p class="err" id="fg-err" role="alert"></p><button class="btn block" type="submit">${T('שמירה וכניסה', 'Save & sign in')}</button></form>`;
 }
 
 // ---------- My account: dashboard, orders, addresses, profile ----------
@@ -896,6 +926,9 @@ export async function authSubmit(form, kind) {
       if (!valid.password(d.password)) throw new Error('pass');
       if (!d.agree) throw new Error('agree');
       await db.register({ name: clean(d.name, 80), phone: normPhone(d.phone), email: clean(d.email, 120), password: d.password, wholesale: !!d.wholesale, biz: clean(d.biz, 80), newsletter: !!d.newsletter });
+      const bd = /^\d{4}-\d{2}-\d{2}$/.test(d.birthday || '') ? d.birthday : '';
+      const ad = clean(d.city, 60) && clean(d.street, 120) ? [{ label: T('בית', 'Home'), city: clean(d.city, 60), street: clean(d.street, 120), apt: clean(d.apt, 40), notes: '', def: true }] : [];
+      if (bd || ad.length) db.updateMe({ ...(bd ? { birthday: bd } : {}), ...(ad.length ? { addresses: ad } : {}) });
     }
     return true;
   } catch (e) {
@@ -967,7 +1000,7 @@ export function wholesalePage() {
         <ul class="wsx-facts">
           <li><b>${T('התקנה', 'Installed')}</b><span>${T('אצלכם בעסק', 'at your place')}</span></li>
           <li><b>${T('דוגמיות', 'Samples')}</b><span>${T('לפני שמחליטים', 'before you decide')}</span></li>
-          <li><b>${T('עד 5 ליטר', 'Up to 5 L')}</b><span>${T('מילוי במחיר סיטונאי', 'wholesale refills')}</span></li>
+          <li><b>${T('החל מ־5 ליטר', 'From 5 L')}</b><span>${T('מילוי במחיר סיטונאי', 'wholesale refills')}</span></li>
         </ul>
       </div>
       <figure class="wsx-art"><img src="${P}hero-1.webp" alt="${T('מפיצי SAY בעמדת קבלה', 'SAY diffusers at a reception desk')}" width="1400" height="1000"></figure>

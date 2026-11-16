@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261116121041';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261116121041';
-import { CATEGORIES } from './data.js?v=261116121041';
-import * as db from './db.js?v=261116121041';
-import * as S from './views-shop.js?v=261116121041';
-import * as Lg from './views-legal.js?v=261116121041';
-import * as A from './views-admin.js?v=261116121041';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261116122007';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261116122007';
+import { CATEGORIES } from './data.js?v=261116122007';
+import * as db from './db.js?v=261116122007';
+import * as S from './views-shop.js?v=261116122007';
+import * as Lg from './views-legal.js?v=261116122007';
+import * as A from './views-admin.js?v=261116122007';
 
 // Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
 if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
@@ -32,7 +32,8 @@ function header() {
     <button class="icon-btn menu-btn" data-action="menu" aria-label="${t('menu')}" aria-expanded="false" aria-controls="nav">${raw(ICONS.menu)}</button>
     <button class="icon-btn m-search" data-action="search-open" aria-label="${t('search')}" aria-haspopup="dialog">${raw(ICONS.search)}</button>
     <nav class="nav" id="nav" aria-label="${t('menu')}">
-      <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+      <div class="mn-bar"><div class="mn-tick" aria-live="off"><small>SAY BOUTIQUE</small>${(getLang() === 'he' ? ['משלוח חינם בהזמנה מעל 299 ₪', '15% הנחה בהזמנה הראשונה למצטרפים', 'מחירי יבואן — ישר אליכם הביתה', 'החזרה עד 14 יום, בלי שאלות'] : ['Free shipping over ₪299', '15% off your first order for members', 'Importer prices, delivered home', '14-day returns']).map((x, i) => html`<p class="${i ? '' : 'on'}">${x}</p>`)}</div>
+      <button class="icon-btn nav-close" data-action="menu-close" aria-label="${t('close')}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
       <span class="mn-desk">${navLink('#/shop', t('shop'))}${CATEGORIES.slice(0, 2).map((c) => navLink('#/shop/' + c.id, c[getLang()]))}${navLink('#/finder', getLang() === 'he' ? 'מציאת הריח שלי' : 'Scent finder')}${navLink('#/wholesale', t('wholesale'))}</span>
       ${mobileMenu()}
     </nav>
@@ -137,7 +138,13 @@ function stepTicker(d) {
   tickIdx = (cur + d + ms.length) % ms.length;
   ms.forEach((m, k) => { m.classList.toggle('on', k === tickIdx); if (k === tickIdx) m.removeAttribute('aria-hidden'); else m.setAttribute('aria-hidden', 'true'); });
 }
+let mnTimer;
+function startMenuTicker() {
+  clearInterval(mnTimer); if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  mnTimer = setInterval(() => { const ps = $$('.mn-tick p'); if (!ps.length || !$('#nav.open')) return; const i = ps.findIndex((x) => x.classList.contains('on')); ps.forEach((x, k) => x.classList.toggle('on', k === (i + 1) % ps.length)); }, 3000);
+}
 function startTicker() {
+  startMenuTicker();
   clearInterval(tickTimer);
   if (tickPaused || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   tickTimer = setInterval(() => {
@@ -191,7 +198,7 @@ function reelMotion() { const v = $('.rl-vid video'); if (v && (matchMedia('(pre
 function floaters() {
   let hid = false; try { hid = !!sessionStorage.getItem('say_vipf'); } catch {}
   if (hid || /^#\/(checkout|account|done|club)/.test(location.hash)) $('.vipf')?.remove();
-  const top = $('.fab-top'); if (top) { const f = () => top.classList.toggle('show', window.scrollY > 900); window.removeEventListener('scroll', window.__topf || f); window.__topf = f; window.addEventListener('scroll', f, { passive: true }); f(); }
+  const top = $('.fab-top'); if (top) { const f = () => top.classList.toggle('show', window.scrollY > 500); window.removeEventListener('scroll', window.__topf || f); window.__topf = f; window.addEventListener('scroll', f, { passive: true }); f(); }
 }
 function startSlides() {
   clearInterval(slideTimer); slideIdx = 0;
@@ -552,7 +559,9 @@ document.addEventListener('click', async (e) => {
     case 'fs': a11yState.fs = Math.max(0, Math.min(3, (a11yState.fs || 0) + +el.dataset.d)); applyA11y(); break;
     case 'a11y-t': a11yState[el.dataset.k] = !a11yState[el.dataset.k]; el.setAttribute('aria-pressed', a11yState[el.dataset.k]); applyA11y(); break;
     case 'a11y-reset': Object.keys(a11yState).forEach((k) => delete a11yState[k]); a11yState.fs = 0; applyA11y(); $$('[data-action="a11y-t"]').forEach((b) => b.setAttribute('aria-pressed', 'false')); break;
-    case 'auth-tab': state.authTab = el.dataset.tab; rerender(); break;
+    case 'auth-tab': state.authTab = el.dataset.tab; state.fg = null; if (location.hash !== '#/account') location.hash = '#/account'; else rerender(); break;
+    case 'fg-resend': (async () => { try { const r = await db.requestReset(state.fg?.phone); render($('#fg'), S.forgotStep(2, { phone: state.fg?.phone, demoCode: r.demoCode })); toast(getLang() === 'he' ? 'נשלח קוד חדש' : 'New code sent'); } catch (x) { toast(x.message === 'locked' || x.message === 'tooMany' ? (getLang() === 'he' ? 'יותר מדי בקשות. נסו שוב בעוד כרבע שעה.' : 'Too many requests. Try later.') : t('required')); } })(); break;
+    case 'fg-login': (async () => { try { await db.finishReset(state.fg?.token); state.fg = null; state.authTab = 'login'; location.hash = '#/account'; rerender(); } catch { toast(getLang() === 'he' ? 'האימות פג תוקף. נסו שוב.' : 'Verification expired.'); state.authTab = 'forgot'; rerender(); } })(); break;
     case 'logout': db.logout(); location.hash = '#/'; rerender(); break;
     // back office
     case 'edit-product': modal(A.productForm(id ? db.product(id) : null)); break;
@@ -592,6 +601,7 @@ document.addEventListener('input', (e) => {
   const v = clean(el.value, 60);
   if (k === 'search') { state.q = v; searchDeb(); keepFocus('#q'); }
   if (k === 'sq') runSearch(v);
+  if (k === 'cat-q') { let n = 0; $$('.shop-grid > .card').forEach((c) => { const p = db.product(c.dataset.pid); const ok = !v || (p && S.matchProduct(p, v)); c.hidden = !ok; if (ok) n++; }); const cnt = $('.toolbar2 .count b'); if (cnt) cnt.textContent = n; const none = $('.cat-none'); if (none) none.hidden = !!n; }
   if (k === 'oz-q') { let n = 0; $$('.ox-grid > .card').forEach((c) => { const p = db.product(c.dataset.pid); const ok = !v || (p && S.matchProduct(p, v)); c.hidden = !ok; if (ok) n++; }); const cnt = $('#oz-all .count b'); if (cnt) cnt.textContent = n; }
   if (k === 'pq') { state.pq = v; searchDeb(); keepFocus('#pq'); }
   if (k === 'uq') { state.uq = v; searchDeb(); keepFocus('#uq'); }
@@ -689,6 +699,17 @@ document.addEventListener('submit', async (e) => {
     const r = { name: clean(d.name, 60), city: clean(d.city, 40), rating: Math.min(5, Math.max(1, parseInt(d.rating) || 0)), text: clean(d.text, 600) };
     if (!valid.name(r.name) || !d.rating || r.text.length < 10) { err.textContent = he ? 'נא למלא שם, דירוג וכמה מילים על החוויה' : 'Please add your name, a rating and a few words'; return; }
     db.addReview(r); f.innerHTML = `<p class="rv-thanks">${he ? 'תודה רבה! הביקורת תתפרסם אחרי אישור קצר.' : 'Thank you! Your review will appear after a quick check.'}</p>`; return;
+  }
+  if (kind === 'cat-search') { $('.toolbar2')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  if (kind === 'fg-phone' || kind === 'fg-code' || kind === 'fg-pass') {
+    const err = $('#fg-err', f); const he = getLang() === 'he'; const E = { locked: he ? 'יותר מדי ניסיונות. מטעמי אבטחה האימות ננעל ל־15 דקות.' : 'Too many attempts. Locked for 15 minutes.', tooMany: he ? 'נשלחו כבר כמה קודים. נסו שוב בעוד כרבע שעה.' : 'Several codes were sent. Try again in 15 minutes.', expired: he ? 'הקוד פג תוקף. בקשו קוד חדש.' : 'The code expired. Request a new one.', badCode: he ? 'הקוד שגוי. בדקו ונסו שוב.' : 'Wrong code. Please try again.' };
+    btn.disabled = true;
+    try {
+      if (kind === 'fg-phone') { const ph = normPhone(clean(f.phone.value, 20)); if (!valid.phone(ph)) { err.textContent = t('badPhone'); return; } const r = await db.requestReset(ph); state.fg = { phone: ph }; render($('#fg'), S.forgotStep(2, { phone: ph, demoCode: r.demoCode })); $('#fg-c')?.focus(); }
+      if (kind === 'fg-code') { const r = await db.verifyReset(state.fg?.phone, f.code.value); state.fg = { ...state.fg, token: r.token }; render($('#fg'), S.forgotStep(3, r)); }
+      if (kind === 'fg-pass') { if (!valid.password(f.p1.value)) { err.textContent = t('badPass'); return; } if (f.p1.value !== f.p2.value) { err.textContent = he ? 'הסיסמאות אינן תואמות' : 'Passwords do not match'; return; } await db.finishReset(state.fg?.token, f.p1.value); state.fg = null; state.authTab = 'login'; toast(he ? 'הסיסמה עודכנה — אתם מחוברים' : 'Password updated — signed in'); location.hash = '#/account'; rerender(); }
+    } catch (x) { if (err) err.textContent = E[x.message] || t('required'); } finally { if (document.contains(btn)) btn.disabled = false; }
+    return;
   }
   if (kind === 'oil-search') { $('#oz-all')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
   if (kind === 'checkout') {

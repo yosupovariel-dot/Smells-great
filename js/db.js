@@ -1,8 +1,8 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261116121041';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261116121041';
+import { SEED_PRODUCTS } from './data.js?v=261116122007';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261116122007';
 
 const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -79,6 +79,54 @@ export async function login(email, password) {
     lock[email] = rec; write('lock', lock); throw new Error('fail');
   }
   delete lock[email]; write('lock', lock);
+  setSession(u.id); return publicUser(u);
+}
+// ---------- Account recovery by phone (OTP) ----------
+// DEMO_OTP: no SMS provider is connected yet, so the code is shown on screen. When an SMS service is
+// connected, set this to false and send the code from the server — never return it to the browser.
+export const DEMO_OTP = true;
+const OTP_TTL = 10 * 60 * 1000, OTP_TRIES = 5, OTP_LOCK = 15 * 60 * 1000, OTP_MAX_SENDS = 3, OTP_WINDOW = 15 * 60 * 1000;
+const phoneKey = (x) => String(x || '').replace(/\D/g, '').replace(/^972/, '0');
+const sha = async (t) => b64(await crypto.subtle.digest('SHA-256', enc.encode(t)));
+const rnd6 = () => String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, '0');
+const otpStore = () => read('otp', {});
+export async function requestReset(phone) {
+  const k = phoneKey(phone); const all = otpStore(); const r = all[k] || { sends: [], tries: 0, until: 0 };
+  if (r.until > Date.now()) throw new Error('locked');
+  r.sends = (r.sends || []).filter((t) => Date.now() - t < OTP_WINDOW);
+  if (r.sends.length >= OTP_MAX_SENDS) throw new Error('tooMany');
+  const code = rnd6(); const salt = b64(crypto.getRandomValues(new Uint8Array(12)));
+  Object.assign(r, { salt, h: await sha(salt + code), exp: Date.now() + OTP_TTL, tries: 0 }); r.sends.push(Date.now());
+  all[k] = r; write('otp', all);
+  // Same answer whether or not the number is registered (no account enumeration).
+  return DEMO_OTP ? { demoCode: code } : {};
+}
+export async function verifyReset(phone, code) {
+  const k = phoneKey(phone); const all = otpStore(); const r = all[k];
+  if (!r) throw new Error('expired');
+  if (r.until > Date.now()) throw new Error('locked');
+  if (!r.exp || r.exp < Date.now()) throw new Error('expired');
+  const ok = safeEq(await sha(r.salt + String(code).replace(/\D/g, '')), r.h);
+  const u = users().find((x) => x.phone && phoneKey(x.phone) === k && !x.blocked);
+  if (!ok || !u) {
+    r.tries = (r.tries || 0) + 1; if (r.tries >= OTP_TRIES) { r.until = Date.now() + OTP_LOCK; r.h = ''; r.exp = 0; }
+    all[k] = r; write('otp', all); throw new Error(r.until > Date.now() ? 'locked' : 'badCode');
+  }
+  delete all[k]; write('otp', all);
+  const token = b64(crypto.getRandomValues(new Uint8Array(24)));
+  try { sessionStorage.setItem(K('rst'), JSON.stringify({ t: await sha(token), id: u.id, exp: Date.now() + OTP_TTL })); } catch {}
+  const [nm, dom] = u.email.split('@'); return { token, username: `${nm.slice(0, 2)}${'•'.repeat(Math.min(6, Math.max(2, nm.length - 2)))}@${dom}` };
+}
+async function takeReset(token) {
+  let r = null; try { r = JSON.parse(sessionStorage.getItem(K('rst')) || 'null'); } catch {}
+  if (!r || r.exp < Date.now() || !safeEq(await sha(token), r.t)) throw new Error('expired');
+  return r;
+}
+export async function finishReset(token, newPw) {
+  const r = await takeReset(token); const l = users(); const u = l.find((x) => x.id === r.id); if (!u || u.blocked) throw new Error('expired');
+  if (newPw) { Object.assign(u, await hashPw(newPw), { mustChange: false }); saveUsers(l); }
+  const lock = read('lock', {}); delete lock[u.email]; write('lock', lock);
+  try { sessionStorage.removeItem(K('rst')); } catch {}
   setSession(u.id); return publicUser(u);
 }
 export async function changePassword(id, pw) {
