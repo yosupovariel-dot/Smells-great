@@ -3941,21 +3941,6 @@ form[data-form="login"] .fg-link{display:block;margin:-.3rem 0 1rem;margin-inlin
 .lbx.zoomed .lbx-hint{opacity:0}
 /* hero sale tag: boutique black & gold, not red */
 .h-sale{background:#16130F!important;color:#E2C88F!important;border:1px solid rgba(226,200,143,.55);border-radius:999px!important;box-shadow:none!important;animation:none!important}
-/* bigger logo */
-.hdr .brand.logo img{height:72px!important}
-body.scrolled .hdr .brand.logo img{transform:scale(.58)}
-@media (max-width:900px){.hdr .brand.logo img{height:56px!important}body.scrolled .hdr .brand.logo img{transform:scale(.68)}}
-@media (max-width:400px){.hdr .brand.logo img{height:52px!important}}
-@media (max-width:350px){.hdr .brand.logo img{height:42px!important}}
-/* home: the header melts into the hero until you scroll */
-body:has(.hx):not(.scrolled) .hdr{background:transparent!important;border-color:transparent!important;box-shadow:none!important;backdrop-filter:none!important}
-body:has(.hx) .hx{margin-top:-96px}
-body:has(.hx) .hx-copy{padding-top:calc(96px + clamp(1.4rem,4vw,3.5rem))!important}
-@media (max-width:900px){body:has(.hx) .hx{margin-top:-72px}body:has(.hx) .hx-copy{padding-top:calc(72px + 1.3rem)!important}}
-body:has(.hx):not(.scrolled) .hdr .brand.logo img{content:url("../assets/img/logo-wide-light.webp")}
-body:has(.hx):not(.scrolled) .hdr .icon-btn,body:has(.hx):not(.scrolled) .hdr .tool-link,body:has(.hx):not(.scrolled) .hdr .nav a,body:has(.hx):not(.scrolled) .hdr .m-lab small{color:#F4EEE4!important}
-body:has(.hx):not(.scrolled) .hdr svg{stroke:currentColor}
-body:has(.hx):not(.scrolled) .hdr .lang-btn,body:has(.hx):not(.scrolled) .hdr [data-action="lang"]{color:#F4EEE4!important;border-color:rgba(244,238,228,.45)!important;background:transparent!important}
 /* no header hairline across the open drawer, nor on the home hero */
-body.menu-open .hdr::after,body:has(.hx):not(.scrolled) .hdr::after{display:none}
+body.menu-open .hdr::after{display:none}
 body.menu-open .hdr{border-bottom-color:transparent!important}
