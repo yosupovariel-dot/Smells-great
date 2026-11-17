@@ -31,7 +31,8 @@ export const valid = {
   email: (s) => /^[^\s@<>]{1,64}@[^\s@<>]{1,255}\.[a-z]{2,}$/i.test(String(s).trim()),
   phone: (s) => /^0\d{8,9}$/.test(normPhone(s)),
   name: (s) => String(s).trim().length >= 2 && String(s).length <= 80,
-  password: (s) => String(s).length >= 8 && /[A-Za-z]/.test(s) && /\d/.test(s),
+  password: (s) => String(s).length >= 6 && String(s).length <= 128,
+  staffPassword: (s) => String(s).length >= 8 && /[A-Za-z]/.test(s) && /\d/.test(s),
 };
 export const clean = (s, max = 200) => String(s ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, max);
 

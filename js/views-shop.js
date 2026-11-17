@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261117070404';
-import { t, L, getLang } from './i18n.js?v=261117070404';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261117070404';
-import * as db from './db.js?v=261117070404';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261117173103';
+import { t, L, getLang } from './i18n.js?v=261117173103';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261117173103';
+import * as db from './db.js?v=261117173103';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -715,8 +715,9 @@ export function checkout() {
         <div class="row2">${f('name', t('fullName'), 'text', 'name', true, u?.name || '')}${f('phone', t('phone'), 'tel', 'tel', true, u?.phone || '', '050-0000000')}</div>
         ${f('email', t('email'), 'email', 'email', true, u?.email || '', T('לשליחת אישור ההזמנה', 'For your order confirmation'))}</section>
       <section class="co-box"><h2><span>2</span>${T('לאן לשלוח?', 'Where to deliver?')}</h2>
-        ${(() => { const ad = u ? (db.profileOf(u).full.addresses || []).find((a2) => a2.def) : null; return html`<div class="row2">${f('city', t('city'), 'text', 'address-level2', true, ad?.city || '')}${f('street', t('street'), 'text', 'street-address', true, ad?.street || '')}</div>`; })()}
-        ${f('apt', t('apt'), 'text', 'off', false)}
+        ${(() => { const ad = u ? (db.profileOf(u).full.addresses || []).find((a2) => a2.def) : null; return html`${ad ? html`<p class="co-saved">${T('מילאנו את הכתובת הראשית השמורה שלכם — אפשר לתקן כאן.', 'We filled in your saved main address — edit it here if needed.')}</p>` : ''}<div class="row2" data-def="${ad ? [ad.city, ad.street, ad.apt || ''].join('|') : ''}">${f('city', t('city'), 'text', 'address-level2', true, ad?.city || '')}${f('street', t('street'), 'text', 'street-address', true, ad?.street || '')}</div>
+        ${f('apt', t('apt'), 'text', 'off', false, ad?.apt || '')}
+        ${u && u.role === 'customer' ? html`<label class="check co-main"><input type="checkbox" name="saveAddr" checked><span id="co-main-t">${ad ? T('זו הכתובת הראשית שלי להזמנות הבאות', 'This is my main address for next orders') : T('לשמור ככתובת הראשית שלי להזמנות הבאות', 'Save as my main address for next orders')}</span></label>` : ''}`; })()}
         <details class="co-notes"><summary>${T('הוספת הערה לשליח', 'Add a note for the courier')}</summary><textarea class="input" id="notes" name="notes" rows="2" maxlength="300"></textarea></details>
         <p class="co-eta">${T('משלוח עד הבית תוך 7-10 ימים', 'Home delivery in 7–10 days')}${left ? '' : html` · <b>${T('חינם', 'free')}</b>`}</p></section>
       ${tt.pointsAvail >= 100 ? html`<label class="co-pts"><input type="checkbox" data-input="use-points" ${raw(db.usingPoints() ? 'checked' : '')}><span><b>${T(`יש לכם ${tt.pointsAvail} נקודות`, `You have ${tt.pointsAvail} points`)}</b>${T('לממש אותן בהזמנה הזאת (כל 100 נקודות = 10 ₪)', 'Use them on this order (100 points = ₪10)')}</span></label>` : u && u.role !== 'wholesale' ? html`<p class="co-pts-earn">${T(`על ההזמנה הזאת תצברו ${Math.floor(tt.total - tt.shipping)} נקודות`, `This order earns ${Math.floor(tt.total - tt.shipping)} points`)}</p>` : ''}
@@ -748,6 +749,7 @@ export function checkoutSubmit(form) {
     form.elements[keys[0]]?.focus(); return null;
   }
   const customer = { name: clean(d.name, 80), phone: normPhone(d.phone), email: clean(d.email, 120), city: clean(d.city, 60), street: clean(d.street, 120), apt: clean(d.apt, 40), notes: clean(d.notes, 300) };
+  if (d.saveAddr && db.me()) db.saveMainAddress({ city: customer.city, street: customer.street, apt: customer.apt });
   return db.placeOrder(customer);
 }
 
@@ -815,7 +817,7 @@ export function forgotStep(n, x = {}) {
 // ---------- My account: dashboard, orders, addresses, profile ----------
 const STEPS = ['new', 'processing', 'shipped', 'delivered'];
 const track = (o) => { if (o.status === 'cancelled') return html`<p class="trk-x">${statusLabel('cancelled')}</p>`; const i = Math.max(0, STEPS.indexOf(o.status === 'ready' ? 'processing' : o.status));
-  return html`<ol class="trk">${STEPS.map((st, k) => html`<li class="${k <= i ? 'on' : ''}"><i></i><span>${({ new: T('התקבלה', 'Received'), processing: T('בטיפול', 'Processing'), shipped: T('נשלחה', 'Shipped'), delivered: T('נמסרה', 'Delivered') })[st]}</span></li>`)}</ol>${o.tracking ? html`<p class="trk-no">${T('מספר מעקב', 'Tracking')}: <b dir="ltr">${o.tracking}</b></p>` : ''}`; };
+  return html`<ol class="trk">${STEPS.map((st, k) => html`<li class="${k <= i ? 'on' : ''}"><i></i><span>${({ new: T('התקבלה', 'Received'), processing: T('אורזים לכם', 'Packing'), shipped: T('בדרך אליכם', 'On its way'), delivered: T('נמסרה', 'Delivered') })[st]}</span></li>`)}</ol>${o.tracking ? html`<p class="trk-no">${T('מספר מעקב', 'Tracking')}: <b dir="ltr">${o.tracking}</b></p>` : ''}`; };
 const orderCard = (o, open = false) => html`<details class="oc" ${raw(open ? 'open' : '')}><summary><span><b dir="ltr">#${o.num}</b><small>${new Date(o.date).toLocaleDateString(getLang() === 'he' ? 'he-IL' : 'en-GB')}</small></span><span class="pill st-${o.status}">${statusLabel(o.status)}</span><strong>${m(o.total)}</strong></summary>
   ${track(o)}<ul class="oc-items">${o.items.map((x) => html`<li><span>${L(x.name)}${x.size && x.size !== 'יחידה' && x.size !== 'מארז' ? ` · ${x.size}` : ''}${x.opt ? ` · ${x.opt}` : ''} × ${x.qty}</span><b>${m(x.price * x.qty)}</b></li>`)}</ul>
   <p class="oc-addr">${o.customer.street}, ${o.customer.city}</p></details>`;
@@ -906,10 +908,26 @@ export function businessPage(path = '') {
 }
 
 export const statusLabel = (s) => ({
-  he: { new: 'חדשה', processing: 'בטיפול', ready: 'מוכנה למשלוח', shipped: 'בדרך', delivered: 'נמסרה', cancelled: 'בוטלה' },
+  he: { new: 'חדשה', processing: 'באריזה', ready: 'מוכנה למשלוח', shipped: 'בדרך', delivered: 'נמסרה', cancelled: 'בוטלה' },
   en: { new: 'New', processing: 'Processing', ready: 'Ready', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled' },
 })[getLang()][s] || s;
 
+// Finish a verified sign-up (account page): create the account, then birthday + address if given.
+export async function finishSignup(reg) {
+  await db.register(reg);
+  const bd = /^\d{4}-\d{2}-\d{2}$/.test(reg.birthday || '') ? reg.birthday : '';
+  const ad = clean(reg.city, 60) && clean(reg.street, 120) ? [{ label: T('בית', 'Home'), city: clean(reg.city, 60), street: clean(reg.street, 120), apt: clean(reg.apt, 40), notes: '', def: true }] : [];
+  if (bd || ad.length) db.updateMe({ ...(bd ? { birthday: bd } : {}), ...(ad.length ? { addresses: ad } : {}) });
+}
+export function signupCodeStep(phone, demoCode, ctx = 'page') {
+  return html`<div class="su-step">${ctx === 'page' ? html`<button type="button" class="fg-back" data-action="su-back">${he() ? '→' : '←'} ${T('תיקון הפרטים', 'Edit my details')}</button>` : ''}
+    <p class="c3-k">${T('שלב אחרון', 'Last step')}</p><h2 class="auth-h">${T('אימות מספר הטלפון', 'Verify your phone')}</h2>
+    <p class="auth-sub">${T('שלחנו קוד בן 6 ספרות למספר', 'We texted a 6-digit code to')} <bdi dir="ltr">${maskPhone(phone)}</bdi>. ${T('הקוד תקף ל־10 דקות.', 'Valid for 10 minutes.')}</p>
+    ${demoCode ? html`<p class="fg-demo"><b>${T('מצב הדגמה', 'Demo mode')}</b>${T('שירות ה־SMS עוד לא מחובר, לכן הקוד מוצג כאן:', 'SMS is not connected yet, so the code is shown here:')} <code dir="ltr">${demoCode}</code></p>` : ''}
+    <form data-form="su-code" novalidate><div class="field"><label for="su-c">${T('קוד אימות', 'Verification code')}</label><input class="input fg-code" id="su-c" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6" required dir="ltr"></div>
+      <p class="err" id="su-err" role="alert"></p><button class="btn block" type="submit">${T('אימות והצטרפות', 'Verify & join')}</button></form>
+    <p class="fg-alt"><button type="button" class="fg-link" data-action="su-resend">${T('לא קיבלתם? שליחה מחדש', 'Didn’t get it? Resend')}</button></p></div>`;
+}
 export async function authSubmit(form, kind) {
   const d = Object.fromEntries(new FormData(form)); const err = form.querySelector('#auth-err');
   err.textContent = '';
@@ -925,14 +943,13 @@ export async function authSubmit(form, kind) {
       if (!valid.email(d.email)) throw new Error('email');
       if (!valid.password(d.password)) throw new Error('pass');
       if (!d.agree) throw new Error('agree');
-      await db.register({ name: clean(d.name, 80), phone: normPhone(d.phone), email: clean(d.email, 120), password: d.password, wholesale: !!d.wholesale, biz: clean(d.biz, 80), newsletter: !!d.newsletter });
-      const bd = /^\d{4}-\d{2}-\d{2}$/.test(d.birthday || '') ? d.birthday : '';
-      const ad = clean(d.city, 60) && clean(d.street, 120) ? [{ label: T('בית', 'Home'), city: clean(d.city, 60), street: clean(d.street, 120), apt: clean(d.apt, 40), notes: '', def: true }] : [];
-      if (bd || ad.length) db.updateMe({ ...(bd ? { birthday: bd } : {}), ...(ad.length ? { addresses: ad } : {}) });
+      const reg = { name: clean(d.name, 80), phone: normPhone(d.phone), email: clean(d.email, 120), password: d.password, wholesale: !!d.wholesale, biz: clean(d.biz, 80), newsletter: !!d.newsletter, birthday: d.birthday, city: d.city, street: d.street, apt: d.apt };
+      db.precheckSignup(reg.email, reg.phone);
+      return { otp: reg };
     }
     return true;
   } catch (e) {
-    err.textContent = { 'not-ws': T('החשבון הזה הוא חשבון לקוח פרטי. אם ביקשתם חשבון סיטונאי — הוא ממתין לאישור.', 'This is a retail account. Wholesale requests await approval.'), 'use-staff': T('זהו חשבון צוות — היכנסו דרך "כניסת צוות".', 'This is a staff account — use Staff sign-in.'), 'use-customer': T('זהו חשבון לקוח — היכנסו דרך "כניסת לקוחות".', 'This is a customer account — use Customer sign-in.'), fail: t('loginFail'), locked: t('locked'), exists: t('exists'), name: t('fullName') + ': ' + t('required'), phone: t('badPhone'), email: t('badEmail'), pass: t('badPass'), biz: t('bizName') + ': ' + t('required'), agree: t('mustAgree') }[e.message] || t('loginFail');
+    err.textContent = { 'not-ws': T('החשבון הזה הוא חשבון לקוח פרטי. אם ביקשתם חשבון סיטונאי — הוא ממתין לאישור.', 'This is a retail account. Wholesale requests await approval.'), 'use-staff': T('זהו חשבון צוות — היכנסו דרך "כניסת צוות".', 'This is a staff account — use Staff sign-in.'), 'use-customer': T('זהו חשבון לקוח — היכנסו דרך "כניסת לקוחות".', 'This is a customer account — use Customer sign-in.'), fail: t('loginFail'), locked: t('locked'), exists: t('exists'), name: t('fullName') + ': ' + t('required'), phone: t('badPhone'), email: t('badEmail'), pass: t('badPass'), phoneExists: t('phoneExists'), tooMany: T('נשלחו כבר כמה קודים. נסו שוב בעוד כרבע שעה.', 'Several codes were sent. Try again in 15 minutes.'), locked2: t('locked'), biz: t('bizName') + ': ' + t('required'), agree: t('mustAgree') }[e.message] || t('loginFail');
     return false;
   }
 }

@@ -3944,3 +3944,13 @@ form[data-form="login"] .fg-link{display:block;margin:-.3rem 0 1rem;margin-inlin
 /* no header hairline across the open drawer, nor on the home hero */
 body.menu-open .hdr::after{display:none}
 body.menu-open .hdr{border-bottom-color:transparent!important}
+
+/* page stays exactly where it was under the bag drawer */
+body.page-lock{position:fixed;inset-inline:0;width:100%;overflow:hidden}
+/* checkout: main address */
+.co-saved{margin:-.2rem 0 .8rem;font-size:.82rem;color:#7E6236}
+.co-main{margin-top:.4rem;padding:.7rem .9rem;border:1px dashed #cdb88f;border-radius:12px;background:#FBF6EC}
+.co-main span{font-weight:600}
+.su-step .c3-k{margin:0 0 .3rem}
+.c3-form .su-step .auth-h{font-size:1.25rem;margin:.1rem 0 .3rem}
+.c3-form .su-step .auth-sub{font-size:.85rem}

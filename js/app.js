@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261117070404';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261117070404';
-import { CATEGORIES } from './data.js?v=261117070404';
-import * as db from './db.js?v=261117070404';
-import * as S from './views-shop.js?v=261117070404';
-import * as Lg from './views-legal.js?v=261117070404';
-import * as A from './views-admin.js?v=261117070404';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261117173103';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261117173103';
+import { CATEGORIES } from './data.js?v=261117173103';
+import * as db from './db.js?v=261117173103';
+import * as S from './views-shop.js?v=261117173103';
+import * as Lg from './views-legal.js?v=261117173103';
+import * as A from './views-admin.js?v=261117173103';
 
 // Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
 if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
@@ -264,7 +264,7 @@ function maybePromo(delay = 7000, force = false) {
           <label class="c3-in">${I('<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.2-6.5 8-6.5s7 2 8 6.5"/>')}<input name="name" autocomplete="name" required maxlength="80" placeholder="${he ? 'שם מלא *' : 'Full name *'}" aria-label="${he ? 'שם מלא' : 'Full name'}"></label>
           <label class="c3-in">${I('<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>')}<input name="phone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="15" placeholder="${he ? 'מספר טלפון *' : 'Phone *'}" aria-label="${he ? 'טלפון' : 'Phone'}"></label>
           <label class="c3-in">${I('<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3.5 6.5l8.5 6 8.5-6"/>')}<input name="email" type="email" autocomplete="email" required maxlength="120" placeholder="${he ? 'דואר אלקטרוני *' : 'Email *'}" aria-label="${he ? 'אימייל' : 'Email'}"></label>
-          <label class="c3-in">${I('<rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/>')}<input name="password" type="password" autocomplete="new-password" required maxlength="80" placeholder="${he ? 'בחרו סיסמה (8+ תווים, אות ומספר) *' : 'Choose a password *'}" aria-label="${he ? 'סיסמה' : 'Password'}"></label>
+          <label class="c3-in">${I('<rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/>')}<input name="password" type="password" autocomplete="new-password" required maxlength="80" placeholder="${he ? 'בחרו סיסמה (6 תווים לפחות) *' : 'Choose a password (6+) *'}" aria-label="${he ? 'סיסמה' : 'Password'}"></label>
           <label class="cc-check c3-check"><input type="checkbox" name="agree" required><span>${he ? 'מאשר/ת הצטרפות למועדון וקבלת עדכונים בוואטסאפ ובמייל. מבטיחים לא לחפור – רק מבצעים שווים והטבות בלעדיות!' : 'I agree to join and get updates by WhatsApp and email. Only great offers.'}</span></label>
           <p class="cc-err" role="alert"></p>
           <button class="c3-go" type="submit">${he ? 'אני רוצה 15% הנחה והצטרפות!' : 'I want 15% off & join!'}</button>
@@ -383,7 +383,7 @@ function observeBuy() {
   buyObs.observe(btn);
 }
 function go() {
-  const prevY = scrollY; route();
+  const prevY = lockY ?? scrollY; unlockPage(false); route();
   if (!go.keep) { scrollTo(0, 0); $('#main')?.focus({ preventScroll: true }); } else scrollTo(0, prevY);
   go.keep = false;
 }
@@ -392,13 +392,16 @@ const bars = () => $$('.pbar').forEach((b) => (b.style.transform = `scaleX(${b.d
 
 // ---------- Cart drawer ----------
 let releaseDrawer;
+let lockY = null;
+function lockPage() { if (lockY !== null || document.body.classList.contains('menu-open')) return; lockY = window.scrollY; document.body.style.top = `-${lockY}px`; document.body.classList.add('page-lock'); }
+function unlockPage(restore = true) { if (lockY === null) return; const y = lockY; lockY = null; document.body.classList.remove('page-lock'); document.body.style.top = ''; if (restore) window.scrollTo({ top: y, behavior: 'instant' }); }
 function openCart() {
   const d = $('#drawer'); if (!d) return;
   render(d, S.cartDrawer()); bars();
-  document.body.classList.add('cart-open');
+  lockPage(); document.body.classList.add('cart-open');
   releaseDrawer = trapFocus(d, closeCart);
 }
-function closeCart() { document.body.classList.remove('cart-open'); releaseDrawer?.(); releaseDrawer = null; }
+function closeCart() { document.body.classList.remove('cart-open'); releaseDrawer?.(); releaseDrawer = null; unlockPage(); }
 const refreshCart = () => { const d = $('#drawer'); if (d && document.body.classList.contains('cart-open')) { render(d, S.cartDrawer()); bars(); } const n = db.cart().reduce((a, l) => a + l.qty, 0); const btn = $('[data-action="cart-open"]'); if (btn) { btn.setAttribute('aria-label', `${t('cart')} (${n})`); $('.badge', btn)?.remove(); if (n) btn.insertAdjacentHTML('beforeend', `<span class="badge" aria-hidden="true">${n}</span>`); } };
 document.addEventListener('cart', refreshCart);
 
@@ -593,6 +596,8 @@ document.addEventListener('click', async (e) => {
     case 'a11y-t': a11yState[el.dataset.k] = !a11yState[el.dataset.k]; el.setAttribute('aria-pressed', a11yState[el.dataset.k]); applyA11y(); break;
     case 'a11y-reset': Object.keys(a11yState).forEach((k) => delete a11yState[k]); a11yState.fs = 0; applyA11y(); $$('[data-action="a11y-t"]').forEach((b) => b.setAttribute('aria-pressed', 'false')); break;
     case 'auth-tab': state.authTab = el.dataset.tab; state.fg = null; if (location.hash !== '#/account') location.hash = '#/account'; else rerender(); break;
+    case 'su-resend': (async () => { const su = state.su; if (!su) return; try { const r = await db.requestSignupCode(su.reg.phone); const box = su.ctx === 'page' ? $('.auth') : $('.c3-body, .cc-body'); render(box, S.signupCodeStep(su.reg.phone, r.demoCode, su.ctx)); toast(getLang() === 'he' ? 'נשלח קוד חדש' : 'New code sent'); } catch { toast(getLang() === 'he' ? 'יותר מדי בקשות. נסו שוב בעוד כרבע שעה.' : 'Too many requests. Try later.'); } })(); break;
+    case 'su-back': { const su = state.su; state.su = null; state.authTab = 'register'; rerender(); const v = state.suForm || {}; for (const [k2, val] of Object.entries(v)) { const inp = document.querySelector(`form[data-form="register"] [name="${k2}"]`); if (!inp) continue; if (inp.type === 'checkbox') inp.checked = !!val; else if (k2 !== 'password') inp.value = val; } break; }
     case 'fg-resend': (async () => { try { const r = await db.requestReset(state.fg?.phone); render($('#fg'), S.forgotStep(2, { phone: state.fg?.phone, demoCode: r.demoCode })); toast(getLang() === 'he' ? 'נשלח קוד חדש' : 'New code sent'); } catch (x) { toast(x.message === 'locked' || x.message === 'tooMany' ? (getLang() === 'he' ? 'יותר מדי בקשות. נסו שוב בעוד כרבע שעה.' : 'Too many requests. Try later.') : t('required')); } })(); break;
     case 'fg-login': (async () => { try { await db.finishReset(state.fg?.token); state.fg = null; state.authTab = 'login'; location.hash = '#/account'; rerender(); } catch { toast(getLang() === 'he' ? 'האימות פג תוקף. נסו שוב.' : 'Verification expired.'); state.authTab = 'forgot'; rerender(); } })(); break;
     case 'logout': db.logout(); location.hash = '#/'; rerender(); break;
@@ -611,7 +616,7 @@ document.addEventListener('click', async (e) => {
     case 'print': print(); break;
     case 'export-csv': { const blob = new Blob([A.reportCSV(+el.dataset.range)], { type: 'text/csv;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `say-report-${Date.now()}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); break; }
     case 'chg-pass': {
-      const pw = prompt(getLang() === 'he' ? 'סיסמה חדשה (8+ תווים, אות ומספר):' : 'New password (8+ chars, letter & number):');
+      const pw = prompt(getLang() === 'he' ? 'סיסמה חדשה (6 תווים לפחות):' : 'New password (6+ characters):');
       if (pw && valid.password(pw)) { await db.changePassword(db.me().id, pw); toast(getLang() === 'he' ? 'נשמר' : 'Saved'); rerender(); } else if (pw) toast(t('badPass'));
       break;
     }
@@ -641,6 +646,12 @@ document.addEventListener('input', (e) => {
   if (k === 'oq') { state.oq = v; searchDeb(); keepFocus('#oq'); }
   if (k === 'bo-q') boSearchDeb(v);
   if (k === 'ck-q') { const l = $('#ck-list'); if (l) { render(l, A.palette(v)); markActive(0); } }
+});
+document.addEventListener('input', (e) => {
+  const f = e.target.closest?.('form[data-form="checkout"]'); if (!f || !['city', 'street', 'apt'].includes(e.target.name)) return;
+  const def = f.querySelector('[data-def]')?.dataset.def; const lbl = $('#co-main-t'); if (!def || !lbl) return;
+  const now = [f.city.value.trim(), f.street.value.trim(), f.apt.value.trim()].join('|'); const he = getLang() === 'he';
+  lbl.textContent = now === def ? (he ? 'זו הכתובת הראשית שלי להזמנות הבאות' : 'This is my main address for next orders') : (he ? 'לשמור את השינוי ככתובת הראשית שלי להזמנות הבאות' : 'Save this change as my main address');
 });
 function keepFocus(sel) { setTimeout(() => { const i = $(sel); if (i && document.activeElement !== i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 300); }
 document.addEventListener('change', (e) => {
@@ -711,15 +722,26 @@ document.addEventListener('submit', async (e) => {
   if (kind === 'club-join') {
     const he = getLang() === 'he'; const err = $('.cc-err', f); const v = (n) => clean(f.elements[n].value, 160);
     const d = { name: v('name'), phone: normPhone(v('phone')), email: v('email'), password: f.elements.password.value };
-    const bad = !valid.name(d.name) ? (he ? 'נא למלא שם מלא' : 'Please enter your name') : !valid.phone(d.phone) ? (he ? 'מספר טלפון לא תקין' : 'Invalid phone') : !valid.email(d.email) ? (he ? 'כתובת אימייל לא תקינה' : 'Invalid email') : !valid.password(d.password) ? (he ? 'סיסמה: לפחות 8 תווים, אות ומספר' : 'Password: 8+ chars, a letter and a digit') : !f.elements.agree.checked ? (he ? 'יש לאשר את ההצטרפות' : 'Please confirm') : '';
+    const bad = !valid.name(d.name) ? (he ? 'נא למלא שם מלא' : 'Please enter your name') : !valid.phone(d.phone) ? (he ? 'מספר טלפון לא תקין' : 'Invalid phone') : !valid.email(d.email) ? (he ? 'כתובת אימייל לא תקינה' : 'Invalid email') : !valid.password(d.password) ? (he ? 'סיסמה: לפחות 6 תווים' : 'Password: at least 6 characters') : !f.elements.agree.checked ? (he ? 'יש לאשר את ההצטרפות' : 'Please confirm') : '';
     if (bad) { err.textContent = bad; return; }
     btn.disabled = true;
-    try { await db.register({ ...d, newsletter: true }); db.joinClub(d.email.toLowerCase()); }
-    catch (x) { err.textContent = ['exists', 'phoneExists'].includes(x.message) ? t(x.message) : t('required'); btn.disabled = false; return; }
+    try { db.precheckSignup(d.email, d.phone); const r = await db.requestSignupCode(d.phone); state.su = { reg: { ...d, newsletter: true }, ctx: 'popup' }; render($('.c3-body, .cc-body'), S.signupCodeStep(d.phone, r.demoCode, 'popup')); $('#su-c')?.focus(); }
+    catch (x) { err.textContent = ['exists', 'phoneExists'].includes(x.message) ? t(x.message) : x.message === 'tooMany' || x.message === 'locked' ? (he ? 'יותר מדי ניסיונות. נסו שוב בעוד כרבע שעה.' : 'Too many attempts. Try later.') : t('required'); btn.disabled = false; }
+    return;
+  }
+  if (kind === 'su-code') {
+    const err = $('#su-err', f); const he = getLang() === 'he'; const su = state.su; if (!su) return;
+    const E = { locked: he ? 'יותר מדי ניסיונות. מטעמי אבטחה האימות ננעל ל־15 דקות.' : 'Too many attempts. Locked for 15 minutes.', expired: he ? 'הקוד פג תוקף. בקשו קוד חדש.' : 'The code expired. Request a new one.', badCode: he ? 'הקוד שגוי. בדקו ונסו שוב.' : 'Wrong code. Please try again.', exists: t('exists'), phoneExists: t('phoneExists') };
+    btn.disabled = true;
+    try { await db.verifySignupCode(su.reg.phone, f.code.value); if (su.ctx === 'page') await S.finishSignup(su.reg); else { await db.register(su.reg); db.joinClub(su.reg.email.toLowerCase()); } }
+    catch (x) { err.textContent = E[x.message] || t('required'); btn.disabled = false; return; }
+    state.su = null;
+    if (su.ctx === 'page') { toast(he ? 'ברוכים הבאים למועדון! 15% הנחה מחכים לכם בקופה' : 'Welcome! 15% off awaits at checkout'); location.hash = '#/account'; rerender(); return; }
+    const he2 = he;
     render($('.c3-body, .cc-body'), html`<span class="cc-star" aria-hidden="true">✦</span><h2 id="pr-t">${he ? 'ברוכים הבאים למועדון!' : 'Welcome to the club!'}</h2>
       <p class="cc-sub">${he ? 'קוד הקופון שלכם:' : 'Your coupon code:'}</p><p class="cc-code">SAY15</p>
       <p class="cc-sub">${he ? '15% הנחה יופעלו אוטומטית בקופה בהזמנה הראשונה שלכם — אתם כבר מחוברים.' : '15% off applies automatically at checkout on your first order — you are signed in.'}</p>
-      <button class="btn block cc-go" data-action="promo-close">${he ? 'לקניות' : 'Start shopping'}</button>`);
+      <button class="btn block cc-go" data-action="promo-close">${he2 ? 'לקניות' : 'Start shopping'}</button>`);
     $('.promo-x')?.removeAttribute('hidden'); rerender(); return;
   }
   if (kind === 'rv-edit') {
@@ -752,7 +774,12 @@ document.addEventListener('submit', async (e) => {
   }
   if (kind === 'login' || kind === 'register') {
     btn.disabled = true;
-    const ok = await S.authSubmit(f, kind); btn.disabled = false;
+    let ok = await S.authSubmit(f, kind); btn.disabled = false;
+    if (ok && ok.otp) {
+      try { const r = await db.requestSignupCode(ok.otp.phone); state.su = { reg: ok.otp, ctx: 'page', html: $('.auth').innerHTML }; state.suForm = Object.fromEntries(new FormData(f)); render($('.auth'), S.signupCodeStep(ok.otp.phone, r.demoCode, 'page')); $('#su-c')?.focus(); }
+      catch (x) { $('#auth-err', f).textContent = x.message === 'tooMany' || x.message === 'locked' ? (getLang() === 'he' ? 'נשלחו כבר כמה קודים. נסו שוב בעוד כרבע שעה.' : 'Several codes were sent. Try again later.') : t('required'); }
+      return;
+    }
     if (ok) { const u = db.me(); location.hash = { admin: '#/admin', products: '#/admin/products', orders: '#/orders', courier: '#/courier' }[u.role] || '#/account'; rerender(); }
   }
   if (kind === 'profile') {
@@ -796,7 +823,7 @@ document.addEventListener('submit', async (e) => {
     const d = Object.fromEntries(new FormData(f)); const err = $('#sd-err'); const id = f.dataset.id;
     if (!valid.name(d.name)) { err.textContent = t('required'); return; }
     if (!valid.email(d.email)) { err.textContent = t('badEmail'); return; }
-    if ((!id || d.password) && !valid.password(d.password)) { err.textContent = t('badPass'); return; }
+    if ((!id || d.password) && !valid.staffPassword(d.password)) { err.textContent = getLang() === 'he' ? 'לצוות: לפחות 8 תווים, אות ומספר' : 'Staff: 8+ chars, a letter and a digit'; return; }
     try {
       if (id) { db.updateUser(id, { name: clean(d.name, 80), email: clean(d.email, 120), phone: normPhone(d.phone), ...(d.role ? { role: d.role } : {}) }); if (d.password) await db.setPassword(id, d.password); }
       else await db.addStaff({ name: clean(d.name, 80), email: clean(d.email, 120), phone: normPhone(d.phone), role: d.role, password: d.password });

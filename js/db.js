@@ -1,8 +1,8 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261117070404';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261117070404';
+import { SEED_PRODUCTS } from './data.js?v=261117173103';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261117173103';
 
 const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -60,8 +60,10 @@ export async function register({ name, email, phone, password, wholesale, biz, n
   if (l.some((u) => u.email === email)) throw new Error('exists');
   const ph = (x) => String(x || '').replace(/\D/g, '').replace(/^972/, '0');
   if (phone && l.some((u) => u.phone && ph(u.phone) === ph(phone))) throw new Error('phoneExists');
+  if (!(await phoneVerified(phone))) throw new Error('verify');
+  try { sessionStorage.removeItem(K('sv')); } catch {}
   const { salt, hash } = await hashPw(password);
-  const u = { id: uid('u_'), name, email, phone, role: 'customer', wsRequest: !!wholesale, biz: biz || '', newsletter: !!newsletter, address: address || '', club: true, blocked: false, firstOrderDiscount: true, createdAt: Date.now(), salt, hash };
+  const u = { id: uid('u_'), name, email, phone, role: 'customer', wsRequest: !!wholesale, biz: biz || '', newsletter: !!newsletter, address: address || '', club: true, blocked: false, phoneVerified: true, firstOrderDiscount: true, createdAt: Date.now(), salt, hash };
   l.push(u); saveUsers(l); setSession(u.id); return publicUser(u);
 }
 
@@ -90,32 +92,49 @@ const phoneKey = (x) => String(x || '').replace(/\D/g, '').replace(/^972/, '0');
 const sha = async (t) => b64(await crypto.subtle.digest('SHA-256', enc.encode(t)));
 const rnd6 = () => String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, '0');
 const otpStore = () => read('otp', {});
-export async function requestReset(phone) {
-  const k = phoneKey(phone); const all = otpStore(); const r = all[k] || { sends: [], tries: 0, until: 0 };
+async function sendOtp(phone, purpose) {
+  const k = purpose + ':' + phoneKey(phone); const all = otpStore(); const r = all[k] || { sends: [], tries: 0, until: 0 };
   if (r.until > Date.now()) throw new Error('locked');
   r.sends = (r.sends || []).filter((t) => Date.now() - t < OTP_WINDOW);
   if (r.sends.length >= OTP_MAX_SENDS) throw new Error('tooMany');
   const code = rnd6(); const salt = b64(crypto.getRandomValues(new Uint8Array(12)));
   Object.assign(r, { salt, h: await sha(salt + code), exp: Date.now() + OTP_TTL, tries: 0 }); r.sends.push(Date.now());
   all[k] = r; write('otp', all);
-  // Same answer whether or not the number is registered (no account enumeration).
   return DEMO_OTP ? { demoCode: code } : {};
 }
-export async function verifyReset(phone, code) {
-  const k = phoneKey(phone); const all = otpStore(); const r = all[k];
+async function checkOtp(phone, code, purpose, extraOk = true) {
+  const k = purpose + ':' + phoneKey(phone); const all = otpStore(); const r = all[k];
   if (!r) throw new Error('expired');
   if (r.until > Date.now()) throw new Error('locked');
   if (!r.exp || r.exp < Date.now()) throw new Error('expired');
-  const ok = safeEq(await sha(r.salt + String(code).replace(/\D/g, '')), r.h);
+  const ok = safeEq(await sha(r.salt + String(code).replace(/\D/g, '')), r.h) && extraOk;
+  if (!ok) { r.tries = (r.tries || 0) + 1; if (r.tries >= OTP_TRIES) { r.until = Date.now() + OTP_LOCK; r.h = ''; r.exp = 0; } all[k] = r; write('otp', all); throw new Error(r.until > Date.now() ? 'locked' : 'badCode'); }
+  delete all[k]; write('otp', all); return true;
+}
+// Same answer whether or not the number is registered (no account enumeration).
+export const requestReset = (phone) => sendOtp(phone, 'reset');
+export async function verifyReset(phone, code) {
+  const k = phoneKey(phone);
   const u = users().find((x) => x.phone && phoneKey(x.phone) === k && !x.blocked);
-  if (!ok || !u) {
-    r.tries = (r.tries || 0) + 1; if (r.tries >= OTP_TRIES) { r.until = Date.now() + OTP_LOCK; r.h = ''; r.exp = 0; }
-    all[k] = r; write('otp', all); throw new Error(r.until > Date.now() ? 'locked' : 'badCode');
-  }
-  delete all[k]; write('otp', all);
+  await checkOtp(phone, code, 'reset', !!u);
   const token = b64(crypto.getRandomValues(new Uint8Array(24)));
   try { sessionStorage.setItem(K('rst'), JSON.stringify({ t: await sha(token), id: u.id, exp: Date.now() + OTP_TTL })); } catch {}
   const [nm, dom] = u.email.split('@'); return { token, username: `${nm.slice(0, 2)}${'•'.repeat(Math.min(6, Math.max(2, nm.length - 2)))}@${dom}` };
+}
+// Sign-up: check duplicates first, then prove the phone with a code before the account is created.
+export function precheckSignup(email, phone) {
+  const l = users(); const e = String(email).toLowerCase().trim();
+  if (l.some((u) => u.email === e)) throw new Error('exists');
+  if (l.some((u) => u.phone && phoneKey(u.phone) === phoneKey(phone))) throw new Error('phoneExists');
+}
+export const requestSignupCode = (phone) => sendOtp(phone, 'signup');
+export async function verifySignupCode(phone, code) {
+  await checkOtp(phone, code, 'signup');
+  try { sessionStorage.setItem(K('sv'), JSON.stringify({ p: await sha(phoneKey(phone)), exp: Date.now() + OTP_TTL })); } catch {}
+  return true;
+}
+async function phoneVerified(phone) {
+  try { const r = JSON.parse(sessionStorage.getItem(K('sv')) || 'null'); return !!r && r.exp > Date.now() && safeEq(r.p, await sha(phoneKey(phone))); } catch { return false; }
 }
 async function takeReset(token) {
   let r = null; try { r = JSON.parse(sessionStorage.getItem(K('rst')) || 'null'); } catch {}
@@ -377,6 +396,14 @@ export function updateMe(patch) {
   if (patch.birthday && u.birthdaySetAt && Date.now() - u.birthdaySetAt < 300 * 864e5 && u.birthday !== patch.birthday) u.birthday = u.birthday; // guard frequent changes
   if ('birthday' in patch && !u.birthdaySetAt) u.birthdaySetAt = Date.now();
   saveUsers(l); return publicUser(u);
+}
+export function saveMainAddress(a) {
+  const u = me(); if (!u) return; const cur = profileOf(u).full.addresses || [];
+  const same = (x) => x.city === a.city && x.street === a.street && (x.apt || '') === (a.apt || '');
+  const i = cur.findIndex(same);
+  const next = cur.map((x) => ({ ...x, def: false }));
+  if (i >= 0) next[i].def = true; else next.unshift({ label: 'בית', notes: '', ...a, def: true });
+  updateMe({ addresses: next.slice(0, 8) });
 }
 export const myOrders = () => { const u = me(); return u ? orders().filter((o) => o.userId === u.id) : []; };
 export function profileOf(u = me()) {
