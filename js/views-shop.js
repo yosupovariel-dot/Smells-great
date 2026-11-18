@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261117173103';
-import { t, L, getLang } from './i18n.js?v=261117173103';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261117173103';
-import * as db from './db.js?v=261117173103';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261118151525';
+import { t, L, getLang } from './i18n.js?v=261118151525';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261118151525';
+import * as db from './db.js?v=261118151525';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -83,8 +83,9 @@ const BENEFIT = {
 };
 // Quantity + add-to-cart right on the card.
 function buyRow(p) {
-  if (p.quote) return html`<div class="qa qa-q1"><a class="qa-add" href="#/product/${p.id}">${T('לפרטים ומחיר', 'Details & price')}</a></div>`;
-  if (p.picks) return html`<a class="qa-go" href="#/product/${p.id}">${T('לבחירת הריחות', 'Choose scents')}</a>`;
+  // Same three-row shape as a regular buy row (pill · button · note) so every card in a row lines up.
+  if (p.quote) return html`<div class="qa qa-alt"><span class="qa-pill">${T('מחיר לפי התאמה', 'Tailored price')}</span><a class="qa-add" href="#/product/${p.id}">${T('לפרטים ומחיר', 'Details & price')}</a></div><small class="qa-note">${T('מענה מהיר בוואטסאפ', 'Fast reply on WhatsApp')}</small>`;
+  if (p.picks) return html`<div class="qa qa-alt"><span class="qa-pill">${T(`${p.picks} ריחות לבחירה`, `${p.picks} scents to pick`)}</span><a class="qa-add" href="#/product/${p.id}">${T('לבחירת הריחות', 'Choose scents')}</a></div><small class="qa-note">${T('בוחרים לבד — או ', 'Pick yourself — or ')}<a href="#/product/${p.id}">${T('שנפתיע אתכם', 'let us surprise you')}</a></small>`;
   return html`<div class="qa" data-id="${p.id}"><div class="qa-q" role="group" aria-label="${t('qty')}"><button type="button" data-action="qa-step" data-d="1" aria-label="${t('increase')}">+</button><output class="qa-n" aria-live="polite">1</output><button type="button" data-action="qa-step" data-d="-1" aria-label="${t('decrease')}">−</button></div>
     <button type="button" class="qa-add" data-action="quick-add" data-id="${p.id}">${T('הוספה לסל', 'Add to bag')}</button></div>
     ${p.sizes.length > 1 ? html`<small class="qa-note">${p.sizes[0].label}${p.options?.length ? '' : ''} · <a href="#/product/${p.id}">${T('גדלים נוספים', 'More sizes')}</a></small>` : p.options?.length ? html`<small class="qa-note">${L(p.options[0].values[0])} · <a href="#/product/${p.id}">${T('צבעים נוספים', 'More colours')}</a></small>` : ''}`;
@@ -184,7 +185,7 @@ export function home() {
 
   <section class="rl" aria-labelledby="rl-t"><div class="wrap rl-in">
     <figure class="rl-vid"><video src="assets/video/say-reel.mp4" poster="assets/video/say-reel-poster.webp" autoplay muted loop playsinline preload="metadata" width="720" height="900" aria-label="${T('סרטון קצר על מוצרי SAY', 'A short film about SAY products')}"></video>
-      <button class="rl-toggle" data-action="reel-toggle" aria-label="${T('עצירת הסרטון', 'Pause video')}" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button></figure>
+      <button class="rl-toggle rl-tap" data-action="reel-toggle" aria-label="${T('עצירת הסרטון', 'Pause video')}" aria-pressed="false"></button></figure>
     <div class="rl-copy"><p class="hz-k">${T('15 שניות של SAY', '15 seconds of SAY')}</p>
       <h2 id="rl-t">${T('את הריח אי אפשר לצלם.', 'You cannot film a scent.')}<br><em>${T('אבל אפשר להרגיש אותו.', 'But you can feel it.')}</em></h2>
       <p>${T('מכשיר שקט, תמצית בהשראת המלון שאהבתם, ובית שמקבל אתכם כל ערב באותה תחושה של לובי יוקרתי.', 'A silent device, an oil inspired by the hotel you loved, and a home that greets you every evening like a luxury lobby.')}</p>
