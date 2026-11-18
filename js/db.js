@@ -1,8 +1,8 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261118152724';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261118152724';
+import { SEED_PRODUCTS } from './data.js?v=261118173942';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261118173942';
 
 const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -31,7 +31,7 @@ export async function loadCatalog() {
   // Keep admin edits (prices, stock, visibility…) but always take image paths from the server,
   // so a browser holding an older copy never shows missing pictures. New catalog items are added.
   const byId = Object.fromEntries(fresh.map((p) => [p.id, p]));
-  const merged = stored.map((p) => (byId[p.id] ? { ...p, img: byId[p.id].img, gallery: byId[p.id].gallery, pack: byId[p.id].pack, options: byId[p.id].options || p.options } : p));
+  const merged = stored.map((p) => (byId[p.id] ? { ...p, img: byId[p.id].img, gallery: byId[p.id].gallery, pack: byId[p.id].pack, options: byId[p.id].options || p.options, video: byId[p.id].video, videoPoster: byId[p.id].videoPoster } : p));
   for (const p of fresh) if (!stored.some((x) => x.id === p.id)) merged.push(p);
   write('products', merged);
   applyDemoPrices();

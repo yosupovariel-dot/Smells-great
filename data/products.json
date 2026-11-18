@@ -318,7 +318,9 @@
   "stock": 25,
   "tag": "",
   "pack": "assets/products/say-100-6.webp",
-  "was": 379
+  "was": 379,
+  "video": "assets/video/say-100-film.mp4",
+  "videoPoster": "assets/video/say-100-film.webp"
  },
  {
   "id": "say-150",
@@ -733,7 +735,9 @@
    "oil-pure-rain"
   ],
   "was": 129,
-  "quote": false
+  "quote": false,
+  "video": "assets/video/kit-14-film.mp4",
+  "videoPoster": "assets/video/kit-14-film.webp"
  },
  {
   "id": "kit-4",

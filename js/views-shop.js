@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261118152724';
-import { t, L, getLang } from './i18n.js?v=261118152724';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261118152724';
-import * as db from './db.js?v=261118152724';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261118173942';
+import { t, L, getLang } from './i18n.js?v=261118173942';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261118173942';
+import * as db from './db.js?v=261118173942';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -434,6 +434,10 @@ function cmpPrice(p, s, priceOf) {
   if (p.cat === 'oils') { const base = p.sizes.find((x) => ml(x.label)); const v = ml(s.label); if (base && v && s !== base) { const was = Math.round((priceOf(base) / ml(base.label)) * v); if (was > now) return { was, save: Math.round((1 - now / was) * 100) }; } return { was: 0, save: 0 }; }
   return p.was > now ? { was: p.was, save: Math.round((1 - now / p.was) * 100) } : { was: 0, save: 0 };
 }
+const FILM_COPY = {
+  'say-100': [['רואים את השקט. מריחים את המלון.', 'See the calm. Smell the hotel.'], ['SAY 100 בפעולה — אידוי קר, בלי מים ובלי חום, וריח של לובי יוקרתי שממלא את הבית.', 'SAY 100 at work — cold-air diffusion, no water, no heat, and a lobby scent that fills the home.']],
+  'kit-14': [['14 ריחות. מסע אחד.', '14 scents. One journey.'], ['פותחים את הקופסה, מריחים, ומגלים את ריח החתימה שלכם — לפני שקונים בקבוק גדול.', 'Open the box, smell, and find your signature scent before buying a big bottle.']],
+};
 const FIT = {
   'say-car': ['רכב', 'חדר קטן', 'ארון בגדים', 'שירותים'], 'say-room-office': ['חדר שינה', 'משרד', 'חדר ילדים', 'שירותים', 'ארון'],
   'say-100': ['סלון', 'דירה', 'משרד', 'חנות קטנה', 'קליניקה'], 'say-150': ['סלון', 'בית', 'מסדרון', 'חדר שינה', 'קליניקה'],
@@ -519,6 +523,13 @@ export function productPage(id) {
       <ul class="perks"><li>${t('perk1')}</li><li>${t('perk2')}</li>${WARRANTY.has(p.id) ? html`<li>${T('שנת אחריות יבואן', '1-year importer warranty')}</li>` : ''}${p.cat === 'diffusers' ? html`<li><a href="#/guide">${T('מדריך שימוש ותחזוקה', 'Use & care guide')}</a></li>` : html`<li>${t('perk3')}</li>`}</ul>
     </div>
   </div>
+  ${p.video ? (() => { const fc = FILM_COPY[p.id] || [[L(p.name), L(p.name)], ['', '']]; return html`<section class="pfilm" aria-labelledby="pf-t"><div class="pf-in">
+    <div class="pf-copy"><p class="pf-k"><span dir="ltr">SAY FILM</span> · ${T('סרטון של 10 שניות', 'a 10-second film')}</p><h2 id="pf-t">${T(...fc[0])}</h2><p>${T(...fc[1])}</p>
+      <p class="pf-hint">${T('נגיעה בסרטון עוצרת וממשיכה · אפשר להפעיל צליל', 'Tap the film to pause or play · sound available')}</p></div>
+    <figure class="pf-vid"><video src="${p.video}" poster="${p.videoPoster || ''}" muted loop playsinline preload="metadata" width="1280" height="720" aria-label="${T('סרטון', 'Film')} — ${L(p.name)}"></video>
+      <button class="pf-tap" type="button" data-action="film-toggle" aria-label="${T('הפעלה או עצירה של הסרטון', 'Play or pause the film')}"></button>
+      <button class="pf-snd" type="button" data-action="film-sound" aria-pressed="false" aria-label="${T('הפעלת צליל', 'Turn sound on')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="snd-off" d="M17 9l4 6M21 9l-4 6"/><path class="snd-on" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg></button></figure>
+  </div></section>`; })() : ''}
   ${p.specs?.length ? html`<section class="specs" aria-labelledby="spec-t"><h2 id="spec-t">${T('מפרט טכני', 'Specifications')}</h2><table class="spec-tbl"><tbody>${p.specs.map(([k, v]) => html`<tr><th scope="row">${k}</th><td>${v}</td></tr>`)}</tbody></table></section>` : ''}
   ${!p.quote ? html`<section class="rich" aria-label="${T('תיאור המוצר', 'Product description')}">${fitBlock(p)}${he() || !p.desc.en ? richText(p.desc.he) : richText(p.desc.en)}</section>` : ''}
   <section class="block" aria-labelledby="comp-t"><h2 id="comp-t">${t('complements')}</h2><span class="rule"></span><div class="grid">${complements(p).map(card)}</div></section></div>`;

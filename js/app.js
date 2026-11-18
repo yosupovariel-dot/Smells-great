@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261118152724';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261118152724';
-import { CATEGORIES } from './data.js?v=261118152724';
-import * as db from './db.js?v=261118152724';
-import * as S from './views-shop.js?v=261118152724';
-import * as Lg from './views-legal.js?v=261118152724';
-import * as A from './views-admin.js?v=261118152724';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261118173942';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261118173942';
+import { CATEGORIES } from './data.js?v=261118173942';
+import * as db from './db.js?v=261118173942';
+import * as S from './views-shop.js?v=261118173942';
+import * as Lg from './views-legal.js?v=261118173942';
+import * as A from './views-admin.js?v=261118173942';
 
 // Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
 if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
@@ -227,7 +227,14 @@ function startCatRail() {
     else r.scrollBy({ left: dir * step, behavior: 'smooth' });
   }, 2200);
 }
-function reelMotion() { const v = $('.rl-vid video'); if (v && (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop'))) { v.pause(); v.removeAttribute('autoplay'); } }
+let filmObs;
+function filmAutoplay() {
+  filmObs?.disconnect(); const vids = $$('.pf-vid video'); if (!vids.length) return;
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop');
+  filmObs = new IntersectionObserver((es) => es.forEach((x) => { const v = x.target; if (still || v.dataset.user === 'paused') return; if (x.isIntersecting) v.play().catch(() => {}); else v.pause(); v.parentElement.classList.toggle('paused', v.paused); }), { threshold: 0.55 });
+  vids.forEach((v) => filmObs.observe(v));
+}
+function reelMotion() { filmAutoplay(); const v = $('.rl-vid video'); if (v && (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop'))) { v.pause(); v.removeAttribute('autoplay'); } }
 function floaters() {
   let hid = false; try { hid = !!sessionStorage.getItem('say_vipf'); } catch {}
   if (hid || /^#\/(checkout|account|done|club)/.test(location.hash)) $('.vipf')?.remove();
@@ -540,6 +547,8 @@ document.addEventListener('click', async (e) => {
     case 'gd-jump': e.preventDefault(); document.getElementById(el.dataset.t)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); break;
     case 'oil-add': { db.addToCart(id, el.dataset.size, 1); closeModal(); rerender(); if (!location.hash.startsWith('#/checkout')) openCart(); toast(getLang() === 'he' ? 'התמצית נוספה להזמנה' : 'Oil added'); break; }
     case 'oil-skip': { closeModal(); const f = $('form[data-form="checkout"]'); f?.requestSubmit(); break; }
+    case 'film-toggle': { const v = el.parentElement.querySelector('video'); if (v.paused) { v.play().catch(() => {}); v.dataset.user = ''; } else { v.pause(); v.dataset.user = 'paused'; } el.parentElement.classList.toggle('paused', v.paused); break; }
+    case 'film-sound': { const v = el.parentElement.querySelector('video'); v.muted = !v.muted; if (!v.muted && v.paused) v.play().catch(() => {}); el.setAttribute('aria-pressed', String(!v.muted)); el.classList.toggle('on', !v.muted); el.setAttribute('aria-label', getLang() === 'he' ? (v.muted ? 'הפעלת צליל' : 'השתקה') : (v.muted ? 'Turn sound on' : 'Mute')); break; }
     case 'reel-toggle': { const v = el.parentElement.querySelector('video'); const he = getLang() === 'he'; if (v.paused) { v.play(); el.setAttribute('aria-pressed', 'false'); el.setAttribute('aria-label', he ? 'עצירת הסרטון' : 'Pause video'); el.classList.remove('paused'); } else { v.pause(); el.setAttribute('aria-pressed', 'true'); el.setAttribute('aria-label', he ? 'הפעלת הסרטון' : 'Play video'); el.classList.add('paused'); } break; }
     case 'rv-ok': db.setReview(id, 'approved'); rerender(); break;
     case 'rv-hide': db.setReview(id, 'hidden'); rerender(); break;
