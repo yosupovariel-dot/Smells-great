@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261118151525';
-import { t, L, getLang } from './i18n.js?v=261118151525';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261118151525';
-import * as db from './db.js?v=261118151525';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261118152724';
+import { t, L, getLang } from './i18n.js?v=261118152724';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261118152724';
+import * as db from './db.js?v=261118152724';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -193,12 +193,12 @@ export function home() {
   </div></section>
 
   ${dealsSection()}
-  <section class="hz hz-hair" aria-labelledby="hair-t"><div class="wrap">
-    <header class="hz-head"><p class="hz-k">${T('שיער וטיפוח · בקרוב', 'Hair care · Coming soon')}</p><h2 id="hair-t">${T('הטיפוח שלכם, באותה רמה של הריח.', 'Your care, at the level of your scent.')}</h2>
-      <p>${T('קולקציית טיפוח לשיער מגיעה בקרוב לבוטיק. רוצים לשמוע ראשונים?', 'A hair-care collection is coming soon. Want to hear first?')}</p></header>
-    <div class="hz-grid four">${[1, 2, 3, 4].map((i) => html`<a class="hz-card hair" href="#/shop/hair"><span class="hz-img"><img src="assets/products/hair-${i}-sm.webp" alt="" loading="lazy" width="560" height="560"></span><span class="hz-foot"><em>${T('בקרוב בבוטיק', 'Coming soon')}</em><i aria-hidden="true">${he() ? '←' : '→'}</i></span></a>`)}</div>
-    <p class="hz-help"><a href="${waLink(T('שלום, הגעתי דרך אתר SAY BOUTIQUE ואשמח לעדכון כשקולקציית השיער תעלה', 'Hi, please update me when the hair collection launches'))}" target="_blank" rel="noopener noreferrer">${T('עדכנו אותי בוואטסאפ כשהקולקציה עולה', 'Notify me on WhatsApp')}</a></p>
-  </div></section>
+  ${(() => { const hp = ['hair-ce-shampoo', 'hair-hw-mask', 'hair-val-serum', 'hair-st-clay-wax'].map((id) => db.product(id)).filter((x) => x && x.active !== false); return hp.length ? html`<section class="hz hz-hair" aria-labelledby="hair-t"><div class="wrap">
+    <header class="hz-head"><p class="hz-k">${T('שיער וטיפוח · OLIÈRE Paris', 'Hair care · OLIÈRE Paris')}</p><h2 id="hair-t">${T('הטיפוח שלכם, באותה רמה של הריח.', 'Your care, at the level of your scent.')}</h2>
+      <p>${T('שמפו, מסכות, סרומים ועיצוב — שש סדרות של OLIÈRE Paris, עכשיו בבוטיק.', 'Shampoos, masks, serums and styling — six OLIÈRE Paris lines, now in the boutique.')}</p></header>
+    <div class="grid shop-grid hz-hgrid">${hp.map((x) => card(x))}</div>
+    <p class="hz-help"><a class="u-link" href="#/shop/hair">${T('לכל מוצרי השיער', 'All hair care')} <span aria-hidden="true">${arrow()}</span></a></p>
+  </div></section>` : ''; })()}
 
   <section class="hw" aria-labelledby="oil-t"><div class="wrap">
     <div class="hw-in">
@@ -221,7 +221,7 @@ export function home() {
     <header class="h-head"><h2 id="how-t">${T('איך זה עובד', 'How it works')}</h2></header>
     <ol class="how">
       <li><span class="latin">I</span><b>${T('בוחרים מכשיר', 'Choose a device')}</b><p>${T('לפי גודל החלל — מרכב ועד לובי של 300 מ"ר. בלי מים, בלי חום, שקט לגמרי.', 'By the size of your space — from a car to a 300 m² lobby. No water, no heat, silent.')}</p></li>
-      <li><span class="latin">II</span><b>${T('בוחרים ניחוח', 'Choose a scent')}</b><p>${T('54 תמציות בהשראת מלונות, בשמים וטבע. לא בטוחים? ערכת התנסות עושה את העבודה.', '54 oils inspired by hotels, perfumes and nature. Unsure? A discovery kit does the work.')}</p></li>
+      <li><span class="latin">II</span><b>${T('בוחרים ניחוח', 'Choose a scent')}</b><p>${T(`${all.filter((x) => x.cat === 'oils' && !x.picks).length} תמציות בהשראת מלונות, בשמים וטבע. לא בטוחים? ערכת התנסות עושה את העבודה.`, `${all.filter((x) => x.cat === 'oils' && !x.picks).length} oils inspired by hotels, perfumes and nature. Unsure? A discovery kit does the work.`)}</p></li>
       <li><span class="latin">III</span><b>${T('מתזמנים ונהנים', 'Schedule & enjoy')}</b><p>${T('מגדירים שעות באפליקציה, והבית מריח כמו מלון בוטיק — כל יום, אוטומטית.', 'Set the hours in the app and your home smells like a boutique hotel — every day.')}</p></li>
     </ol>
   </div></section>
@@ -262,7 +262,7 @@ function subImg(cat, sub) {
 }
 const CAT_LEAD = {
   diffusers: ['מכשירי בישום שקטים בטכנולוגיית אידוי קר — מרכב ועד לובי של 300 מ"ר.', 'Silent cold-air diffusers — from your car to a 300 m² lobby.'],
-  oils: ['54 תמציות בהשראת בתי מלון, בשמים אייקוניים וטבע — מ־10 מ"ל ועד 5 ליטר.', '54 oils inspired by hotels, iconic perfumes and nature — 10 ml to 5 L.'],
+  oils: ['תמציות בהשראת בתי מלון, בשמים אייקוניים וטבע — מ־10 מ"ל ועד 5 ליטר.', 'Oils inspired by hotels, iconic perfumes and nature — 10 ml to 5 L.'],
   bundles: ['מכשיר ומילוי במארז אחד, במחיר שמשתלם יותר.', 'A device and refill in one box, for less.'],
 };
 const PRICE_BANDS = [['', T('הכל', 'All')], ['0-100', T('עד 100₪', 'Up to ₪100')], ['100-300', '100–300₪'], ['300-9999', T('מעל 300₪', 'Over ₪300')]];
@@ -542,7 +542,7 @@ const SYN = [[/מפזר(י|ים)?/g, 'מפיצ'], [/מבשמ(ים)?/g, 'מפיצ
 export const snorm = (x) => String(x || '').toLowerCase().normalize('NFKD').replace(/[֑-ׇ]/g, '').replace(/[ךםןףץ]/g, (c) => FINAL[c]).replace(/["'׳״`´’\-–_.,/()]/g, ' ').replace(/([a-z])(\d)/g, '$1 $2').replace(/(\d)([a-z])/g, '$1 $2').replace(/\s+/g, ' ').trim();
 const qnorm = (q) => { let n = snorm(q); for (const [r, w] of SYN) n = n.replace(r, w); return n.replace(/\s+/g, ' ').trim(); };
 const lev = (a, b) => { if (Math.abs(a.length - b.length) > 2) return 9; const d = Array.from({ length: b.length + 1 }, (_, i) => i); for (let i = 1; i <= a.length; i++) { let prev = d[0]; d[0] = i; for (let j = 1; j <= b.length; j++) { const t2 = d[j]; d[j] = Math.min(d[j] + 1, d[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = t2; } } return d[b.length]; };
-const hayOf = (p) => snorm(`${p.name.he} ${p.name.en} ${p.sub || ''} ${catName(p.cat)} ${p.cat === 'diffusers' ? 'מפיצ מפיצי ריח' : p.cat === 'oils' ? 'תמצית תמציות שמנ' : p.cat === 'bundles' ? 'מארז מארזים חבילה' : ''} ${p.desc?.he ? String(p.desc.he).split('\n')[0].slice(0, 160) : ''} ${(p.options?.[0]?.values || []).map((v) => v.he).join(' ')}`);
+const hayOf = (p) => snorm(`${p.name.he} ${p.name.en} ${p.sub || ''} ${catName(p.cat)} ${p.cat === 'diffusers' ? 'מפיצ מפיצי ריח' : p.cat === 'oils' ? 'תמצית תמציות שמנ' : p.cat === 'bundles' ? 'מארז מארזים חבילה' : p.cat === 'hair' ? 'אוליר oliere שיער טיפוח' : p.cat === 'home' ? 'ניקיטה ניקוי ניקיון' : p.cat === 'glass' ? 'תמונה תמונות זכוכית קיר' : ''} ${p.desc?.he ? String(p.desc.he).split('\n')[0].slice(0, 160) : ''} ${(p.options?.[0]?.values || []).map((v) => v.he).join(' ')}`);
 // score: 0 = no match, 2 = exact words, 1 = fuzzy
 export function matchProduct(p, q) {
   const n = qnorm(q); if (!n) return 2; const hay = hayOf(p); const hw = hay.split(' ');

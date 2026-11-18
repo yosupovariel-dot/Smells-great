@@ -4,9 +4,9 @@ export const CATEGORIES = [
   { id: 'diffusers', he: 'מפיצי ריח', en: 'Diffusers', descHe: 'מכשירי בישום חכמים', descEn: 'Smart scent devices', img: 'assets/products/cat-diffusers-all.webp' },
   { id: 'oils', he: 'תמציות שמן', en: 'Fragrance Oils', descHe: 'בהשראת מלונות ובשמים', descEn: 'Hotel & perfume inspired', img: 'assets/products/cat-oils.webp' },
   { id: 'dubai', he: 'בשמי דובאי', en: 'Dubai Perfumes', descHe: 'בקרוב', descEn: 'Coming soon', img: 'assets/products/cat-dubai.webp' },
-  { id: 'hair', he: 'טיפוח השיער', en: 'Hair Care', descHe: 'בקרוב', descEn: 'Coming soon', img: 'assets/products/hair-1.webp' },
-  { id: 'home', he: 'ניקיון ואווירה', en: 'Cleaning & Ambience', descHe: 'בקרוב', descEn: 'Coming soon', img: 'assets/products/cat-home.webp' },
-  { id: 'glass', he: 'תמונות זכוכית', en: 'Glass Art', descHe: 'בקרוב', descEn: 'Coming soon', img: 'assets/products/cat-glass.webp' },
+  { id: 'hair', he: 'טיפוח השיער', en: 'Hair Care', descHe: 'OLIÈRE Paris — טיפוח מקצועי לשיער', descEn: 'OLIÈRE Paris professional hair care', img: 'assets/products/hair-1.webp' },
+  { id: 'home', he: 'ניקיון ואווירה', en: 'Cleaning & Ambience', descHe: 'NIKITA ופינל — ניקיון שעושה שיפוץ', descEn: 'NIKITA & Finel cleaning', img: 'assets/products/cat-home.webp' },
+  { id: 'glass', he: 'תמונות זכוכית', en: 'Glass Art', descHe: 'תמונות זכוכית לקיר — מוכנות ובהתאמה אישית', descEn: 'Glass wall art, ready-made and custom', img: 'assets/products/cat-glass.webp' },
   { id: 'bundles', he: 'מארזים משתלמים', en: 'Value Bundles', descHe: 'מכשיר + מילוי במחיר מיוחד', descEn: 'Device + refill deals', img: 'assets/products/bundle-3.webp' },
 ];
 
@@ -17,6 +17,9 @@ export const COMPLEMENTS = {
   diffusers: ['kit-14', 'kit-4', 'oil-luxury-hotel', 'oil-white-tea'],
   oils: ['say-150', 'say-car', 'kit-14', 'say-room-office'],
   bundles: ['kit-14', 'say-150', 'oil-king-david', 'oil-white-tea'],
+  hair: ['hair-ce-shampoo', 'hair-ce-mask', 'hair-ce-serum', 'hair-ce-leavein'],
+  home: ['nikita-c100', 'nikita-c80', 'nikita-onyx', 'nikita-n-gel'],
+  glass: ['say-150', 'kit-14', 'oil-king-david', 'say-room-office'],
 };
 
 // Elegant placeholder illustrations until real photos are imported.
