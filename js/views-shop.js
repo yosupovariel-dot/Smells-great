@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261118173942';
-import { t, L, getLang } from './i18n.js?v=261118173942';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261118173942';
-import * as db from './db.js?v=261118173942';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261119170955';
+import { t, L, getLang } from './i18n.js?v=261119170955';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261119170955';
+import * as db from './db.js?v=261119170955';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -85,7 +85,7 @@ const BENEFIT = {
 function buyRow(p) {
   // Same three-row shape as a regular buy row (pill · button · note) so every card in a row lines up.
   if (p.quote) return html`<div class="qa qa-alt"><span class="qa-pill">${T('מחיר לפי התאמה', 'Tailored price')}</span><a class="qa-add" href="#/product/${p.id}">${T('לפרטים ומחיר', 'Details & price')}</a></div><small class="qa-note">${T('מענה מהיר בוואטסאפ', 'Fast reply on WhatsApp')}</small>`;
-  if (p.picks) return html`<div class="qa qa-alt"><span class="qa-pill">${T(`${p.picks} ריחות לבחירה`, `${p.picks} scents to pick`)}</span><a class="qa-add" href="#/product/${p.id}">${T('לבחירת הריחות', 'Choose scents')}</a></div><small class="qa-note">${T('בוחרים לבד — או ', 'Pick yourself — or ')}<a href="#/product/${p.id}">${T('שנפתיע אתכם', 'let us surprise you')}</a></small>`;
+  if (p.picks) return html`<div class="qa qa-alt"><span class="qa-pill">${T(`${p.picks} ריחות לבחירה`, `${p.picks} scents to pick`)}</span><a class="qa-add" href="#/product/${p.id}">${T('לבחירת הריחות', 'Choose scents')}</a></div><small class="qa-note">${T('או ', 'or ')}<a href="#/product/${p.id}">${T('הפתיעו אותי', 'surprise me')}</a></small>`;
   return html`<div class="qa" data-id="${p.id}"><div class="qa-q" role="group" aria-label="${t('qty')}"><button type="button" data-action="qa-step" data-d="1" aria-label="${t('increase')}">+</button><output class="qa-n" aria-live="polite">1</output><button type="button" data-action="qa-step" data-d="-1" aria-label="${t('decrease')}">−</button></div>
     <button type="button" class="qa-add" data-action="quick-add" data-id="${p.id}">${T('הוספה לסל', 'Add to bag')}</button></div>
     ${p.sizes.length > 1 ? html`<small class="qa-note">${p.sizes[0].label}${p.options?.length ? '' : ''} · <a href="#/product/${p.id}">${T('גדלים נוספים', 'More sizes')}</a></small>` : p.options?.length ? html`<small class="qa-note">${L(p.options[0].values[0])} · <a href="#/product/${p.id}">${T('צבעים נוספים', 'More colours')}</a></small>` : ''}`;
