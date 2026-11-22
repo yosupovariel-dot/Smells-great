@@ -1,8 +1,8 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261119170955';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261119170955';
+import { SEED_PRODUCTS } from './data.js?v=261122111222';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261122111222';
 
 const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };
@@ -31,7 +31,11 @@ export async function loadCatalog() {
   // Keep admin edits (prices, stock, visibility…) but always take image paths from the server,
   // so a browser holding an older copy never shows missing pictures. New catalog items are added.
   const byId = Object.fromEntries(fresh.map((p) => [p.id, p]));
-  const merged = stored.map((p) => (byId[p.id] ? { ...p, img: byId[p.id].img, gallery: byId[p.id].gallery, pack: byId[p.id].pack, options: byId[p.id].options || p.options, video: byId[p.id].video, videoPoster: byId[p.id].videoPoster } : p));
+  // A product whose catalog revision ("rev") is newer than the browser's copy is taken from the server whole (stock and visibility stay local).
+  const RETIRED = ['finel-range'];
+  const merged = stored.filter((p) => !RETIRED.includes(p.id)).map((p) => { const f = byId[p.id]; if (!f) return p;
+    if ((f.rev || 0) > (p.rev || 0)) return { ...f, stock: p.stock ?? f.stock, active: p.active ?? f.active };
+    return { ...p, img: f.img, gallery: f.gallery, pack: f.pack, options: f.options || p.options, video: f.video, videoPoster: f.videoPoster, videoPortrait: f.videoPortrait, pickFrom: f.pickFrom || p.pickFrom }; });
   for (const p of fresh) if (!stored.some((x) => x.id === p.id)) merged.push(p);
   write('products', merged);
   applyDemoPrices();

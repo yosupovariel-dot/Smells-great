@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261119170955';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261119170955';
-import { CATEGORIES } from './data.js?v=261119170955';
-import * as db from './db.js?v=261119170955';
-import * as S from './views-shop.js?v=261119170955';
-import * as Lg from './views-legal.js?v=261119170955';
-import * as A from './views-admin.js?v=261119170955';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261122111222';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261122111222';
+import { CATEGORIES } from './data.js?v=261122111222';
+import * as db from './db.js?v=261122111222';
+import * as S from './views-shop.js?v=261122111222';
+import * as Lg from './views-legal.js?v=261122111222';
+import * as A from './views-admin.js?v=261122111222';
 
 // Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
 if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
@@ -234,7 +234,7 @@ function filmAutoplay() {
   filmObs = new IntersectionObserver((es) => es.forEach((x) => { const v = x.target; if (still || v.dataset.user === 'paused') return; if (x.isIntersecting) v.play().catch(() => {}); else v.pause(); v.parentElement.classList.toggle('paused', v.paused); }), { threshold: 0.55 });
   vids.forEach((v) => filmObs.observe(v));
 }
-function reelMotion() { filmAutoplay(); const v = $('.rl-vid video'); if (v && (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop'))) { v.pause(); v.removeAttribute('autoplay'); } }
+function reelMotion() { filmAutoplay(); if (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop')) $$('.cat-film video').forEach((v) => { v.pause(); v.removeAttribute('autoplay'); }); const v = $('.rl-vid video'); if (v && (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop'))) { v.pause(); v.removeAttribute('autoplay'); } }
 function floaters() {
   let hid = false; try { hid = !!sessionStorage.getItem('say_vipf'); } catch {}
   if (hid || /^#\/(checkout|account|done|club)/.test(location.hash)) $('.vipf')?.remove();
@@ -279,14 +279,14 @@ function maybePromo(delay = 7000, force = false) {
         <a class="c3-login" href="#/account" data-action="promo-close">${he ? 'כבר חברים? התחברות' : 'Already a member? Sign in'}</a>
       </div>
     </div>`);
-    document.body.append(w); requestAnimationFrame(() => w.classList.add('in'));
+    document.body.append(w); lockPage(); requestAnimationFrame(() => w.classList.add('in'));
     setTimeout(() => { const x = $('.promo-x', w); if (x) { x.hidden = false; x.classList.add('show'); } }, force ? 0 : 3000);
     w.addEventListener('click', (e) => { if (e.target === w && !$('.promo-x', w)?.hidden) closePromo(); });
     promoRelease = trapFocus(w.firstElementChild, closePromo);
   }, delay);
 }
 let promoRelease;
-function closePromo() { const w = $('#promo'); if (!w) return; w.remove(); promoRelease?.(); promoRelease = null; }
+function closePromo() { const w = $('#promo'); if (!w) return; w.remove(); promoRelease?.(); promoRelease = null; unlockPage(); }
 
 function maybeConsent() {
   if (db.me() || location.hash.match(/^#\/(admin|orders|courier)/)) return;
@@ -547,6 +547,14 @@ document.addEventListener('click', async (e) => {
     case 'gd-jump': e.preventDefault(); document.getElementById(el.dataset.t)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); break;
     case 'oil-add': { db.addToCart(id, el.dataset.size, 1); closeModal(); rerender(); if (!location.hash.startsWith('#/checkout')) openCart(); toast(getLang() === 'he' ? 'התמצית נוספה להזמנה' : 'Oil added'); break; }
     case 'oil-skip': { closeModal(); const f = $('form[data-form="checkout"]'); f?.requestSubmit(); break; }
+    case 'gl-quote': {
+      const he = getLang() === 'he'; const num = (id) => parseFloat(String($(id)?.value || '').replace(',', '.'));
+      const L2 = num('#gl-l'), W2 = num('#gl-w'), T2 = num('#gl-t'); const err = $('#gl-err');
+      if (!(L2 > 0 && L2 <= 600) || !(W2 > 0 && W2 <= 600)) { err.textContent = he ? 'נא לכתוב אורך ורוחב בסנטימטרים' : 'Please enter length and width in cm'; break; }
+      err.textContent = ''; const note = clean($('#gl-n')?.value || '', 200);
+      const txt = `שלום, אשמח להצעת מחיר לתמונת זכוכית בהתאמה אישית\nדגם: ${clean(el.dataset.name || '', 80)}\nמידה: ${L2} × ${W2} ס"מ${T2 > 0 ? `\nעובי: ${T2} מ"מ` : ''}${note ? `\nהערות: ${note}` : ''}`;
+      window.open(`https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(txt)}`, '_blank', 'noopener');
+      const done = $('.gl-done'); if (done) done.hidden = false; break; }
     case 'film-toggle': { const v = el.parentElement.querySelector('video'); if (v.paused) { v.play().catch(() => {}); v.dataset.user = ''; } else { v.pause(); v.dataset.user = 'paused'; } el.parentElement.classList.toggle('paused', v.paused); break; }
     case 'film-sound': { const v = el.parentElement.querySelector('video'); v.muted = !v.muted; if (!v.muted && v.paused) v.play().catch(() => {}); el.setAttribute('aria-pressed', String(!v.muted)); el.classList.toggle('on', !v.muted); el.setAttribute('aria-label', getLang() === 'he' ? (v.muted ? 'הפעלת צליל' : 'השתקה') : (v.muted ? 'Turn sound on' : 'Mute')); break; }
     case 'reel-toggle': { const v = el.parentElement.querySelector('video'); const he = getLang() === 'he'; if (v.paused) { v.play(); el.setAttribute('aria-pressed', 'false'); el.setAttribute('aria-label', he ? 'עצירת הסרטון' : 'Pause video'); el.classList.remove('paused'); } else { v.pause(); el.setAttribute('aria-pressed', 'true'); el.setAttribute('aria-label', he ? 'הפעלת הסרטון' : 'Play video'); el.classList.add('paused'); } break; }
@@ -676,6 +684,12 @@ document.addEventListener('change', (e) => {
     if (note) note.hidden = !w || !!el.dataset.sale;
     const k = $('.ml10'); if (k) k.hidden = !/^10\s*מ"ל$|^10\s*ml$/i.test(el.value.trim());
   }
+  if (k === 'gl-shape') {
+    const custom = el.value === 'custom';
+    $$('.gl-sizes').forEach((g) => (g.hidden = custom || g.dataset.shape !== el.value));
+    const c = $('.gl-custom'); if (c) c.hidden = !custom; const br = $('.pdp .buy-row'); if (br) br.hidden = custom; const pp = $('#pdp-price'); if (pp) pp.hidden = custom;
+    if (!custom) { const r = $(`.gl-sizes[data-shape="${el.value}"] input[name="size"]`); if (r) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); } }
+  }
   if (k === 'opt' && el.dataset.img) {
     const want = el.dataset.img.replace(/-sm\.webp$/, '.webp'); const slides = $$('.pg-slide'); let i = slides.findIndex((f) => f.querySelector('img').getAttribute('src').replace(/-sm\.webp$/, '.webp') === want);
     if (i < 0 && slides[0]) { slides[0].querySelector('img').src = el.dataset.img; i = 0; }
@@ -715,9 +729,9 @@ document.addEventListener('submit', async (e) => {
     const p = db.product(f.dataset.id); let opt = clean(d.get('opt') || '', 40);
     if (p.picks) {
       const picks = d.getAll('pick').map((x) => clean(x, 40));
-      if (d.get('surprise')) opt = getLang() === 'he' ? 'הפתיעו אותי' : 'Surprise me';
+      if (d.get('surprise')) opt = (opt ? opt + ' · ' : '') + (getLang() === 'he' ? 'הפתיעו אותי' : 'Surprise me');
       else if (picks.length !== p.picks) { $('#add-err').textContent = getLang() === 'he' ? `יש לבחור ${p.picks} ניחוחות (נבחרו ${picks.length})` : `Please choose ${p.picks} scents (${picks.length} chosen)`; $('.picker').scrollIntoView({ block: 'center' }); return; }
-      else opt = picks.join(', ');
+      else opt = (opt ? opt + ' · ' : '') + picks.join(', ');
     }
     $('#add-err').textContent = '';
     db.addToCart(f.dataset.id, d.get('size'), qty, opt); toast(t('added'));
