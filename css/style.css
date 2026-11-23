@@ -4071,3 +4071,10 @@ body.page-lock{position:fixed;inset-inline:0;width:100%;overflow:hidden}
 .dx-q{margin-top:1.2rem}
 @media (min-width:900px){.ch-media{height:min(46vw,520px)}.ch-body{margin-top:-2.2rem}.ch-feats{gap:1.2rem;max-width:680px}.ch-feats li{font-size:.86rem}.ch-ic{width:62px;height:62px}.ch-ic svg{width:30px;height:30px}}
 @media (max-width:360px){.ch-feats li{font-size:.7rem}.ch-ic{width:46px;height:46px}.ch-ic svg{width:22px;height:22px}}
+/* desktop: keep the film at its true 3:2 shape, centred on the cream set, so products are never cut */
+@media (min-width:900px){
+  .ch{background:radial-gradient(70% 60% at 50% 22%,#FFFDF8 0%,#F3EADB 55%,#EFE4D1 100%)}
+  .ch-media{height:auto;aspect-ratio:3/2;width:min(100%,780px);margin:0 auto;background:transparent;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%)}
+  .ch-media::after{background:linear-gradient(180deg,rgba(251,248,243,0) 60%,rgba(243,234,219,.75) 85%,#F1E7D6 100%)}
+  .ch-body{margin-top:-3rem}
+}
