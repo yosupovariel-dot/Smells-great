@@ -4078,3 +4078,21 @@ body.page-lock{position:fixed;inset-inline:0;width:100%;overflow:hidden}
   .ch-media::after{background:linear-gradient(180deg,rgba(251,248,243,0) 60%,rgba(243,234,219,.75) 85%,#F1E7D6 100%)}
   .ch-body{margin-top:-3rem}
 }
+/* hero v2: the photo dissolves gradually into the cream, and the text rises into the fade (no hard edge) */
+.ch{background:#FAF5EC!important}
+.ch-media{background:transparent!important;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 38%,rgba(0,0,0,.82) 55%,rgba(0,0,0,.45) 72%,rgba(0,0,0,.14) 87%,transparent 100%)!important;mask-image:linear-gradient(180deg,#000 0%,#000 38%,rgba(0,0,0,.82) 55%,rgba(0,0,0,.45) 72%,rgba(0,0,0,.14) 87%,transparent 100%)!important}
+.ch-media::after{display:none!important}
+.ch-body{margin-top:-4.2rem!important}
+.ch h1{font-family:Heebo,Assistant,Arial,sans-serif!important;font-weight:800!important;letter-spacing:-.015em;font-size:clamp(2.1rem,8.4vw,3.4rem)!important}
+.ch-d,.ch-go,.ch-feats li{font-family:Heebo,Assistant,Arial,sans-serif!important}
+.ch-d{font-weight:400;color:#2f2922}
+.ch-feats li{font-weight:500}
+.ch-k{text-shadow:0 1px 0 rgba(255,255,255,.6)}
+@media (min-width:900px){
+  .ch{background:radial-gradient(70% 60% at 50% 22%,#FFFDF8 0%,#F6EFE3 55%,#F2E9DA 100%)!important}
+  .ch-media{-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 45%,rgba(0,0,0,.5) 75%,transparent 100%),linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%)!important;mask-image:linear-gradient(180deg,#000 0%,#000 45%,rgba(0,0,0,.5) 75%,transparent 100%),linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%)!important;-webkit-mask-composite:source-in;mask-composite:intersect}
+  .ch-body{margin-top:-5rem!important}
+}
+.ch-media{height:clamp(270px,74vw,520px)!important;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 58%,rgba(0,0,0,.72) 72%,rgba(0,0,0,.3) 86%,transparent 100%)!important;mask-image:linear-gradient(180deg,#000 0%,#000 58%,rgba(0,0,0,.72) 72%,rgba(0,0,0,.3) 86%,transparent 100%)!important}
+.ch-body{margin-top:-2.6rem!important}
+@media (min-width:900px){.ch-media{height:auto!important;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 58%,rgba(0,0,0,.55) 78%,transparent 100%),linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%)!important;mask-image:linear-gradient(180deg,#000 0%,#000 58%,rgba(0,0,0,.55) 78%,transparent 100%),linear-gradient(90deg,transparent 0,#000 18%,#000 82%,transparent 100%)!important}.ch-body{margin-top:-3.4rem!important}}
