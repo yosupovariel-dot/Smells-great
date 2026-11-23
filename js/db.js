@@ -1,8 +1,8 @@
 // Data layer. Currently backed by browser storage (demo / preview mode).
 // Every function here maps 1:1 to a future server API endpoint — swap the bodies for fetch() calls
 // when hosting is connected. Never trust the client for prices/roles in production: the server must re-validate.
-import { SEED_PRODUCTS } from './data.js?v=261122111222';
-import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261122111222';
+import { SEED_PRODUCTS } from './data.js?v=261123065616';
+import { uid, monthKey, FREE_SHIP, SHIP_COST } from './util.js?v=261123065616';
 
 const K = (k) => 'say9_' + k;
 const read = (k, d) => { try { const v = localStorage.getItem(K(k)); return v ? JSON.parse(v) : d; } catch { return d; } };

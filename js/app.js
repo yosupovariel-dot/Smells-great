@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261122111222';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261122111222';
-import { CATEGORIES } from './data.js?v=261122111222';
-import * as db from './db.js?v=261122111222';
-import * as S from './views-shop.js?v=261122111222';
-import * as Lg from './views-legal.js?v=261122111222';
-import * as A from './views-admin.js?v=261122111222';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261123065616';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261123065616';
+import { CATEGORIES } from './data.js?v=261123065616';
+import * as db from './db.js?v=261123065616';
+import * as S from './views-shop.js?v=261123065616';
+import * as Lg from './views-legal.js?v=261123065616';
+import * as A from './views-admin.js?v=261123065616';
 
 // Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
 if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
@@ -234,7 +234,7 @@ function filmAutoplay() {
   filmObs = new IntersectionObserver((es) => es.forEach((x) => { const v = x.target; if (still || v.dataset.user === 'paused') return; if (x.isIntersecting) v.play().catch(() => {}); else v.pause(); v.parentElement.classList.toggle('paused', v.paused); }), { threshold: 0.55 });
   vids.forEach((v) => filmObs.observe(v));
 }
-function reelMotion() { filmAutoplay(); if (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop')) $$('.cat-film video').forEach((v) => { v.pause(); v.removeAttribute('autoplay'); }); const v = $('.rl-vid video'); if (v && (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop'))) { v.pause(); v.removeAttribute('autoplay'); } }
+function reelMotion() { filmAutoplay(); if (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop')) $$('.cat-film video, .ch-media video').forEach((v) => { v.pause(); v.removeAttribute('autoplay'); }); const v = $('.rl-vid video'); if (v && (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop'))) { v.pause(); v.removeAttribute('autoplay'); } }
 function floaters() {
   let hid = false; try { hid = !!sessionStorage.getItem('say_vipf'); } catch {}
   if (hid || /^#\/(checkout|account|done|club)/.test(location.hash)) $('.vipf')?.remove();
@@ -547,6 +547,7 @@ document.addEventListener('click', async (e) => {
     case 'gd-jump': e.preventDefault(); document.getElementById(el.dataset.t)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); break;
     case 'oil-add': { db.addToCart(id, el.dataset.size, 1); closeModal(); rerender(); if (!location.hash.startsWith('#/checkout')) openCart(); toast(getLang() === 'he' ? 'התמצית נוספה להזמנה' : 'Oil added'); break; }
     case 'oil-skip': { closeModal(); const f = $('form[data-form="checkout"]'); f?.requestSubmit(); break; }
+    case 'cat-jump': { const t = document.querySelector(el.dataset.to); if (t) t.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); break; }
     case 'gl-quote': {
       const he = getLang() === 'he'; const num = (id) => parseFloat(String($(id)?.value || '').replace(',', '.'));
       const L2 = num('#gl-l'), W2 = num('#gl-w'), T2 = num('#gl-t'); const err = $('#gl-err');

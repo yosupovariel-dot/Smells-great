@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261122111222';
-import { t, L, getLang } from './i18n.js?v=261122111222';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261122111222';
-import * as db from './db.js?v=261122111222';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261123065616';
+import { t, L, getLang } from './i18n.js?v=261123065616';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261123065616';
+import * as db from './db.js?v=261123065616';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -348,15 +348,7 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
     const kit = active().find((p) => p.picks === 14);
     const moods = [['fresh', 'נקי ורגוע', 'Clean & calm', 'כמו מצעים של מלון, רגע אחרי שהחדר סודר.', 'Like hotel sheets, right after housekeeping.', 'ניקיון ורעננות'], ['sweet', 'מפנק ומתוק', 'Cosy & sweet', 'וניל, קפה ומאפה חם — הבית מחבק.', 'Vanilla, coffee, warm pastry — a hug.', 'מאפים ומתוקים'], ['floral', 'רך ופרחוני', 'Soft & floral', 'ורדים, פריחה ושקט של ספא.', 'Roses, blossom and spa calm.', 'טבע וספא'], ['rich', 'עמוק ויוקרתי', 'Rich & luxurious', 'הלובי של מלון חמישה כוכבים.', 'A five-star hotel lobby.', 'בתי מלון ויוקרה']];
     const items = list.filter((p) => !p.picks);
-    return html`<div class="shop-page oz">${catFilm('oils')}
-    <header class="oz-hero">
-      <div class="oz-media"><span class="mist" aria-hidden="true"><i></i><i></i><i></i></span><img src="${c.img}" alt="" width="1600" height="1000" fetchpriority="high"></div>
-      <div class="oz-card">${crumbs}
-        <p class="oz-k">${T(`${items.length} תמציות שמן למפיצי ריח`, `${items.length} fragrance oils`)}</p>
-        <h1>${T('נושמים פנימה.', 'Breathe in.')}<br><em>${T('ומרגישים במלון.', 'You are at the hotel.')}</em></h1>
-        <p>${T('כל תמצית נולדה מזיכרון של מקום. ספרו לנו איך אתם רוצים שהבית ירגיש — ואנחנו נראה לכם מאיפה להתחיל.', 'Every oil began as a memory of a place. Tell us how home should feel — we show you where to start.')}</p>
-      </div>
-    </header>
+    return html`<div class="shop-page oz">${catHero('oils')}
     <div class="wrap">
       <form class="oz-search" role="search" data-form="oil-search"><label for="oz-q"><b>${T('מכירים כבר את הריח?', 'Already know the scent?')}</b>${T('חפשו לפי שם — מלון, בושם או ניחוח', 'Search by name — hotel, perfume or note')}</label>
         <div class="oz-sbox"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="oz-q" name="q" type="search" data-input="oz-q" maxlength="60" autocomplete="off" placeholder="${T('למשל: הילטון, וניל, טום פורד…', 'e.g. Hilton, vanilla, Tom Ford…')}"><button type="submit">${T('חיפוש', 'Search')}</button></div></form>
@@ -372,14 +364,14 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
       <div class="grid shop-grid ox-grid">${items.map((p) => card(p))}</div></section>
     </div></div><div class="block"></div>`;
   }
-  const film = CAT_FILMS.has(cat) && !sub && !q ? catFilm(cat) : '';
-  return html`<div class="shop-page">${film}
-    ${cat === 'diffusers' && !sub && !q ? dxHead(crumbs) : html`    <header class="sp-head cat wrap">
+  const top = CAT_HERO[cat] && !sub && !q;
+  return html`<div class="shop-page">
+    ${top ? html`${catHero(cat)}${cat === 'diffusers' ? dxQuick() : ''}` : html`    <header class="sp-head cat wrap">
       <div class="sp-head-t">${crumbs}<p class="kicker latin">${cat ? (CATEGORIES.find((x) => x.id === cat)?.en || '') : 'Search'}</p><h1>${title}</h1>
         ${c && !soon ? html`<p class="lead">${T(...(CAT_LEAD[cat] || [c.descHe, c.descEn]))}</p>` : ''}</div>
       ${heroImg ? html`<figure class="sp-arch ${cat === 'diffusers' && !sub ? 'studio' : ''}"><img src="${heroImg}" alt="" width="900" height="1100" fetchpriority="high"></figure>` : html`<figure class="sp-arch empty"><img src="assets/img/mark.webp" alt="" width="180" height="156"></figure>`}
     </header>`}
-    <div class="wrap">
+    <div class="wrap" id="cat-start">
       ${catTabs(cat)}
       ${subs.length > 1 ? html`<nav class="stories" aria-label="${T('תת־קטגוריות', 'Subcategories')}">
         <a href="#/shop/${cat}" aria-current="${!sub}"><span class="st-img all">${T('הכל', 'All')}</span><b>${T('הכל', 'All')}</b></a>
@@ -394,6 +386,44 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
 }
 
 // Diffusers: a lit "showroom" stage — every device side by side, sized to scale, each labelled with the space it covers.
+const IC = {
+  drop: '<path d="M12 3c3.5 4.4 6 7.7 6 11a6 6 0 01-12 0c0-3.3 2.5-6.6 6-11z"/>', flask: '<path d="M9 3h6M10 3v6L5 18.5A1.6 1.6 0 006.4 21h11.2a1.6 1.6 0 001.4-2.5L14 9V3M7.5 15h9"/>',
+  leaf: '<path d="M5 19c0-9 5-14 15-15-1 10-6 15-15 15zM5 19l7-7"/>', diamond: '<path d="M6 4h12l3 5-9 11L3 9zM3 9h18M9 4l3 16 3-16"/>',
+  wind: '<path d="M3 9h11a3 3 0 10-3-3M3 13h15a3 3 0 11-3 3M3 17h7"/>', house: '<path d="M3 11l9-7 9 7M5.5 9.5V20h13V9.5M10 20v-5h4v5"/>',
+  speaker: '<path d="M4 9h4l5-4v14l-5-4H4zM16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/>', star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8L3.5 9.7l5.9-.9z"/>',
+  bottle: '<path d="M10 3h4v3h-4zM9 6h6l1 3v11a1 1 0 01-1 1H9a1 1 0 01-1-1V9z"/>', coins: '<ellipse cx="12" cy="6" rx="6" ry="2.5"/><path d="M6 6v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V6M6 10v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-4M6 14v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-4"/>',
+  gift: '<path d="M4 10h16v10H4zM3 7h18v3H3zM12 7v13M12 7c-1.5-3.5-5-3.5-4.5-1 .3 1 2.5 1 4.5 1zm0 0c1.5-3.5 5-3.5 4.5-1-.3 1-2.5 1-4.5 1z"/>',
+  feather: '<path d="M20 4c-8 0-13 5-13 12v4M7 16c5 0 9-3 10-9M10 13h5"/>', flower: '<circle cx="12" cy="12" r="2.2"/><path d="M12 9.8c-1.5-3.5 1.5-5.8 0-6.8-1.5 1 1.5 3.3 0 6.8zM12 14.2c1.5 3.5-1.5 5.8 0 6.8 1.5-1-1.5-3.3 0-6.8zM9.8 12c-3.5 1.5-5.8-1.5-6.8 0 1 1.5 3.3-1.5 6.8 0zM14.2 12c3.5-1.5 5.8 1.5 6.8 0-1-1.5-3.3 1.5-6.8 0z"/>',
+  sparkles: '<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9zM5 15l.6 1.4L7 17l-1.4.6L5 19l-.6-1.4L3 17l1.4-.6z"/>',
+  mosque: '<path d="M4 21V12l2-2 2 2v9M16 21v-9l2-2 2 2v9M8 21v-6a4 4 0 018 0v6M12 5c2 1.5 4 3.5 4 6H8c0-2.5 2-4.5 4-6zM12 3v2M3 21h18"/>',
+  crown: '<path d="M3 18h18M4 18l-1-10 5 4 4-7 4 7 5-4-1 10"/>', frame: '<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 15l5-4 4 3 3-2 6 4"/>',
+  ruler: '<path d="M3 17L17 3l4 4L7 21zM7 13l2 2M10 10l2 2M13 7l2 2"/>',
+};
+const CAT_HERO = {
+  oils: ['PERFUME OILS', 'תמציות שמן למפיצי ריח', 'Fragrance oils for diffusers', 'ניחוחות יוקרתיים בריכוז גבוה לאווירה מושלמת ועמידה לאורך זמן.', 'Luxurious, highly concentrated scents that last.', 'למגוון הניחוחות', 'Explore the scents', '#oz-all',
+    [['drop', 'איכות פרימיום', 'Premium quality'], ['flask', 'לכל סוגי המפיצים', 'For every diffuser'], ['leaf', 'מבחר רחב של ניחוחות', 'A wide range of scents'], ['diamond', 'ריכוז גבוה ועמיד', 'Concentrated & lasting']]],
+  diffusers: ['SCENT DIFFUSERS', 'מפיצי ריח', 'Scent diffusers', 'טכנולוגיה מתקדמת לבישום חללים עם ניחוחות יוקרתיים כמו במלון בוטיק.', 'Advanced space-scenting technology, like a boutique hotel.', 'לכל המפיצים', 'All diffusers', '#cat-start',
+    [['diamond', 'עיצוב יוקרתי ומודרני', 'Luxurious, modern design'], ['wind', 'פיזור אחיד ומתקדם', 'Even, advanced diffusion'], ['house', 'לבית ולעסק', 'Home & business'], ['speaker', 'שקט ועוצמתי', 'Quiet & powerful']]],
+  bundles: ['VALUE BUNDLES', 'מארזים משתלמים', 'Value bundles', 'מפיץ ריח + תמצית שמן – במארז אחד לחוויית בישום שלמה וחסכונית.', 'A diffuser and an oil in one box — complete and better value.', 'למארזים המיוחדים', 'See the bundles', '#cat-start',
+    [['star', 'המוצרים הנבחרים שלנו', 'Our top picks'], ['bottle', 'שילוב מנצח', 'A winning pair'], ['coins', 'חיסכון משתלם', 'Real savings'], ['gift', 'מתנה מושלמת', 'The perfect gift']]],
+  hair: ['HAIR CARE', 'טיפוח השיער', 'Hair care', 'סדרת טיפוח מקצועית לשיער בריא, רך, מבריק ומלא בניחוח יוקרתי.', 'Professional care for healthy, soft, shiny hair.', 'לכל מוצרי השיער', 'All hair care', '#cat-start',
+    [['leaf', 'לשימוש יומיומי', 'For everyday use'], ['flask', 'פורמולה מקצועית', 'Professional formula'], ['feather', 'שיער רך ומבריק', 'Soft, shiny hair'], ['drop', 'הזנה ועומק לחות', 'Deep nourishment']]],
+  home: ['CLEANING & AMBIENCE', 'ניקיון ואווירה', 'Cleaning & ambience', 'מוצרי ניקיון איכותיים עם ניחוח יוקרתי שמשאירים את הבית נקי, רענן ומבושם לאורך זמן.', 'Quality cleaning products with a luxurious scent that lasts.', 'למגוון המוצרים', 'See the products', '#cat-start',
+    [['leaf', 'איכות מקצועית', 'Professional quality'], ['house', 'לכל אזורי הבית', 'For every room'], ['flower', 'ניחוח עוצמתי', 'A strong scent'], ['sparkles', 'ניקיון עמוק ויעיל', 'Deep, effective clean']]],
+  dubai: ['DUBAI PERFUMES', 'בשמי דובאי', 'Dubai perfumes', 'ניחוחות עוצמתיים ומיוחדים בהשראת עולם הבישום של דובאי.', 'Bold, distinctive scents inspired by the perfume world of Dubai.', 'למגוון בשמי דובאי', 'Explore Dubai perfumes', '#cat-start',
+    [['mosque', 'השראה ממדינות המזרח', 'Inspired by the East'], ['bottle', 'ריכוז גבוה ועמיד', 'Concentrated & lasting'], ['diamond', 'איכות פרימיום', 'Premium quality'], ['crown', 'ניחוחות ייחודיים', 'Unique scents']]],
+  glass: ['GLASS ART', 'תמונות זכוכית', 'Glass art', 'תמונות על זכוכית מחוסמת אקסטרה קליר — גלריה אמיתית על הקיר שלכם.', 'Prints on extra-clear tempered glass — a real gallery on your wall.', 'לכל העיצובים', 'All designs', '#cat-start',
+    [['diamond', 'זכוכית מחוסמת 6 מ"מ', '6 mm tempered glass'], ['frame', '4 צורות לבחירה', '4 shapes'], ['ruler', 'מידה בהתאמה אישית', 'Custom sizes'], ['house', 'לבית ולעסק', 'Home & business']]],
+};
+function catHero(cat) {
+  const h = CAT_HERO[cat]; if (!h) return '';
+  const [k, he1, en1, he2, en2, he3, en3, to, feats] = h; const c = CATEGORIES.find((x) => x.id === cat);
+  const media = CAT_FILMS.has(cat) ? html`<video src="assets/video/cat-${cat}.mp4" poster="assets/video/cat-${cat}.webp" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>` : html`<img src="${c?.img || ''}" alt="" width="1600" height="1000" fetchpriority="high">`;
+  return html`<header class="ch"><div class="ch-media">${media}</div>
+    <div class="ch-body wrap"><p class="ch-k latin">${k}</p><h1>${T(he1, en1)}</h1><p class="ch-d">${T(he2, en2)}</p>
+      <button type="button" class="ch-go" data-action="cat-jump" data-to="${to}">${T(he3, en3)} <span aria-hidden="true">›</span></button>
+      <ul class="ch-feats">${feats.map(([ic, fh, fe]) => html`<li><span class="ch-ic">${raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${IC[ic]}</svg>`)}</span>${T(fh, fe)}</li>`)}</ul></div></header>`;
+}
 const CAT_FILMS = new Set(['diffusers', 'oils', 'bundles', 'hair', 'home', 'glass']);
 const CAT_LINE = { diffusers: ['שקט. בלי מים. רק ריח.', 'Silent. Waterless. Just scent.'], oils: ['כל ריח — זיכרון של מקום.', 'Every scent, a memory of a place.'], bundles: ['הכול במארז אחד.', 'Everything in one box.'],
   hair: ['OLIÈRE Paris · טיפוח מקצועי', 'OLIÈRE Paris · professional care'], home: ['ניקיון שעושה שיפוץ.', 'Cleaning that renovates.'], glass: ['גלריה על הקיר שלכם.', 'A gallery on your wall.'] };
@@ -401,6 +431,9 @@ function catFilm(cat) {
   const c = CATEGORIES.find((x) => x.id === cat); const n = active().filter((p) => p.cat === cat && !(cat === 'oils' && p.picks)).length;
   return html`<section class="cat-film" aria-label="${c ? L(c) : ''}"><video src="assets/video/cat-${cat}.mp4" poster="assets/video/cat-${cat}.webp" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>
     <div class="cf-in wrap"><b>${T(...(CAT_LINE[cat] || ['', '']))}</b><small>${n} ${T('מוצרים', 'products')}</small></div></section>`;
+}
+function dxQuick() {
+  return html`<div class="wrap dx-q"><button type="button" class="qs" data-action="search-open"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span><b>${T('יודעים מה אתם מחפשים?', 'Know what you want?')}</b>${T('הקליקו כאן וחפשו לפי דגם, חלל או ריח', 'Tap to search by model, space or scent')}</span><i>${T('חיפוש מהיר', 'Quick search')}</i></button></div>`;
 }
 function dxHead(crumbs) {
   const ids = [['say-car', 'רכב וחדר קטן', 'Car & small room', .34], ['say-room-office', 'עד 20 מ"ר', 'Up to 20 m²', .3], ['say-100', 'עד 100 מ"ר', 'Up to 100 m²', .45], ['say-150', 'עד 150 מ"ר', 'Up to 150 m²', .45], ['say-300', 'עד 300 מ"ר', 'Up to 300 m²', .5], ['say-400', 'לובי ואולם', 'Lobby & hall', 1]];
