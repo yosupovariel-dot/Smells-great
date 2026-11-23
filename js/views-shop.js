@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261123113711';
-import { t, L, getLang } from './i18n.js?v=261123113711';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261123113711';
-import * as db from './db.js?v=261123113711';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261123220917';
+import { t, L, getLang } from './i18n.js?v=261123220917';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261123220917';
+import * as db from './db.js?v=261123220917';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -415,10 +415,13 @@ const CAT_HERO = {
   glass: ['GLASS ART', 'תמונות זכוכית', 'Glass art', 'תמונות על זכוכית מחוסמת אקסטרה קליר — גלריה אמיתית על הקיר שלכם.', 'Prints on extra-clear tempered glass — a real gallery on your wall.', 'לכל העיצובים', 'All designs', '#cat-start',
     [['diamond', 'זכוכית מחוסמת 6 מ"מ', '6 mm tempered glass'], ['frame', '4 צורות לבחירה', '4 shapes'], ['ruler', 'מידה בהתאמה אישית', 'Custom sizes'], ['house', 'לבית ולעסק', 'Home & business']]],
 };
+// Real footage where we have it; product montages elsewhere.
+const HERO_FILM = { oils: 'assets/video/kit-14-film', diffusers: 'assets/video/say-100-film', bundles: 'assets/video/bundles-film' };
 function catHero(cat) {
   const h = CAT_HERO[cat]; if (!h) return '';
   const [k, he1, en1, he2, en2, he3, en3, to, feats] = h; const c = CATEGORIES.find((x) => x.id === cat);
-  const media = CAT_FILMS.has(cat) ? html`<video src="assets/video/cat-${cat}.mp4" poster="assets/video/cat-${cat}.webp" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>` : html`<img src="${c?.img || ''}" alt="" width="1600" height="1000" fetchpriority="high">`;
+  const film = HERO_FILM[cat] || `assets/video/cat-${cat}`;
+  const media = CAT_FILMS.has(cat) ? html`<video src="${film}.mp4" poster="${film}.webp" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video>` : html`<img src="${c?.img || ''}" alt="" width="1600" height="1000" fetchpriority="high">`;
   return html`<header class="ch"><div class="ch-media">${media}</div>
     <div class="ch-body wrap"><p class="ch-k latin">${k}</p><h1>${T(he1, en1)}</h1><p class="ch-d">${T(he2, en2)}</p>
       <button type="button" class="ch-go" data-action="cat-jump" data-to="${to}">${T(he3, en3)} <span aria-hidden="true">›</span></button>
