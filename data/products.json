@@ -320,7 +320,113 @@
   "pack": "assets/products/say-100-6.webp",
   "was": 379,
   "video": "assets/video/say-100-film.mp4",
-  "videoPoster": "assets/video/say-100-film.webp"
+  "videoPoster": "assets/video/say-100-film.webp",
+  "skins": [
+   {
+    "id": "s01",
+    "he": "ורוד פרחוני",
+    "en": "Blush floral",
+    "img": "assets/skins/skin-01.webp"
+   },
+   {
+    "id": "s02",
+    "he": "שחור וזהב",
+    "en": "Black & gold",
+    "img": "assets/skins/skin-02.webp"
+   },
+   {
+    "id": "s03",
+    "he": "רוז גולד כתרים",
+    "en": "Rose-gold crowns",
+    "img": "assets/skins/skin-03.webp"
+   },
+   {
+    "id": "s04",
+    "he": "יהלום ורוד",
+    "en": "Rose diamond",
+    "img": "assets/skins/skin-04.webp"
+   },
+   {
+    "id": "s05",
+    "he": "לבן ותכלת",
+    "en": "White & sky",
+    "img": "assets/skins/skin-05.webp"
+   },
+   {
+    "id": "s06",
+    "he": "רוז גולד פרחים",
+    "en": "Rose-gold blooms",
+    "img": "assets/skins/skin-06.webp"
+   },
+   {
+    "id": "s07",
+    "he": "כסף ויהלומים",
+    "en": "Silver diamonds",
+    "img": "assets/skins/skin-07.webp"
+   },
+   {
+    "id": "s08",
+    "he": "שיש וזהב",
+    "en": "Marble & gold",
+    "img": "assets/skins/skin-08.webp"
+   },
+   {
+    "id": "s09",
+    "he": "נחושת",
+    "en": "Copper",
+    "img": "assets/skins/skin-09.webp"
+   },
+   {
+    "id": "s10",
+    "he": "אפרסק וזהב",
+    "en": "Peach & gold",
+    "img": "assets/skins/skin-10.webp"
+   },
+   {
+    "id": "s11",
+    "he": "מנטה וזהב",
+    "en": "Mint & gold",
+    "img": "assets/skins/skin-11.webp"
+   },
+   {
+    "id": "s12",
+    "he": "ורוד עתיק",
+    "en": "Antique pink",
+    "img": "assets/skins/skin-12.webp"
+   },
+   {
+    "id": "s13",
+    "he": "שמפניה וזהב",
+    "en": "Champagne & gold",
+    "img": "assets/skins/skin-13.webp"
+   },
+   {
+    "id": "s14",
+    "he": "שחור מבריק",
+    "en": "Gloss black",
+    "img": "assets/skins/skin-14.webp"
+   },
+   {
+    "id": "s15",
+    "he": "בטון אפור",
+    "en": "Grey concrete",
+    "img": "assets/skins/skin-15.webp"
+   },
+   {
+    "id": "s16",
+    "he": "עץ טבעי",
+    "en": "Natural wood",
+    "img": "assets/skins/skin-16.webp"
+   },
+   {
+    "id": "s17",
+    "he": "כסף מלכותי",
+    "en": "Royal silver",
+    "img": "assets/skins/skin-17.webp"
+   }
+  ],
+  "skinsFree": 3,
+  "rev": 3
  },
  {
   "id": "say-150",
@@ -5445,7 +5551,112 @@
    "oil-bubbles",
    "oil-pure-rain"
   ],
-  "rev": 2
+  "rev": 3,
+  "skins": [
+   {
+    "id": "s01",
+    "he": "ורוד פרחוני",
+    "en": "Blush floral",
+    "img": "assets/skins/skin-01.webp"
+   },
+   {
+    "id": "s02",
+    "he": "שחור וזהב",
+    "en": "Black & gold",
+    "img": "assets/skins/skin-02.webp"
+   },
+   {
+    "id": "s03",
+    "he": "רוז גולד כתרים",
+    "en": "Rose-gold crowns",
+    "img": "assets/skins/skin-03.webp"
+   },
+   {
+    "id": "s04",
+    "he": "יהלום ורוד",
+    "en": "Rose diamond",
+    "img": "assets/skins/skin-04.webp"
+   },
+   {
+    "id": "s05",
+    "he": "לבן ותכלת",
+    "en": "White & sky",
+    "img": "assets/skins/skin-05.webp"
+   },
+   {
+    "id": "s06",
+    "he": "רוז גולד פרחים",
+    "en": "Rose-gold blooms",
+    "img": "assets/skins/skin-06.webp"
+   },
+   {
+    "id": "s07",
+    "he": "כסף ויהלומים",
+    "en": "Silver diamonds",
+    "img": "assets/skins/skin-07.webp"
+   },
+   {
+    "id": "s08",
+    "he": "שיש וזהב",
+    "en": "Marble & gold",
+    "img": "assets/skins/skin-08.webp"
+   },
+   {
+    "id": "s09",
+    "he": "נחושת",
+    "en": "Copper",
+    "img": "assets/skins/skin-09.webp"
+   },
+   {
+    "id": "s10",
+    "he": "אפרסק וזהב",
+    "en": "Peach & gold",
+    "img": "assets/skins/skin-10.webp"
+   },
+   {
+    "id": "s11",
+    "he": "מנטה וזהב",
+    "en": "Mint & gold",
+    "img": "assets/skins/skin-11.webp"
+   },
+   {
+    "id": "s12",
+    "he": "ורוד עתיק",
+    "en": "Antique pink",
+    "img": "assets/skins/skin-12.webp"
+   },
+   {
+    "id": "s13",
+    "he": "שמפניה וזהב",
+    "en": "Champagne & gold",
+    "img": "assets/skins/skin-13.webp"
+   },
+   {
+    "id": "s14",
+    "he": "שחור מבריק",
+    "en": "Gloss black",
+    "img": "assets/skins/skin-14.webp"
+   },
+   {
+    "id": "s15",
+    "he": "בטון אפור",
+    "en": "Grey concrete",
+    "img": "assets/skins/skin-15.webp"
+   },
+   {
+    "id": "s16",
+    "he": "עץ טבעי",
+    "en": "Natural wood",
+    "img": "assets/skins/skin-16.webp"
+   },
+   {
+    "id": "s17",
+    "he": "כסף מלכותי",
+    "en": "Royal silver",
+    "img": "assets/skins/skin-17.webp"
+   }
+  ],
+  "skinsFree": 3
  },
  {
   "id": "bundle-say150-1l",
@@ -7169,7 +7380,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-002",
@@ -7415,7 +7626,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-003",
@@ -7661,7 +7872,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-004",
@@ -7907,7 +8118,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-005",
@@ -8153,7 +8364,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-006",
@@ -8399,7 +8610,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-007",
@@ -8645,7 +8856,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-008",
@@ -8891,7 +9102,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-009",
@@ -9137,7 +9348,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-010",
@@ -9383,7 +9594,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-011",
@@ -9629,7 +9840,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-012",
@@ -9875,7 +10086,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-013",
@@ -10121,7 +10332,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-014",
@@ -10367,7 +10578,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-015",
@@ -10613,7 +10824,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-016",
@@ -10859,7 +11070,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-017",
@@ -11105,7 +11316,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-018",
@@ -11351,7 +11562,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-019",
@@ -11597,7 +11808,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-020",
@@ -11843,7 +12054,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-021",
@@ -12089,7 +12300,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-022",
@@ -12335,7 +12546,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-023",
@@ -12581,7 +12792,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-024",
@@ -12827,7 +13038,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-025",
@@ -13073,7 +13284,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-026",
@@ -13319,7 +13530,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-027",
@@ -13565,7 +13776,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-028",
@@ -13811,7 +14022,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-029",
@@ -14057,7 +14268,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-030",
@@ -14303,7 +14514,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-031",
@@ -14549,7 +14760,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-032",
@@ -14795,7 +15006,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-033",
@@ -15041,7 +15252,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-034",
@@ -15287,7 +15498,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-035",
@@ -15533,7 +15744,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-036",
@@ -15779,7 +15990,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-037",
@@ -16025,7 +16236,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-038",
@@ -16271,7 +16482,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-039",
@@ -16517,7 +16728,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-040",
@@ -16763,7 +16974,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-041",
@@ -17009,7 +17220,7 @@
   "glass": {
    "set": 2
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-042",
@@ -17255,7 +17466,7 @@
   "glass": {
    "set": 2
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-043",
@@ -17501,7 +17712,7 @@
   "glass": {
    "set": 2
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-044",
@@ -17747,7 +17958,7 @@
   "glass": {
    "set": 2
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-045",
@@ -17993,7 +18204,7 @@
   "glass": {
    "set": 2
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-046",
@@ -18239,7 +18450,7 @@
   "glass": {
    "set": 2
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-047",
@@ -18485,7 +18696,7 @@
   "glass": {
    "set": 2
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-048",
@@ -18731,7 +18942,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-049",
@@ -18977,7 +19188,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-050",
@@ -19223,7 +19434,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-051",
@@ -19469,7 +19680,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-052",
@@ -19715,7 +19926,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-053",
@@ -19961,7 +20172,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-054",
@@ -20207,7 +20418,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-055",
@@ -20453,7 +20664,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-056",
@@ -20699,7 +20910,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-057",
@@ -20945,7 +21156,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-058",
@@ -21191,7 +21402,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-059",
@@ -21437,7 +21648,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-060",
@@ -21683,7 +21894,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-061",
@@ -21929,7 +22140,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-062",
@@ -22175,7 +22386,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-063",
@@ -22421,7 +22632,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-064",
@@ -22667,7 +22878,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-065",
@@ -22913,7 +23124,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-066",
@@ -23159,7 +23370,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-067",
@@ -23405,7 +23616,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-068",
@@ -23651,7 +23862,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-069",
@@ -23897,7 +24108,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-070",
@@ -24143,7 +24354,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-071",
@@ -24389,7 +24600,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-072",
@@ -24635,7 +24846,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-073",
@@ -24881,7 +25092,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-074",
@@ -25127,7 +25338,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-075",
@@ -25373,7 +25584,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-076",
@@ -25619,7 +25830,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-077",
@@ -25865,7 +26076,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-078",
@@ -26111,7 +26322,7 @@
   "glass": {
    "set": 1
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-079",
@@ -26357,7 +26568,7 @@
   "glass": {
    "set": 3
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-080",
@@ -26603,7 +26814,7 @@
   "glass": {
    "set": 3
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-081",
@@ -26849,7 +27060,7 @@
   "glass": {
    "set": 3
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-082",
@@ -27095,7 +27306,7 @@
   "glass": {
    "set": 3
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-083",
@@ -27341,7 +27552,7 @@
   "glass": {
    "set": 3
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-084",
@@ -27587,7 +27798,7 @@
   "glass": {
    "set": 3
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-085",
@@ -27833,7 +28044,7 @@
   "glass": {
    "set": 3
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-086",
@@ -28079,7 +28290,7 @@
   "glass": {
    "set": 3
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-087",
@@ -28325,7 +28536,7 @@
   "glass": {
    "set": 3
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-088",
@@ -28571,7 +28782,7 @@
   "glass": {
    "set": 3
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-089",
@@ -28817,7 +29028,7 @@
   "glass": {
    "set": 3
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "glass-090",
@@ -29063,7 +29274,7 @@
   "glass": {
    "set": 3
   },
-  "rev": 2
+  "rev": 3
  },
  {
   "id": "finel-floor",
@@ -29472,5 +29683,311 @@
   "stock": 50,
   "quote": true,
   "rev": 2
+ },
+ {
+  "id": "glass-hangers",
+  "cat": "glass",
+  "sub": "",
+  "addon": true,
+  "name": {
+   "he": "ערכת תלייה לתמונת זכוכית",
+   "en": "Glass-art hanging kit"
+  },
+  "desc": {
+   "he": "ערכת תלייה לתמונת זכוכית.",
+   "en": "Hanging kit for glass art."
+  },
+  "specs": [],
+  "sizes": [
+   {
+    "label": "יחידה",
+    "price": 10,
+    "wholesale": 8,
+    "cost": 4
+   }
+  ],
+  "options": [
+   {
+    "name": {
+     "he": "צבע",
+     "en": "Colour"
+    },
+    "values": [
+     {
+      "he": "שחור",
+      "en": "Black"
+     },
+     {
+      "he": "כסף",
+      "en": "Silver"
+     },
+     {
+      "he": "זהב",
+      "en": "Gold"
+     },
+     {
+      "he": "זהב מוברש",
+      "en": "Brushed gold"
+     }
+    ]
+   }
+  ],
+  "img": "assets/products/glass-079.webp",
+  "gallery": [],
+  "fit": "cover",
+  "active": true,
+  "stock": 500,
+  "rev": 3
+ },
+ {
+  "id": "glass-custom",
+  "cat": "custom",
+  "sub": "",
+  "name": {
+   "he": "תמונת זכוכית מהתמונה שלכם",
+   "en": "Glass print of your own photo"
+  },
+  "desc": {
+   "he": "הופכים כל תמונה — משפחה, נוף, לוגו של העסק או ברכה — לתמונת זכוכית מחוסמת אקסטרה קליר בעובי 6 מ\"מ.\n\nבוחרים צורה ומידה, מעלים את התמונה ומוסיפים כיתוב אם רוצים. למידה מיוחדת בחרו \"התאמה אישית\" ונחזור עם הצעת מחיר.",
+   "en": "Turn any photo into 6 mm extra-clear tempered glass art. Choose a shape and size, upload your photo and add a caption."
+  },
+  "specs": [
+   [
+    "חומר",
+    "זכוכית מחוסמת אקסטרה קליר"
+   ],
+   [
+    "עובי",
+    "6 מ\"מ"
+   ],
+   [
+    "צורות",
+    "מלבן · פנורמי · ריבוע · התאמה אישית"
+   ]
+  ],
+  "sizes": [
+   {
+    "label": "מלבן 20×30 ס\"מ",
+    "dim": "20×30 ס\"מ",
+    "shape": "rect",
+    "price": 150,
+    "wholesale": 120,
+    "cost": 68
+   },
+   {
+    "label": "מלבן 30×40 ס\"מ",
+    "dim": "30×40 ס\"מ",
+    "shape": "rect",
+    "price": 230,
+    "wholesale": 184,
+    "cost": 104
+   },
+   {
+    "label": "מלבן 30×45 ס\"מ",
+    "dim": "30×45 ס\"מ",
+    "shape": "rect",
+    "price": 250,
+    "wholesale": 200,
+    "cost": 112
+   },
+   {
+    "label": "מלבן 40×60 ס\"מ",
+    "dim": "40×60 ס\"מ",
+    "shape": "rect",
+    "price": 300,
+    "wholesale": 240,
+    "cost": 135
+   },
+   {
+    "label": "מלבן 50×70 ס\"מ",
+    "dim": "50×70 ס\"מ",
+    "shape": "rect",
+    "price": 400,
+    "wholesale": 320,
+    "cost": 180
+   },
+   {
+    "label": "מלבן 60×90 ס\"מ",
+    "dim": "60×90 ס\"מ",
+    "shape": "rect",
+    "price": 500,
+    "wholesale": 400,
+    "cost": 225
+   },
+   {
+    "label": "מלבן 70×100 ס\"מ",
+    "dim": "70×100 ס\"מ",
+    "shape": "rect",
+    "price": 600,
+    "wholesale": 480,
+    "cost": 270
+   },
+   {
+    "label": "מלבן 80×120 ס\"מ",
+    "dim": "80×120 ס\"מ",
+    "shape": "rect",
+    "price": 800,
+    "wholesale": 640,
+    "cost": 360
+   },
+   {
+    "label": "מלבן 100×150 ס\"מ",
+    "dim": "100×150 ס\"מ",
+    "shape": "rect",
+    "price": 1200,
+    "wholesale": 960,
+    "cost": 540
+   },
+   {
+    "label": "מלבן 130×200 ס\"מ",
+    "dim": "130×200 ס\"מ",
+    "shape": "rect",
+    "price": 2100,
+    "wholesale": 1680,
+    "cost": 945
+   },
+   {
+    "label": "פנורמי 30×80 ס\"מ",
+    "dim": "30×80 ס\"מ",
+    "shape": "pano",
+    "price": 300,
+    "wholesale": 240,
+    "cost": 135
+   },
+   {
+    "label": "פנורמי 40×80 ס\"מ",
+    "dim": "40×80 ס\"מ",
+    "shape": "pano",
+    "price": 350,
+    "wholesale": 280,
+    "cost": 158
+   },
+   {
+    "label": "פנורמי 50×100 ס\"מ",
+    "dim": "50×100 ס\"מ",
+    "shape": "pano",
+    "price": 550,
+    "wholesale": 440,
+    "cost": 248
+   },
+   {
+    "label": "פנורמי 60×120 ס\"מ",
+    "dim": "60×120 ס\"מ",
+    "shape": "pano",
+    "price": 650,
+    "wholesale": 520,
+    "cost": 292
+   },
+   {
+    "label": "פנורמי 70×140 ס\"מ",
+    "dim": "70×140 ס\"מ",
+    "shape": "pano",
+    "price": 800,
+    "wholesale": 640,
+    "cost": 360
+   },
+   {
+    "label": "פנורמי 80×160 ס\"מ",
+    "dim": "80×160 ס\"מ",
+    "shape": "pano",
+    "price": 1200,
+    "wholesale": 960,
+    "cost": 540
+   },
+   {
+    "label": "פנורמי 100×200 ס\"מ",
+    "dim": "100×200 ס\"מ",
+    "shape": "pano",
+    "price": 1900,
+    "wholesale": 1520,
+    "cost": 855
+   },
+   {
+    "label": "פנורמי 120×240 ס\"מ",
+    "dim": "120×240 ס\"מ",
+    "shape": "pano",
+    "price": 2600,
+    "wholesale": 2080,
+    "cost": 1170
+   },
+   {
+    "label": "ריבוע 30×30 ס\"מ",
+    "dim": "30×30 ס\"מ",
+    "shape": "square",
+    "price": 250,
+    "wholesale": 200,
+    "cost": 112
+   },
+   {
+    "label": "ריבוע 40×40 ס\"מ",
+    "dim": "40×40 ס\"מ",
+    "shape": "square",
+    "price": 300,
+    "wholesale": 240,
+    "cost": 135
+   },
+   {
+    "label": "ריבוע 50×50 ס\"מ",
+    "dim": "50×50 ס\"מ",
+    "shape": "square",
+    "price": 350,
+    "wholesale": 280,
+    "cost": 158
+   },
+   {
+    "label": "ריבוע 70×70 ס\"מ",
+    "dim": "70×70 ס\"מ",
+    "shape": "square",
+    "price": 550,
+    "wholesale": 440,
+    "cost": 248
+   },
+   {
+    "label": "ריבוע 80×80 ס\"מ",
+    "dim": "80×80 ס\"מ",
+    "shape": "square",
+    "price": 650,
+    "wholesale": 520,
+    "cost": 292
+   },
+   {
+    "label": "ריבוע 100×100 ס\"מ",
+    "dim": "100×100 ס\"מ",
+    "shape": "square",
+    "price": 850,
+    "wholesale": 680,
+    "cost": 382
+   },
+   {
+    "label": "ריבוע 120×120 ס\"מ",
+    "dim": "120×120 ס\"מ",
+    "shape": "square",
+    "price": 1200,
+    "wholesale": 960,
+    "cost": 540
+   },
+   {
+    "label": "ריבוע 130×130 ס\"מ",
+    "dim": "130×130 ס\"מ",
+    "shape": "square",
+    "price": 1300,
+    "wholesale": 1040,
+    "cost": 585
+   }
+  ],
+  "img": "assets/products/glass-075.webp",
+  "gallery": [
+   "assets/products/glass-076.webp",
+   "assets/products/glass-077.webp",
+   "assets/products/glass-078.webp"
+  ],
+  "fit": "cover",
+  "active": true,
+  "stock": 50,
+  "glass": {
+   "set": 1,
+   "upload": true
+  },
+  "rev": 3
  }
 ]

@@ -1,7 +1,7 @@
-import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261123220917';
-import { t, L, getLang } from './i18n.js?v=261123220917';
-import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261123220917';
-import * as db from './db.js?v=261123220917';
+import { html, raw, money, valid, clean, toast, PHONE_DISPLAY, PHONE_INTL, FREE_SHIP, normPhone } from './util.js?v=261125123747';
+import { t, L, getLang } from './i18n.js?v=261125123747';
+import { CATEGORIES, COMPLEMENTS, artSVG, scentOf, STRENGTHS, NOTES } from './data.js?v=261125123747';
+import * as db from './db.js?v=261125123747';
 
 const m = (n) => money(n, getLang());
 const he = () => getLang() === 'he';
@@ -15,7 +15,7 @@ export const media = (p, cls = '', eager = false, src = p.img, full = false) =>
 const catName = (id) => L(CATEGORIES.find((c) => c.id === id));
 // Display names drop the sheet's marketing tail ("ערכות התנסות – מומלץ…" → "ערכות התנסות").
 export const subName = (s) => (he() ? s : db.SITE.site?.subEn?.[s] || s).split(/\s[–-]\s(?!\d)/)[0];
-const active = () => db.products().filter((p) => p.active !== false);
+const active = () => db.products().filter((p) => p.active !== false && !p.addon);
 const minPrice = (p, ws) => Math.min(...p.sizes.map((s) => (ws && s.wholesale ? s.wholesale : s.price)));
 // Customer-facing WhatsApp links open an empty chat (no pre-written message).
 const waLink = (msg) => `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(msg || T('שלום, הגעתי דרך אתר SAY BOUTIQUE ואשמח לעזרה', 'Hi, I came from the SAY BOUTIQUE website'))}`;
@@ -115,6 +115,13 @@ export function card(p, opts = {}) {
 }
 
 // ---------- Home ----------
+const HOME_FILMS = [
+  { v: 'assets/video/say-100-film', pid: 'say-100', href: '#/product/say-100', he: 'SAY 100', en: 'SAY 100' },
+  { v: 'assets/video/kit-14-film', pid: 'kit-14', href: '#/product/kit-14', he: 'ערכת 14 ריחות', en: '14-scent kit' },
+  { v: 'assets/video/cat-hair', href: '#/shop/hair', he: 'טיפוח השיער · OLIÈRE', en: 'Hair care · OLIÈRE' },
+  { v: 'assets/video/cat-glass', href: '#/shop/glass', he: 'תמונות זכוכית', en: 'Glass art' },
+  { v: 'assets/video/cat-home', href: '#/shop/home', he: 'ניקיון ואווירה', en: 'Cleaning & ambience' },
+];
 export const HERO_SLIDES = [
   { pid: 'bundle-say300-1l', he: 'SAY 300 עם תמצית ליטר', en: 'SAY 300 with a litre of oil' },
   { pid: 'bundle-say150-1l', he: 'SAY 150 עם תמצית ליטר', en: 'SAY 150 with a litre of oil' },
@@ -158,25 +165,18 @@ export function home() {
   const kit = all.find((p) => p.picks === 14);
   const families = Object.keys(banners).map((f) => ({ f, img: banners[f], n: all.filter((p) => p.sub === f).length })).filter((x) => x.n);
   return html`
-  <section class="hx" aria-labelledby="hero-t">
-    <div class="h-slides" role="region" aria-roledescription="carousel" aria-label="${T('מוצרים נבחרים', 'Featured')}">
-      ${hero.map((src, i) => html`<figure class="slide ${i ? '' : 'on'}"><img src="${src}" alt="${HERO_SLIDES[i]?.[getLang()] || 'SAY Boutique'}" width="2000" height="968" ${raw(i ? 'fetchpriority="low"' : 'fetchpriority="high"')} decoding="async"></figure>`)}
-    </div>
-    <div class="hx-shade" aria-hidden="true"></div>
-    <div class="hx-copy wrap">
-      <p class="hx-k"><span class="hx-sale">SALE</span>Luxury Home Fragrances</p>
-      <h1 id="hero-t">${T('יוקרה שמרגישים', 'Luxury you can feel')}<br><em>${T('בכל חלל.', 'in every space.')}</em></h1>
-      <p class="hx-lead">${T('מפיצי ריח בעיצוב אישי, מבחר עצום של ניחוחות ותמציות שמן איכותיות – במחירי יבואן לצרכן.', 'Hotel-grade diffusers and fragrance oils for home and business, at importer prices.')}</p>
-      <div class="hx-cta"><a class="hx-btn" href="#/shop">${T('לגלות את הקולקציה', 'Discover the collection')}</a><a class="hx-link" href="#/finder">${T('למצוא את הריח שלי', 'Find my scent')}</a></div>
-    </div>
-    ${hero.length ? html`<div class="h-offers">${HERO_SLIDES.slice(0, hero.length).map((sl, i) => { const p = db.product(sl.pid); const now = p ? minPrice(p) : 0; const was = p?.was > now ? p.was : 0;
-      return html`<a class="h-offer ${i ? '' : 'on'}" href="#/product/${sl.pid}"><small class="h-k">${was ? html`<em class="h-sale">${T('מבצע', 'Sale')}</em>` : T('בחירת הבוטיק ✦', 'Boutique pick ✦')}</small><b>${sl[getLang()]}</b>
-        <span class="h-price">${now ? html`${was ? html`<s>${m(was)}</s>` : ''}<strong>${m(now)}</strong>` : html`<strong>${T('מחיר מיוחד — בוואטסאפ', 'Special price on WhatsApp')}</strong>`}</span><i><span>${T('לפרטים והזמנה', 'View & order')}</span> ${arrow()}</i></a>`; })}</div>
-    <div class="h-dots" aria-hidden="true">${hero.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>
-    <div class="sr-only">${hero.map((_, i) => html`<button data-action="slide" data-i="${i}" aria-label="${T('שקופית', 'Slide')} ${i + 1}" aria-current="${i === 0}"></button>`)}</div>` : ''}
-  </section>
-  <div class="hx-under"><p>${T('מפיצי ריח בעיצוב אישי, מבחר עצום של ניחוחות ותמציות שמן איכותיות – במחירי יבואן לצרכן.', 'Hotel-grade diffusers and fragrance oils for home and business, at importer prices.')}</p>
-    <div class="hx-cta"><a class="hx-btn" href="#/shop">${T('לגלות את הקולקציה', 'Discover the collection')}</a><a class="hx-link" href="#/finder">${T('למצוא את הריח שלי', 'Find my scent')}</a></div></div>
+  ${(() => { const slides = HOME_FILMS.map((x) => ({ ...x, p: x.pid ? db.product(x.pid) : null }));
+    return html`<header class="ch hh" aria-labelledby="hero-t"><div class="ch-media hh-media" role="region" aria-roledescription="carousel" aria-label="${T('סרטונים', 'Films')}">
+      ${slides.map((x, i) => html`<figure class="hh-s ${i ? '' : 'on'}"><video src="${x.v}.mp4" poster="${x.v}.webp" muted loop playsinline ${raw(i ? 'preload="none"' : 'autoplay preload="auto"')} aria-hidden="true"></video></figure>`)}
+      <div class="hh-chips">${slides.map((x, i) => { const now = x.p ? minPrice(x.p) : 0; const was = x.p?.was > now ? x.p.was : 0;
+        return html`<a class="hh-c ${i ? '' : 'on'}" href="${x.href}">${was ? html`<em>${T('מבצע', 'Sale')}</em>` : ''}<b>${T(x.he, x.en)}</b>${now ? html`<span>${was ? html`<s>${m(was)}</s>` : ''}${m(now)}</span>` : ''}<i aria-hidden="true">‹</i></a>`; })}</div>
+      <div class="h-dots" aria-hidden="true">${slides.map((_, i) => html`<i class="${i ? '' : 'on'}"></i>`)}</div>
+      <div class="sr-only">${slides.map((_, i) => html`<button data-action="slide" data-i="${i}" aria-label="${T('סרטון', 'Film')} ${i + 1}"></button>`)}</div></div>
+    <div class="ch-body wrap"><p class="ch-k latin"><span class="hh-sale">SALE</span>Luxury Home Fragrances</p>
+      <h1 id="hero-t">${T('יוקרה שמרגישים', 'Luxury you can feel')} <em>${T('בכל חלל.', 'in every space.')}</em></h1>
+      <p class="ch-d">${T('מפיצי ריח בעיצוב אישי, מבחר עצום של ניחוחות ותמציות שמן איכותיות – במחירי יבואן לצרכן.', 'Hotel-grade diffusers and fragrance oils for home and business, at importer prices.')}</p>
+      <div class="hh-cta"><a class="ch-go" href="#/shop">${T('לגלות את הקולקציה', 'Discover the collection')} <span aria-hidden="true">›</span></a><a class="hh-link" href="#/finder">${T('למצוא את הריח שלי', 'Find my scent')}</a></div></div></header>`; })()}
+
   <ul class="usp" aria-label="${T('למה SAY', 'Why SAY')}"><li><b>5</b>${T('שנות פעילות', 'years in business')}</li><li><b>₪</b>${T('מחירי יבואן לצרכן', 'importer prices')}</li><li><b>✦</b>${T('מבחר עצום של ניחוחות', 'a huge choice of scents')}</li><li><b>⌂</b>${T('שירות בפריסה ארצית', 'nationwide service')}</li></ul>
 
   <nav class="hxc" aria-label="${t('categories')}"><div class="wrap"><div class="hxc-row">${CATEGORIES.map((c) => { const n = all.filter((p) => p.cat === c.id).length; return html`<a href="#/shop/${c.id}" class="${n ? '' : 'soon'}"><span class="hxc-img"><img src="${small(c.id === 'diffusers' ? 'assets/products/say-150-3.webp' : c.img || 'assets/img/mark.webp')}" alt="" width="120" height="120" loading="lazy"></span><b>${L(c)}</b>${n ? '' : html`<small>${T('בקרוב', 'soon')}</small>`}</a>`; })}</div></div></nav>
@@ -268,7 +268,16 @@ const CAT_LEAD = {
   bundles: ['מכשיר ומילוי במארז אחד, במחיר שמשתלם יותר.', 'A device and refill in one box, for less.'],
 };
 const PRICE_BANDS = [['', T('הכל', 'All')], ['0-100', T('עד 100₪', 'Up to ₪100')], ['100-300', '100–300₪'], ['300-9999', T('מעל 300₪', 'Over ₪300')]];
-const sortBar = (q, sort, n, f = {}, scent = true) => { const active_ = (f.str ? 1 : 0) + (f.notes?.length || 0) + (f.stock ? 1 : 0) + (f.space ? 1 : 0) + (f.color ? 1 : 0); return html`<div class="toolbar2">
+const CAT_SEARCH = {
+  hair: [['כבר יודעים מה השיער שלכם אוהב?', 'Know what your hair loves?'], ['חפשו את המוצר האהוב עליכם לפי שם, סדרה או סוג הטיפול.', 'Search by name, line or treatment.'], ['למשל: מסכה, Hydra Wave, סרום…', 'e.g. mask, Hydra Wave, serum…']],
+  glass: [['איזו יצירה תספר את הסיפור שלכם?', 'Which piece tells your story?'], ['חפשו לפי סגנון, נושא או עיצוב ומצאו את התמונה שתשלים את החלל שלכם.', 'Search by style or subject and find the piece for your space.'], ['למשל: אריות, נוף, ברכת הבית…', 'e.g. lions, landscape, home blessing…']],
+  home: [['כבר יודעים מה הבית שלכם צריך?', 'Know what your home needs?'], ['חפשו לפי מוצר, סדרה או ניחוח — ונמצא את הפתרון הנקי ביותר.', 'Search by product, line or scent.'], ['למשל: רובה, אבנית, מרכך, NIKITA…', 'e.g. grout, limescale, softener…']],
+  bundles: [['מחפשים את המארז המושלם?', 'Looking for the perfect bundle?'], ['הקלידו דגם, נפח או סוג מארז — ונראה לכם מה הכי משתלם.', 'Type a model, volume or bundle type.'], ['למשל: מארז רכב, SAY 150, ליטר…', 'e.g. car kit, SAY 150, litre…']],
+  dubai: [['כבר מכירים את הבושם?', 'Already know the perfume?'], ['חפשו לפי שם או תו ריח.', 'Search by name or note.'], ['חפשו בושם', 'Search perfumes']],
+};
+const LIST_T = { oils: ['כל התמציות', 'All oils'], diffusers: ['כל המפיצים', 'All diffusers'], bundles: ['כל המארזים', 'All bundles'], hair: ['כל מוצרי השיער', 'All hair care'], home: ['כל מוצרי הניקיון', 'All cleaning'], glass: ['כל העיצובים', 'All designs'], dubai: ['כל הבשמים', 'All perfumes'] };
+const listHead = (title, kicker) => html`<header class="lst-h"><span class="lst-k latin">${kicker || 'THE COLLECTION'}</span><h2>${title}</h2><i class="lst-orn" aria-hidden="true"></i></header>`;
+const sortBar = (q, sort, n, f = {}, scent = true) => { const active_ = (f.str ? 1 : 0) + (f.notes?.length || 0) + (f.stock ? 1 : 0) + (f.space ? 1 : 0) + (f.color ? 1 : 0) + (f.sub2 ? 1 : 0); return html`<div class="toolbar2">
   <div class="tb-btns">
     ${scent ? '' : raw('<!--')}<button class="tb-btn" data-action="filter-open" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg><span>${T('סינון', 'Filter')}</span>${active_ ? html`<em>${active_}</em>` : ''}</button>${scent ? '' : raw('-->')}
     <label class="tb-btn sel"><span class="sr-only">${t('sortBy')}</span><select id="sort" data-input="sort">
@@ -283,8 +292,9 @@ export function filterSheet(f = {}, cat = '') {
     <form data-form="filter">
       ${cat === 'diffusers' ? html`<fieldset><legend>${T('גודל החלל', 'Space size')}</legend><div class="fs-opts">${[['', T('הכל', 'All')], ...(db.SITE.subs?.['מפיצי ריח'] || []).map((x) => [x, subName(x)])].map(([v, l2]) => html`<label><input type="radio" name="space" value="${v}" ${raw((f.space || '') === v ? 'checked' : '')}><span>${l2}</span></label>`)}</div></fieldset>
       <fieldset><legend>${T('צבע', 'Colour')}</legend><div class="fs-opts">${[['', T('הכל', 'All')], ['לבן', T('לבן', 'White')], ['שחור', T('שחור', 'Black')], ['ברונזה', T('ברונזה', 'Bronze')], ['כסף', T('כסוף / אפור', 'Silver / grey')]].map(([v, l2]) => html`<label><input type="radio" name="color" value="${v}" ${raw((f.color || '') === v ? 'checked' : '')}><span>${l2}</span></label>`)}</div></fieldset>` : html`
+      ${cat !== 'oils' && cat ? (() => { const subs = (db.SITE.subs?.[CATEGORIES.find((x) => x.id === cat)?.he] || []).filter((s2) => active().some((p) => p.sub === s2)); return subs.length ? html`<fieldset><legend>${cat === 'hair' ? T('סדרה', 'Line') : T('סוג', 'Type')}</legend><div class="fs-opts">${[['', T('הכל', 'All')], ...subs.map((x) => [x, subName(x)])].map(([v, l2]) => html`<label><input type="radio" name="sub2" value="${v}" ${raw((f.sub2 || '') === v ? 'checked' : '')}><span>${l2}</span></label>`)}</div></fieldset>` : ''; })() : html`
       <fieldset><legend>${T('עוצמת הריח', 'Scent strength')}</legend><div class="fs-opts">${[['', 'הכל', 'All'], ...STRENGTHS].map(([v, h, e]) => html`<label><input type="radio" name="str" value="${v}" ${raw((f.str || '') === v ? 'checked' : '')}><span>${T(h, e)}</span></label>`)}</div></fieldset>
-      <fieldset><legend>${T('אופי הריח', 'Scent character')} <small>${T('אפשר לבחור כמה', 'pick any')}</small></legend><div class="fs-opts">${NOTES.map(([v, h, e]) => html`<label><input type="checkbox" name="notes" value="${v}" ${raw(f.notes?.includes(v) ? 'checked' : '')}><span>${T(h, e)}</span></label>`)}</div></fieldset>`}
+      <fieldset><legend>${T('אופי הריח', 'Scent character')} <small>${T('אפשר לבחור כמה', 'pick any')}</small></legend><div class="fs-opts">${NOTES.map(([v, h, e]) => html`<label><input type="checkbox" name="notes" value="${v}" ${raw(f.notes?.includes(v) ? 'checked' : '')}><span>${T(h, e)}</span></label>`)}</div></fieldset>`}`}
       <label class="switch big"><input type="checkbox" name="stock" ${raw(f.stock ? 'checked' : '')}><span></span>${T('במלאי בלבד', 'In stock only')}</label>
       <button class="btn block" type="submit">${T('הצגת תוצאות', 'Show results')}</button>
     </form></aside></div>`;
@@ -296,12 +306,14 @@ const catTabs = (cat) => html`<nav class="cat-pills" aria-label="${t('categories
 </nav>`;
 
 export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
+  if (cat === 'custom' && !q) { const pp = productPage('glass-custom'); return html`<div class="shop-page custom-pg">${catHero('custom')}<div id="cat-start"></div>${pp || ''}</div><div class="block"></div>`; }
   let list = active();
   if (f.space) list = list.filter((p) => p.cat !== 'diffusers' || p.sub === f.space);
   if (f.color) list = list.filter((p) => p.cat !== 'diffusers' || (p.options?.[0]?.values || []).some((v) => (f.color === 'כסף' ? /כסף|כסוף|אפור|silver|grey/i : new RegExp(f.color)).test(v.he)));
   if (f.str) list = list.filter((p) => p.cat !== 'oils' || scentOf(p).strength === f.str);
   if (f.notes?.length) list = list.filter((p) => p.cat !== 'oils' || scentOf(p).notes.some((n) => f.notes.includes(n)));
   if (f.stock) list = list.filter((p) => p.quote || p.stock > 0);
+  if (f.sub2 && cat && (db.SITE.subs?.[CATEGORIES.find((x) => x.id === cat)?.he] || []).includes(f.sub2)) list = list.filter((p) => p.sub === f.sub2);
   if (cat) list = list.filter((p) => p.cat === cat);
   if (sub) list = list.filter((p) => p.sub === sub);
   if (q) list = list.filter((p) => matchProduct(p, q));
@@ -359,7 +371,7 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
       <section class="oz-worlds" aria-labelledby="oz-w"><h2 id="oz-w">${T('או בחרו עולם', 'Or pick a world')}</h2>
         <div class="oz-wrail">${worlds.map(({ s2, n }) => html`<a class="oz-w" href="#/shop/oils/${encodeURIComponent(s2)}"><img src="${small(subImg('oils', s2))}" alt="" loading="lazy" width="500" height="650"><span><small>${n} ${T('ריחות', 'scents')}</small><b>${subName(s2)}</b></span></a>`)}</div>
       </section>
-      <section id="oz-all" class="oz-all"><h2>${f.notes?.length ? T('הריחות שמתאימים לכם', 'Your matches') : T('כל התמציות', 'All oils')}</h2>
+      <section id="oz-all" class="oz-all">${listHead(f.notes?.length ? T('הריחות שמתאימים לכם', 'Your matches') : T('כל התמציות', 'All oils'))}
       ${sortBar(q, sort, items.length, f)}
       <div class="grid shop-grid ox-grid">${items.map((p) => card(p))}</div></section>
     </div></div><div class="block"></div>`;
@@ -377,10 +389,11 @@ export function shop(cat, q = '', sort = 'pop', sub = '', f = {}) {
         <a href="#/shop/${cat}" aria-current="${!sub}"><span class="st-img all">${T('הכל', 'All')}</span><b>${T('הכל', 'All')}</b></a>
         ${subs.map((s2) => html`<a href="#/shop/${cat}/${encodeURIComponent(s2)}" aria-current="${s2 === sub}"><span class="st-img ${cat === 'diffusers' ? 'studio' : ''}"><img src="${small(subImg(cat, s2))}" alt="" width="160" height="160" loading="lazy"></span><b>${subName(s2)}</b></a>`)}
       </nav>` : ''}
-      ${!soon && cat && cat !== 'diffusers' ? html`<form class="oz-search cat-search" role="search" data-form="cat-search"><label for="cq"><b>${T('מחפשים משהו מסוים?', 'Looking for something specific?')}</b>${T(`הקלידו מה שבא לכם — גם עם שגיאת כתיב נמצא`, 'Type anything — typos are fine')}</label>
-        <div class="oz-sbox"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="cq" name="q" type="search" data-input="cat-q" maxlength="60" autocomplete="off" placeholder="${cat === 'bundles' ? T('למשל: מארז רכב, SAY 150, ליטר, ניקיון…', 'e.g. car kit, SAY 150, litre…') : T('חפשו לפי שם או סוג', 'Search by name or type')}"><button type="submit">${T('חיפוש', 'Search')}</button></div></form>` : ''}
+      ${!soon && cat && cat !== 'diffusers' ? html`<form class="oz-search cat-search" role="search" data-form="cat-search"><label for="cq"><b>${T(...(CAT_SEARCH[cat]?.[0] || ['מחפשים משהו מסוים?', 'Looking for something specific?']))}</b>${T(...(CAT_SEARCH[cat]?.[1] || ['הקלידו מה שבא לכם — גם עם שגיאת כתיב נמצא', 'Type anything — typos are fine']))}</label>
+        <div class="oz-sbox"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="cq" name="q" type="search" data-input="cat-q" maxlength="60" autocomplete="off" placeholder="${T(...(CAT_SEARCH[cat]?.[2] || ['חפשו לפי שם או סוג', 'Search by name or type']))}"><button type="submit">${T('חיפוש', 'Search')}</button></div></form>` : ''}
       ${soon ? html`<div class="soon-box"><p class="eyebrow latin">Coming soon</p><h2>${T('הקולקציה תעלה בקרוב', 'The collection is coming soon')}</h2><p>${T('אנחנו מכינים עבורכם קולקציה חדשה. רוצים לשמוע ראשונים או להזמין כבר עכשיו?', 'A new collection is on its way. Want to hear first or order now?')}</p><a class="btn" href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('לפרטים בוואטסאפ', 'Ask on WhatsApp')}</a></div>` : html`
-      ${sortBar(q, sort, list.length, f, cat === 'oils' || cat === 'diffusers' || !!q)}
+      ${list.length || q ? listHead(sub ? subName(sub) : q ? T('תוצאות החיפוש', 'Search results') : T(...(LIST_T[cat] || ['כל המוצרים', 'All products']))) : ''}
+      ${sortBar(q, sort, list.length, f, true)}
       ${list.length ? html`<div class="grid shop-grid">${list.map((p) => card(p))}</div><p class="cat-none" hidden>${T('לא מצאנו התאמה. נסו מילה אחרת — או ', 'No match. Try another word — or ')}<a href="${waLink()}" target="_blank" rel="noopener noreferrer">${T('שאלו אותנו בוואטסאפ', 'ask us on WhatsApp')}</a></p>` : html`<div class="empty"><p>${T('לא נמצאו מוצרים בסינון הנוכחי. אפשר לשנות או לאפס את המסננים.', 'No products match these filters.')}</p><button class="btn ghost" data-action="filter-clear">${T('איפוס המסננים', 'Reset filters')}</button></div>`}`}
     </div></div><div class="block"></div>`;
 }
@@ -412,6 +425,8 @@ const CAT_HERO = {
     [['leaf', 'איכות מקצועית', 'Professional quality'], ['house', 'לכל אזורי הבית', 'For every room'], ['flower', 'ניחוח עוצמתי', 'A strong scent'], ['sparkles', 'ניקיון עמוק ויעיל', 'Deep, effective clean']]],
   dubai: ['DUBAI PERFUMES', 'בשמי דובאי', 'Dubai perfumes', 'ניחוחות עוצמתיים ומיוחדים בהשראת עולם הבישום של דובאי.', 'Bold, distinctive scents inspired by the perfume world of Dubai.', 'למגוון בשמי דובאי', 'Explore Dubai perfumes', '#cat-start',
     [['mosque', 'השראה ממדינות המזרח', 'Inspired by the East'], ['bottle', 'ריכוז גבוה ועמיד', 'Concentrated & lasting'], ['diamond', 'איכות פרימיום', 'Premium quality'], ['crown', 'ניחוחות ייחודיים', 'Unique scents']]],
+  custom: ['CUSTOM DESIGN', 'עיצוב והתאמה אישית', 'Custom design', 'מעלים תמונה, בוחרים צורה ומידה, ומקבלים יצירת זכוכית שהיא רק שלכם.', 'Upload a photo, pick a shape and size, and get glass art that is yours alone.', 'בואו נעצב', 'Start designing', '#cat-start',
+    [['frame', 'מהתמונה שלכם', 'From your photo'], ['feather', 'כיתוב אישי', 'Personal text'], ['ruler', 'כל מידה', 'Any size'], ['diamond', 'זכוכית 6 מ"מ', '6 mm glass']]],
   glass: ['GLASS ART', 'תמונות זכוכית', 'Glass art', 'תמונות על זכוכית מחוסמת אקסטרה קליר — גלריה אמיתית על הקיר שלכם.', 'Prints on extra-clear tempered glass — a real gallery on your wall.', 'לכל העיצובים', 'All designs', '#cat-start',
     [['diamond', 'זכוכית מחוסמת 6 מ"מ', '6 mm tempered glass'], ['frame', '4 צורות לבחירה', '4 shapes'], ['ruler', 'מידה בהתאמה אישית', 'Custom sizes'], ['house', 'לבית ולעסק', 'Home & business']]],
 };
@@ -481,21 +496,34 @@ function cmpPrice(p, s, priceOf) {
   if (p.cat === 'oils') { const base = p.sizes.find((x) => ml(x.label)); const v = ml(s.label); if (base && v && s !== base) { const was = Math.round((priceOf(base) / ml(base.label)) * v); if (was > now) return { was, save: Math.round((1 - now / was) * 100) }; } return { was: 0, save: 0 }; }
   return p.was > now ? { was: p.was, save: Math.round((1 - now / p.was) * 100) } : { was: 0, save: 0 };
 }
+// SAY 100 skins: pick up to three designs (included with the device).
+function skinPicker(p) {
+  const n = p.skinsFree || 3;
+  return html`<fieldset class="skins" aria-describedby="sk-n"><legend><span><b>${T('טפטים להלבשת המכשיר', 'Device skins')}</b><small>${T(`בחרו עד ${n} עיצובים — מתנה עם המכשיר`, `Pick up to ${n} designs — included free`)}</small></span><em id="sk-n" class="sk-n" aria-live="polite">0/${n}</em></legend>
+    <div class="sk-grid" data-max="${n}">${p.skins.map((k) => html`<label class="sk"><input type="checkbox" name="skin" value="${k.he}" data-input="skin"><span><img src="${k.img}" alt="" loading="lazy" width="360" height="520"><b>${L(k)}</b></span></label>`)}</div>
+    <p class="sk-hint">${T('לא בחרתם? נשלח את 3 העיצובים האהובים ביותר.', 'No choice? We send our 3 most-loved designs.')}</p></fieldset>`;
+}
 // Printed glass: shape first (rectangle / panoramic / square / custom), then the sizes of that shape.
 const SHAPES = [['rect', 'מלבן', 'Rectangle', '<rect x="3" y="6" width="18" height="12" rx="1"/>'], ['pano', 'פנורמי', 'Panoramic', '<rect x="1.5" y="8.5" width="21" height="7" rx="1"/>'], ['square', 'ריבוע', 'Square', '<rect x="5" y="5" width="14" height="14" rx="1"/>'], ['custom', 'התאמה אישית', 'Custom', '<rect x="4" y="4" width="16" height="16" rx="1" stroke-dasharray="3 2.5"/><path d="M9 12h6M12 9v6"/>']];
 function glassPicker(p, priceOf) {
-  const set = p.glass?.set || 1;
+  const set = p.glass?.set || 1; const up = !!p.glass?.upload;
+  const fileBlock = (sfx) => html`<div class="gl-up"><label class="gl-file" for="gl-f${sfx}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg><span><b>${T('צירוף קובץ תמונה', 'Attach a photo')}</b><small class="gl-fname" id="gl-fn${sfx}">${T('JPG או PNG, באיכות הכי גבוהה שיש לכם', 'JPG or PNG, best quality you have')}</small></span><input type="file" id="gl-f${sfx}" accept="image/*" data-input="gl-file" data-sfx="${sfx}"></label><img class="gl-prev" id="gl-pv${sfx}" alt="" hidden>
+      <div class="field"><label for="gl-cap${sfx}">${T('כיתוב על התמונה (רשות)', 'Text on the print (optional)')}</label><input class="input" id="gl-cap${sfx}" maxlength="80" placeholder="${T('למשל: משפחת כהן · ברוכים הבאים', 'e.g. The Cohens · Welcome')}"></div></div>`;
   return html`<fieldset class="gl-shape"><legend>${T('בחרו צורה', 'Choose a shape')}</legend><div class="gl-shapes">${SHAPES.map(([k, h, e, ic], i) => html`<label class="gl-sh"><input type="radio" name="shape" value="${k}" data-input="gl-shape" ${raw(i ? '' : 'checked')}><span>${raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg>`)}<b>${T(h, e)}</b></span></label>`)}</div></fieldset>
-    ${SHAPES.slice(0, 3).map(([k, h, e], gi) => html`<fieldset class="sizes gl-sizes" data-shape="${k}" ${raw(gi ? 'hidden' : '')}><legend>${T('מידה (ס"מ)', 'Size (cm)')}${set > 1 ? html` <small>${set === 2 ? T('· מחיר לזוג', '· price per pair') : T('· מחיר לשלישייה', '· price per set of 3')}</small>` : ''}</legend>
+    ${SHAPES.slice(0, 3).map(([k], gi) => html`<fieldset class="gl-sizes" data-shape="${k}" ${raw(gi ? 'hidden' : '')}><legend>${T('מידה (ס"מ)', 'Size (cm)')}${set > 1 ? html` <small>${set === 2 ? T('· מחיר לזוג', '· price per pair') : T('· מחיר לשלישייה', '· price per set of 3')}</small>` : ''}</legend>
       <div class="gl-grid">${p.sizes.filter((x) => x.shape === k).map((x, i) => html`<label class="gl-size"><input type="radio" name="size" value="${x.label}" data-input="size" data-price="${priceOf(x)}" data-was="0" data-save="0" ${raw(!gi && !i ? 'checked' : '')}><span><b dir="ltr">${x.dim.replace(' ס"מ', '')}</b><em>${m(priceOf(x))}</em></span></label>`)}</div></fieldset>`)}
-    <div class="gl-custom" hidden><p class="gl-c-t">${T('ספרו לנו את המידה שאתם צריכים — ונחזור עם הצעת מחיר.', 'Tell us the size you need and we will send a quote.')}</p>
+    ${up ? html`<div class="gl-upwrap"><p class="gl-c-t">${T('התמונה שלכם', 'Your photo')}</p>${fileBlock('2')}</div>` : ''}
+    <fieldset class="gl-hang"><label class="gl-hang-t"><input type="checkbox" name="hang" data-input="gl-hang"><span><b>${T('להוסיף ערכת תלייה', 'Add a hanging kit')}</b><small>+${m(10)}</small></span></label>
+      <div class="gl-hcol" hidden>${[['שחור', 'Black', 'k'], ['כסף', 'Silver', 's'], ['זהב', 'Gold', 'g'], ['זהב מוברש', 'Brushed gold', 'b']].map(([h, e, c], i) => html`<label class="gl-hc"><input type="radio" name="hangc" value="${h}" ${raw(i ? '' : 'checked')}><span><i class="hc-${c}" aria-hidden="true"></i>${T(h, e)}</span></label>`)}</div></fieldset>
+    <div class="gl-custom" hidden><p class="gl-c-t">${T('ספרו לנו מה אתם צריכים — ונחזור עם הצעת מחיר.', 'Tell us what you need and we will send a quote.')}</p>
       <div class="gl-c-row"><div class="field"><label for="gl-l">${T('אורך (ס"מ)', 'Length (cm)')}</label><input class="input" id="gl-l" inputmode="decimal" maxlength="6" placeholder="120"></div>
         <div class="field"><label for="gl-w">${T('רוחב (ס"מ)', 'Width (cm)')}</label><input class="input" id="gl-w" inputmode="decimal" maxlength="6" placeholder="80"></div>
-        <div class="field"><label for="gl-t">${T('עובי (מ"מ)', 'Thickness (mm)')}</label><input class="input" id="gl-t" inputmode="decimal" maxlength="4" placeholder="6"></div></div>
-      <div class="field"><label for="gl-n">${T('הערות (רשות)', 'Notes (optional)')}</label><input class="input" id="gl-n" maxlength="200" placeholder="${T('למשל: הדפסה של תמונה משלי', 'e.g. print my own photo')}"></div>
+        <div class="field"><label for="gl-t">${T('עובי', 'Thickness')}</label><select class="input" id="gl-t"><option value="6 מ&quot;מ – סטנדרט">${T('6 מ"מ – סטנדרט', '6 mm – standard')}</option><option value="עובי אחר">${T('עובי אחר', 'Other')}</option></select></div></div>
+      ${fileBlock('')}
+      <div class="field"><label for="gl-n">${T('מה עוד חשוב לנו לדעת? (רשות)', 'Anything else? (optional)')}</label><textarea class="input" id="gl-n" rows="3" maxlength="400" placeholder="${T('למשל: הדפסה של תמונה משלי, לוגו לעסק, צבעים מסוימים', 'e.g. my own photo, a business logo, specific colours')}"></textarea></div>
       <p class="err" id="gl-err" role="alert"></p>
       <button type="button" class="btn block gl-go" data-action="gl-quote" data-name="${L(p.name)}">${T('שליחת בקשה להצעת מחיר', 'Request a quote')}</button>
-      <p class="gl-done" hidden>${T('מעולה! ההודעה מוכנה בוואטסאפ — נחזור אליכם עם הצעת מחיר.', 'Done — your message is ready on WhatsApp. We will reply with a quote.')}</p></div>`;
+      <p class="gl-done" hidden>${T('מעולה! הבקשה מוכנה בוואטסאפ — נחזור אליכם עם הצעת מחיר.', 'Done — your request is ready on WhatsApp. We will reply with a quote.')}</p></div>`;
 }
 const FILM_COPY = {
   'say-100': [['רואים את השקט. מריחים את המלון.', 'See the calm. Smell the hotel.'], ['SAY 100 בפעולה — אידוי קר, בלי מים ובלי חום, וריח של לובי יוקרתי שממלא את הבית.', 'SAY 100 at work — cold-air diffusion, no water, no heat, and a lobby scent that fills the home.']],
@@ -516,13 +544,13 @@ function specBoxes(p) {
   const ctl = spec(p, 'שליטה ובקרה', 'שליטה'); const ctlS = /wi-?fi/i.test(ctl) ? 'Wi-Fi + אפליקציה' : /אפליקציה|bluetooth/i.test(ctl) ? 'אפליקציה + Bluetooth' : shortV(ctl) || shortV(spec(p, 'חיישן חכם')) || 'לחצן הפעלה';
   const pow = shortV(spec(p, 'הספק', 'מקור כוח'));
   const fill = shortV(spec(p, 'קיבולת מכל שמן', 'קיבולת בקבוק שמן', 'קיבולת בקבוק מילוי'));
-  const box = (ic, k, v) => v ? html`<li>${raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg>`)}<span><small>${k}</small><b>${v}</b></span></li>` : '';
-  return html`<ul class="pdp-specs">
-    ${box('<path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6"/>', T('כיסוי', 'Coverage'), cov)}
-    ${box('<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>', T('שליטה', 'Control'), ctlS.length > 26 ? ctlS.slice(0, 24) + '…' : ctlS)}
-    ${box('<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>', T('הספק', 'Power'), pow.length > 20 ? pow.slice(0, 18) + '…' : pow)}
-    ${box('<path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/>', T('מילוי', 'Tank'), fill)}
-  </ul>`;
+  const noise = spec(p, 'רמת רעש'); const noiseS = (noise.match(/\d+\s*dBA?/i) || [''])[0] ? `${T('עד', 'up to')} ${(noise.match(/\d+\s*dBA?/i))[0].replace(/\s+/g, '')}` : noise ? T('שקט במיוחד', 'Ultra quiet') : '';
+  const src = spec(p, 'מקור כוח'); const srcS = /סוללה נטענת/.test(src) ? T('סוללה נטענת', 'Rechargeable') : /USB|סוללות/.test(src) ? T('USB או סוללות', 'USB or batteries') : '';
+  const ctlShort = /טיימר/.test(ctl) && !/אפליקציה|wi-?fi|bluetooth/i.test(ctl) ? T('טיימר חכם', 'Smart timer') : ctlS;
+  const items = [['<path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6"/>', T('כיסוי', 'Coverage'), cov], ['<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>', T('שליטה', 'Control'), ctlShort.length > 22 ? ctlShort.slice(0, 20) + '…' : ctlShort],
+    ['<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>', T('הספק', 'Power'), pow.length > 14 ? pow.slice(0, 12) + '…' : pow], ['<path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/>', T('מילוי', 'Tank'), fill],
+    ['<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9.5l4 5M21 9.5l-4 5"/>', T('רעש', 'Noise'), noiseS], ['<rect x="3" y="7" width="16" height="10" rx="2"/><path d="M21 10.5v3M7 10.5v3"/>', T('הפעלה', 'Power source'), srcS]].filter((x) => x[2]).slice(0, 4);
+  return html`<ul class="pdp-specs n${items.length}">${items.map(([ic, k, v]) => html`<li>${raw(`<svg viewBox="0 0 24 24" aria-hidden="true">${ic}</svg>`)}<span><small>${k}</small><b>${v}</b></span></li>`)}</ul>`;
 }
 const fitBlock = (p) => FIT[p.id] ? html`<div class="fit"><b>${T('מתאים ל:', 'Suits:')}</b>${FIT[p.id].map((x) => html`<span>${x}</span>`)}${(spec(p, 'שטח כיסוי').match(/עד\s*[\d,]+\s*מ"[רק]/) || [])[0] ? html`<em>${(spec(p, 'שטח כיסוי').match(/עד\s*[\d,]+\s*מ"[רק]/))[0]}</em>` : ''}</div>` : '';
 
@@ -567,6 +595,7 @@ export function productPage(id) {
         ${opt ? html`<fieldset class="sizes"><legend>${L(opt.name)}</legend>
           ${opt.values.map((v, i) => html`<label class="size-opt sw-opt"><input type="radio" name="opt" value="${v.he}" ${raw(i ? '' : 'checked')} data-input="opt" data-img="${v.imgs?.[0] || ''}"><span>${opt.name?.he === 'ניחוח' ? '' : html`<i class="sw ${swatch(v.he)}" aria-hidden="true"></i>`}${L(v)}</span></label>`)}
         </fieldset>` : ''}
+        ${p.skins?.length ? skinPicker(p) : ''}
         ${p.picks ? html`<fieldset class="picker pk" aria-describedby="pick-count"><legend class="pk-head"><span><b>${p.picks === 1 ? T('בחרו את הניחוח', 'Choose your scent') : T(`בחרו ${p.picks} ניחוחות`, `Choose ${p.picks} scents`)}</b><small>${T('פתחו עולם ריח וסמנו את מה שמסקרן אתכם', 'Open a scent world and tap what intrigues you')}</small></span><span id="pick-count" class="pk-count" aria-live="polite">0/${p.picks}</span></legend>
           <p class="pk-hint">${p.cat === 'bundles' ? (p.picks === 1 ? T('איזה ריח ימלא את הבית? בחרו את התמצית שתגיע במארז.', 'Which scent fills your home? Pick the oil for your bundle.') : T(`בחרו ${p.picks} ריחות שיגיעו במארז — או שנבחר בשבילכם.`, `Pick ${p.picks} scents for your bundle — or let us choose.`)) : T('בחרו את הריחות שאתם כבר מכירים, ואנחנו נעזור לכם להשלים את הערכה.', 'Pick the scents you know; we will help complete the kit.')}</p>
           
@@ -1184,4 +1213,14 @@ export function oilNudge(ctx = 'checkout') {
     <a class="on-more" href="#/shop/oils" data-action="modal-close"><span><b>${T('מחפשים ריח אחר?', 'Looking for another scent?')}</b><small>${T(`לכל ${active().filter((p) => p.cat === 'oils' && !p.picks).length} התמציות — מלונות, בשמים, טבע ומתוקים`, 'All our oils — hotels, perfumes, nature and sweet')}</small></span><i aria-hidden="true">${arrow()}</i></a>
     <button class="on-skip" data-action="${ctx === 'add' ? 'oil-later' : 'oil-skip'}">${ctx === 'add' ? T('אולי אחר כך — להמשיך לקנות', 'Maybe later — keep shopping') : T('להמשיך בלי תמצית', 'Continue without oil')}</button>
   </div></div>`;
+}
+
+// After adding a custom glass print: the photo still has to reach us (no upload server yet).
+export function glassFileNote() {
+  return html`<div class="modal-bg on-bg"><div class="oln gfn" role="dialog" aria-modal="true" aria-labelledby="gfn-t">
+    <button class="on-x" data-action="modal-close" aria-label="${t('close')}">×</button>
+    <p class="c3-k">${T('✓ נוסף לסל', '✓ Added to your bag')}</p><h2 id="gfn-t">${T('עוד צעד קטן — שלחו לנו את התמונה', 'One more step — send us the photo')}</h2>
+    <p class="on-sub">${T('כדי שנתחיל לעבוד על ההדפסה, שלחו את הקובץ בוואטסאפ. בטלפון הוא יצורף לבד.', 'Send the file on WhatsApp so we can start. On a phone it attaches automatically.')}</p>
+    <button class="btn block gold" type="button" data-action="gl-share">${T('שליחת התמונה בוואטסאפ', 'Send the photo on WhatsApp')}</button>
+    <button class="on-skip" data-action="oil-later">${T('אשלח אחר כך — להמשך הקנייה', 'Later — keep shopping')}</button></div></div>`;
 }

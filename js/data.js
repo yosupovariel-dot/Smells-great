@@ -7,6 +7,7 @@ export const CATEGORIES = [
   { id: 'hair', he: 'טיפוח השיער', en: 'Hair Care', descHe: 'OLIÈRE Paris — טיפוח מקצועי לשיער', descEn: 'OLIÈRE Paris professional hair care', img: 'assets/products/hair-1.webp' },
   { id: 'home', he: 'ניקיון ואווירה', en: 'Cleaning & Ambience', descHe: 'NIKITA ופינל — ניקיון שעושה שיפוץ', descEn: 'NIKITA & Finel cleaning', img: 'assets/products/cat-home.webp' },
   { id: 'glass', he: 'תמונות זכוכית', en: 'Glass Art', descHe: 'תמונות זכוכית לקיר — מוכנות ובהתאמה אישית', descEn: 'Glass wall art, ready-made and custom', img: 'assets/products/cat-glass.webp' },
+  { id: 'custom', he: 'עיצוב והתאמה אישית', en: 'Custom design', descHe: 'תמונת זכוכית מהתמונה שלכם', descEn: 'Glass art from your own photo', img: 'assets/products/glass-075.webp' },
   { id: 'bundles', he: 'מארזים משתלמים', en: 'Value Bundles', descHe: 'מכשיר + מילוי במחיר מיוחד', descEn: 'Device + refill deals', img: 'assets/products/bundle-3.webp' },
 ];
 

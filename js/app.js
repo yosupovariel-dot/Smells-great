@@ -1,10 +1,10 @@
-import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261123220917';
-import { t, getLang, setLang, applyLang } from './i18n.js?v=261123220917';
-import { CATEGORIES } from './data.js?v=261123220917';
-import * as db from './db.js?v=261123220917';
-import * as S from './views-shop.js?v=261123220917';
-import * as Lg from './views-legal.js?v=261123220917';
-import * as A from './views-admin.js?v=261123220917';
+import { html, raw, render, $, $$, toast, trapFocus, debounce, valid, clean, PHONE_DISPLAY, PHONE_INTL, normPhone } from './util.js?v=261125123747';
+import { t, getLang, setLang, applyLang } from './i18n.js?v=261125123747';
+import { CATEGORIES } from './data.js?v=261125123747';
+import * as db from './db.js?v=261125123747';
+import * as S from './views-shop.js?v=261125123747';
+import * as Lg from './views-legal.js?v=261125123747';
+import * as A from './views-admin.js?v=261125123747';
 
 // Clickjacking guard: GitHub Pages cannot send frame-ancestors, so refuse to run inside a foreign frame.
 if (window.top !== window.self) { try { window.top.location = window.self.location.href; } catch { document.documentElement.innerHTML = ''; } throw new Error('framed'); }
@@ -157,7 +157,7 @@ function startTicker() {
 // ---------- Hero slides ----------
 let slideTimer, slideIdx = 0;
 function showSlide(i) {
-  const ss = $$('.slide'); if (!ss.length) return;
+  const ss = $$('.slide, .hh-s'); if (!ss.length) return;
   slideIdx = (i + ss.length) % ss.length;
   // Never reveal a slide whose image hasn't finished loading — keep the current one instead.
   const img = ss[slideIdx].querySelector('img');
@@ -166,7 +166,9 @@ function showSlide(i) {
   $$('.dots button').forEach((b, k) => b.setAttribute('aria-current', k === slideIdx));
   const n = $('#slide-n'); if (n) n.textContent = String(slideIdx + 1).padStart(2, '0');
   $$('.h-progress i, .h-dots i').forEach((b, k) => b.classList.toggle('on', k === slideIdx));
-  $$('.h-offer').forEach((o, k) => o.classList.toggle('on', k === slideIdx));
+  $$('.hh-c').forEach((o, k) => o.classList.toggle('on', k === slideIdx));
+  $$('.hh-s video').forEach((v, k) => { if (k === slideIdx) { v.preload = 'auto'; if (!(matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('a11y-stop'))) v.play().catch(() => {}); } else v.pause(); });
+  if (!$('.hh')) $$('.h-offer').forEach((o, k) => o.classList.toggle('on', k === slideIdx));
   const cap = $('#slide-cap'); const sl = S.HERO_SLIDES?.[slideIdx];
   if (cap && sl) { cap.textContent = sl[getLang()]; cap.href = '#/product/' + sl.pid; }
 }
@@ -205,14 +207,14 @@ let mx = null;
 document.addEventListener('mousedown', (e) => { if (e.target.closest('.h-slides')) { mx = e.clientX; e.preventDefault(); } });
 document.addEventListener('mouseup', (e) => { if (mx === null) return; const dx = e.clientX - mx; mx = null; if (Math.abs(dx) < 40) return; showSlide(slideIdx + (dx < 0 ? 1 : -1)); clearInterval(slideTimer); });
 let tx = null, ty = 0;
-document.addEventListener('touchstart', (e) => { if (e.target.closest('.hx') && e.touches.length === 1) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; } }, { passive: true });
+document.addEventListener('touchstart', (e) => { if (e.target.closest('.hx, .hh-media') && e.touches.length === 1) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; } }, { passive: true });
 document.addEventListener('touchend', (e) => {
   if (tx === null) return; const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; tx = null;
   if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
   const fwd = document.dir === 'rtl' ? dx > 0 : dx < 0; showSlide(slideIdx + (fwd ? 1 : -1)); clearInterval(slideTimer);
-  if (e.target.closest('.h-offer')) { const a = e.target.closest('.h-offer'); a.dataset.swiped = '1'; setTimeout(() => delete a.dataset.swiped, 400); }
+  if (e.target.closest('.h-offer, .hh-c')) { const a = e.target.closest('.h-offer, .hh-c'); a.dataset.swiped = '1'; setTimeout(() => delete a.dataset.swiped, 400); }
 }, { passive: true });
-document.addEventListener('click', (e) => { const a = e.target.closest('.h-offer[data-swiped]'); if (a) e.preventDefault(); }, true);
+document.addEventListener('click', (e) => { const a = e.target.closest('.h-offer[data-swiped], .hh-c[data-swiped]'); if (a) e.preventDefault(); }, true);
 // Category circles row: gentle auto-scroll on phones, pauses when touched.
 let catTimer, catHold = 0;
 function startCatRail() {
@@ -238,12 +240,13 @@ function reelMotion() { filmAutoplay(); if (matchMedia('(prefers-reduced-motion:
 function floaters() {
   let hid = false; try { hid = !!sessionStorage.getItem('say_vipf'); } catch {}
   if (hid || /^#\/(checkout|account|done|club)/.test(location.hash)) $('.vipf')?.remove();
+  const vt = $('.vipf'), hd = $('.hdr'); if (vt && hd && vt.parentElement !== hd) hd.append(vt);
   const top = $('.fab-top'); if (top) { const f = () => top.classList.toggle('show', window.scrollY > 500); window.removeEventListener('scroll', window.__topf || f); window.__topf = f; window.addEventListener('scroll', f, { passive: true }); f(); }
 }
 function startSlides() {
   clearInterval(slideTimer); slideIdx = 0;
-  if (!$('.slide') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  slideTimer = setInterval(() => { if (!tickPaused) showSlide(slideIdx + 1); }, 5500);
+  if (!$('.slide, .hh-s') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  slideTimer = setInterval(() => { if (!tickPaused) showSlide(slideIdx + 1); }, $('.hh-s') ? 7000 : 5500);
 }
 
 // ---------- Consent ----------
@@ -550,12 +553,14 @@ document.addEventListener('click', async (e) => {
     case 'cat-jump': { const t = document.querySelector(el.dataset.to); if (t) t.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); break; }
     case 'gl-quote': {
       const he = getLang() === 'he'; const num = (id) => parseFloat(String($(id)?.value || '').replace(',', '.'));
-      const L2 = num('#gl-l'), W2 = num('#gl-w'), T2 = num('#gl-t'); const err = $('#gl-err');
+      const L2 = num('#gl-l'), W2 = num('#gl-w'); const err = $('#gl-err');
       if (!(L2 > 0 && L2 <= 600) || !(W2 > 0 && W2 <= 600)) { err.textContent = he ? 'נא לכתוב אורך ורוחב בסנטימטרים' : 'Please enter length and width in cm'; break; }
-      err.textContent = ''; const note = clean($('#gl-n')?.value || '', 200);
-      const txt = `שלום, אשמח להצעת מחיר לתמונת זכוכית בהתאמה אישית\nדגם: ${clean(el.dataset.name || '', 80)}\nמידה: ${L2} × ${W2} ס"מ${T2 > 0 ? `\nעובי: ${T2} מ"מ` : ''}${note ? `\nהערות: ${note}` : ''}`;
-      window.open(`https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(txt)}`, '_blank', 'noopener');
+      err.textContent = ''; const th = clean($('#gl-t')?.value || '', 40); const cap = clean($('#gl-cap')?.value || '', 80); const note = clean($('#gl-n')?.value || '', 400); const fl = $('#gl-f')?.files?.[0];
+      const hang = $('[name="hang"]')?.checked ? clean($('[name="hangc"]:checked')?.value || '', 20) : '';
+      const txt = `שלום, אשמח להצעת מחיר לתמונת זכוכית בהתאמה אישית\n${el.dataset.name ? `דגם: ${clean(el.dataset.name, 80)}\n` : ''}מידה: ${L2} × ${W2} ס"מ\nעובי: ${th || '6 מ"מ – סטנדרט'}${cap ? `\nכיתוב: ${cap}` : ''}${hang ? `\nערכת תלייה: ${hang}` : ''}${note ? `\nהערות: ${note}` : ''}${fl ? '\n(מצורפת תמונה)' : ''}`;
+      shareToWhatsApp(txt, fl);
       const done = $('.gl-done'); if (done) done.hidden = false; break; }
+    case 'gl-share': { shareToWhatsApp(getLang() === 'he' ? 'שלום, מצורפת התמונה להזמנת תמונת הזכוכית שלי' : 'Hi, here is the photo for my glass order', state.glFile); break; }
     case 'film-toggle': { const v = el.parentElement.querySelector('video'); if (v.paused) { v.play().catch(() => {}); v.dataset.user = ''; } else { v.pause(); v.dataset.user = 'paused'; } el.parentElement.classList.toggle('paused', v.paused); break; }
     case 'film-sound': { const v = el.parentElement.querySelector('video'); v.muted = !v.muted; if (!v.muted && v.paused) v.play().catch(() => {}); el.setAttribute('aria-pressed', String(!v.muted)); el.classList.toggle('on', !v.muted); el.setAttribute('aria-label', getLang() === 'he' ? (v.muted ? 'הפעלת צליל' : 'השתקה') : (v.muted ? 'Turn sound on' : 'Mute')); break; }
     case 'reel-toggle': { const v = el.parentElement.querySelector('video'); const he = getLang() === 'he'; if (v.paused) { v.play(); el.setAttribute('aria-pressed', 'false'); el.setAttribute('aria-label', he ? 'עצירת הסרטון' : 'Pause video'); el.classList.remove('paused'); } else { v.pause(); el.setAttribute('aria-pressed', 'true'); el.setAttribute('aria-label', he ? 'הפעלת הסרטון' : 'Play video'); el.classList.add('paused'); } break; }
@@ -671,6 +676,11 @@ document.addEventListener('input', (e) => {
   const now = [f.city.value.trim(), f.street.value.trim(), f.apt.value.trim()].join('|'); const he = getLang() === 'he';
   lbl.textContent = now === def ? (he ? 'זו הכתובת הראשית שלי להזמנות הבאות' : 'This is my main address for next orders') : (he ? 'לשמור את השינוי ככתובת הראשית שלי להזמנות הבאות' : 'Save this change as my main address');
 });
+// Send text (and a photo when the device can share files) to WhatsApp. Without file sharing, WhatsApp opens with the text and the photo is attached in the chat.
+function shareToWhatsApp(text, file) {
+  if (file && navigator.canShare?.({ files: [file] })) { navigator.share({ files: [file], text }).catch(() => {}); return; }
+  window.open(`https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(text + (file ? (getLang() === 'he' ? '\n(אצרף את התמונה כאן בצ׳אט)' : '\n(I will attach the photo here)') : ''))}`, '_blank', 'noopener');
+}
 function keepFocus(sel) { setTimeout(() => { const i = $(sel); if (i && document.activeElement !== i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); } }, 300); }
 document.addEventListener('change', (e) => {
   const el = e.target; const k = el.dataset.input; if (!k) return;
@@ -685,10 +695,17 @@ document.addEventListener('change', (e) => {
     if (note) note.hidden = !w || !!el.dataset.sale;
     const k = $('.ml10'); if (k) k.hidden = !/^10\s*מ"ל$|^10\s*ml$/i.test(el.value.trim());
   }
+  if (k === 'skin') { const box = el.closest('.sk-grid'); const max = +box.dataset.max; const on = $$('[data-input="skin"]:checked', box); if (on.length > max) { el.checked = false; toast(getLang() === 'he' ? `אפשר לבחור עד ${max} עיצובים` : `Up to ${max} designs`); } const n = $('#sk-n'); if (n) n.textContent = `${$$('[data-input="skin"]:checked', box).length}/${max}`; }
+  if (k === 'gl-hang') { const c = $('.gl-hcol'); if (c) c.hidden = !el.checked; }
+  if (k === 'gl-file') { const fl = el.files?.[0]; const sfx = el.dataset.sfx || ''; const pv = $('#gl-pv' + sfx); const fn = $('#gl-fn' + sfx);
+    if (fl && !/^image\//.test(fl.type)) { el.value = ''; toast(getLang() === 'he' ? 'אפשר לצרף רק קובץ תמונה' : 'Images only'); return; }
+    if (fl && fl.size > 25 * 1024 * 1024) { el.value = ''; toast(getLang() === 'he' ? 'הקובץ גדול מ־25MB' : 'File over 25MB'); return; }
+    if (pv) { if (pv.src) URL.revokeObjectURL(pv.src); if (fl) { pv.src = URL.createObjectURL(fl); pv.hidden = false; } else pv.hidden = true; }
+    if (fn && fl) fn.textContent = fl.name; state.glFile = fl || null; }
   if (k === 'gl-shape') {
     const custom = el.value === 'custom';
     $$('.gl-sizes').forEach((g) => (g.hidden = custom || g.dataset.shape !== el.value));
-    const c = $('.gl-custom'); if (c) c.hidden = !custom; const br = $('.pdp .buy-row'); if (br) br.hidden = custom; const pp = $('#pdp-price'); if (pp) pp.hidden = custom;
+    const c = $('.gl-custom'); if (c) c.hidden = !custom; const br = $('.pdp .buy-row'); if (br) br.hidden = custom; const pp = $('#pdp-price'); if (pp) pp.hidden = custom; const uw = $('.gl-upwrap'); if (uw) uw.hidden = custom; const hg = $('.gl-hang'); if (hg) hg.hidden = custom;
     if (!custom) { const r = $(`.gl-sizes[data-shape="${el.value}"] input[name="size"]`); if (r) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); } }
   }
   if (k === 'opt' && el.dataset.img) {
@@ -734,8 +751,13 @@ document.addEventListener('submit', async (e) => {
       else if (picks.length !== p.picks) { $('#add-err').textContent = getLang() === 'he' ? `יש לבחור ${p.picks} ניחוחות (נבחרו ${picks.length})` : `Please choose ${p.picks} scents (${picks.length} chosen)`; $('.picker').scrollIntoView({ block: 'center' }); return; }
       else opt = (opt ? opt + ' · ' : '') + picks.join(', ');
     }
+    const skins = d.getAll('skin').map((x) => clean(x, 40)).slice(0, p.skinsFree || 3);
+    if (p.skins?.length) opt = (opt ? opt + ' · ' : '') + (getLang() === 'he' ? 'טפטים: ' : 'Skins: ') + (skins.length ? skins.join(', ') : (getLang() === 'he' ? 'הפופולריים' : 'most loved'));
+    if (p.glass?.upload) { const cap = clean($('#gl-cap2')?.value || '', 80); const fl = $('#gl-f2')?.files?.[0]; if (!fl) { $('#add-err').textContent = getLang() === 'he' ? 'נא לצרף את התמונה שתרצו להדפיס' : 'Please attach your photo'; $('.gl-upwrap')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; } state.glFile = fl; opt = (opt ? opt + ' · ' : '') + (getLang() === 'he' ? 'קובץ: ' : 'File: ') + clean(fl.name, 60) + (cap ? ` · ${getLang() === 'he' ? 'כיתוב' : 'Text'}: ${cap}` : ''); }
     $('#add-err').textContent = '';
     db.addToCart(f.dataset.id, d.get('size'), qty, opt); toast(t('added'));
+    if (p.glass && d.get('hang')) db.addToCart('glass-hangers', 'יחידה', qty, clean(d.get('hangc') || 'שחור', 20));
+    if (p.glass?.upload && state.glFile) { modal(S.glassFileNote()); return; }
     if (p.cat === 'diffusers' && S.needsOil()) modal(S.oilNudge('add')); else if (p.upsellKit && !db.cart().some((l) => db.product(l.pid)?.picks)) modal(S.kitUpsell()); else openCart();
   }
   if (kind === 'club') {
@@ -835,7 +857,7 @@ document.addEventListener('submit', async (e) => {
     window.open(`https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(txt)}`, '_blank', 'noopener');
     f.reset(); err.textContent = ''; toast(t('sent'));
   }
-  if (kind === 'filter') { const d = new FormData(f); const sp = String(d.get('space') || '').slice(0, 80), co = String(d.get('color') || ''); state.f = { str: ['strong', 'soft'].includes(d.get('str')) ? d.get('str') : '', notes: d.getAll('notes').filter((x) => ['sweet', 'fresh', 'floral', 'rich'].includes(x)), stock: !!d.get('stock'), space: (db.SITE.subs?.['מפיצי ריח'] || []).includes(sp) ? sp : '', color: ['לבן', 'שחור', 'ברונזה', 'כסף'].includes(co) ? co : '' }; closeModal(); rerender(); return; }
+  if (kind === 'filter') { const d = new FormData(f); const sp = String(d.get('space') || '').slice(0, 80), co = String(d.get('color') || ''); state.f = { str: ['strong', 'soft'].includes(d.get('str')) ? d.get('str') : '', notes: d.getAll('notes').filter((x) => ['sweet', 'fresh', 'floral', 'rich'].includes(x)), stock: !!d.get('stock'), space: (db.SITE.subs?.['מפיצי ריח'] || []).includes(sp) ? sp : '', color: ['לבן', 'שחור', 'ברונזה', 'כסף'].includes(co) ? co : '', sub2: Object.values(db.SITE.subs || {}).flat().includes(String(d.get('sub2') || '')) ? String(d.get('sub2')) : '' }; closeModal(); rerender(); return; }
   if (kind === 'customer') {
     const d = Object.fromEntries(new FormData(f)); const err = $('#cd-err');
     if (!valid.name(d.name)) { err.textContent = t('required'); return; }
